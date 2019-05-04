@@ -17,13 +17,12 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Sets authentication response from the webview for token acquisition continuation.
         /// </summary>
-        /// <param name="requestCode">Request response code</param>
-        /// <param name="resultCode">Result code from authentication</param>
-        /// <param name="data">Response data from authentication</param>
-        [CLSCompliant(false)]
+        /// <param name="requestCode">Request response code.</param>
+        /// <param name="resultCode">Result code from authentication.</param>
+        /// <param name="data">Response data from authentication.</param>
         public static void SetAuthenticationContinuationEventArgs(int requestCode, Result resultCode, Intent data)
         {
-            RequestContext requestContext = new RequestContext(null, new MsalLogger(Guid.Empty, null));
+            RequestContext requestContext = new RequestContext(null, new OAuth2Logger(Guid.Empty, null));
 
             requestContext.Logger.Info(string.Format(CultureInfo.InvariantCulture, "Received Activity Result({0})", (int)resultCode));
             AuthorizationResult authorizationResult = null;

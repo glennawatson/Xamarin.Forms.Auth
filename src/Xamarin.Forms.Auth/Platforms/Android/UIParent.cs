@@ -13,7 +13,7 @@ namespace Xamarin.Forms.Auth
 {
     /// <summary>
     /// Android specific UI properties for interactive flows, such as the parent activity and
-    /// which browser to use
+    /// which browser to use.
     /// </summary>
     public sealed class UIParent
     {
@@ -25,77 +25,62 @@ namespace Xamarin.Forms.Auth
             ModuleInitializer.EnsureModuleInitialized();
         }
 
-
         /// <summary>
-        /// Default constructor. Should not be used on Android.
+        /// Initializes a new instance of the <see cref="UIParent"/> class.
         /// </summary>
         [Obsolete("This constructor should not be used because this object requires a parameters of type Activity. ")]
         public UIParent() // do not delete this ctor because it exists on NetStandard
         {
-            throw new MsalClientException(MsalError.ActivityRequired, MsalErrorMessage.ActivityRequired);
+            throw new AuthClientException(MsalError.ActivityRequired, "Constructor should not be used because this object requires a parameters of type Activity");
         }
 
         /// <summary>
-        /// Initializes an instance for a provided activity.
+        /// Initializes a new instance of the <see cref="UIParent"/> class.
         /// </summary>
-        /// <param name="activity">parent activity for the call. REQUIRED.</param>
-        [CLSCompliant(false)]
+        /// <param name="activity">The parent activity to call.</param>
         public UIParent(Activity activity)
         {
             CoreUIParent = new CoreUIParent(activity);
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="UIParent"/> class.
         /// Initializes an instance for a provided activity with flag directing the application
-        /// to use the embedded webview instead of the system browser. See https://aka.ms/msal-net-uses-web-browser
+        /// to use the embedded webview instead of the system browser.
         /// </summary>
-        [CLSCompliant(false)]
-        public UIParent(Activity activity, bool useEmbeddedWebview) : this(activity)
+        /// <param name="activity">The parent activity to call.</param>
+        /// <param name="useEmbeddedWebview">Flag to determine between embedded vs system browser.</param>
+        public UIParent(Activity activity, bool useEmbeddedWebview)
+            : this(activity)
         {
             CoreUIParent.UseEmbeddedWebview = useEmbeddedWebview;
         }
 
-        #if ANDROID_RUNTIME
         /// <summary>
+        /// Initializes a new instance of the <see cref="UIParent"/> class.
         /// Platform agnostic constructor that allows building an UIParent from a NetStandard assembly.
         /// On Android, the parent is expected to be an Activity.
         /// </summary>
-        /// <remarks>This constructor is only avaiable at runtime, to provide support for NetStandard</remarks>
+        /// <remarks>This constructor is only avaiable at runtime, to provide support for NetStandard.</remarks>
         /// <param name="parent">Android Activity on which to parent the web UI. Cannot be null.</param>
-        /// <param name="useEmbeddedWebview">Flag to determine between embedded vs system browser. See https://aka.ms/msal-net-uses-web-browser </param>
+        /// <param name="useEmbeddedWebview">Flag to determine between embedded vs system browser.</param>
         public UIParent(object parent, bool useEmbeddedWebview)
         : this(ValidateParentObject(parent), useEmbeddedWebview)
         {
         }
 
-        #endif
-
-        private static Activity ValidateParentObject(object parent)
-        {
-            if (parent == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(parent) +
-                    " cannot be null on Android platforms. Please pass in an Activity to which to attach a web UI.");
-            }
-
-            if (!(parent is Activity parentActivity))
-            {
-                throw new ArgumentException(nameof(parent) +
-                                            " is expected to be of type Android.App.Activity but is of type " +
-                                            parent.GetType());
-            }
-
-            return parentActivity;
-        }
-
+        /// <summary>
+        /// Gets the core ui parent.
+        /// </summary>
         internal CoreUIParent CoreUIParent { get; }
 
         /// <summary>
         /// Checks Android device for chrome packages.
+        /// </summary>
+        /// <returns>
         /// Returns true if chrome package for launching system webview is enabled on device.
         /// Returns false if chrome package is not found.
-        /// </summary>
+        /// </returns>
         /// <example>
         /// The following code decides, in a Xamarin.Forms app, which browser to use based on the presence of the
         /// required packages.
@@ -109,6 +94,23 @@ namespace Xamarin.Forms.Auth
             bool isBrowserWithCustomTabSupportAvailable = IsBrowserWithCustomTabSupportAvailable();
             return (isBrowserWithCustomTabSupportAvailable || IsChromeEnabled()) &&
                    isBrowserWithCustomTabSupportAvailable;
+        }
+
+        private static Activity ValidateParentObject(object parent)
+        {
+            if (parent == null)
+            {
+                throw new ArgumentNullException(nameof(parent), nameof(parent) + " cannot be null on Android platforms. Please pass in an Activity to which to attach a web UI.");
+            }
+
+            if (!(parent is Activity parentActivity))
+            {
+                throw new ArgumentException(nameof(parent) +
+                                            " is expected to be of type Android.App.Activity but is of type " +
+                                            parent.GetType());
+            }
+
+            return parentActivity;
         }
 
         private static bool IsBrowserWithCustomTabSupportAvailable()

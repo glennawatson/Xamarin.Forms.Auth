@@ -11,9 +11,7 @@ namespace Xamarin.Forms.Auth
     [global::Android.Runtime.Preserve(AllMembers = true)]
     internal class DeviceAuthHelper
     {
-        public static bool CanHandleDeviceAuthChallenge {
-            get { return false; }
-        }
+        public static bool CanHandleDeviceAuthChallenge => false;
 
         public static Task<string> CreateDeviceAuthChallengeResponseAsync(IDictionary<string, string> challengeData)
         {

@@ -33,5 +33,11 @@ namespace Xamarin.Forms.Auth
         /// </summary>
         /// <param name="messageScrubbed">The message.</param>
         void Info(string messageScrubbed);
+
+        /// <summary>
+        /// Logs a verbose message.
+        /// </summary>
+        /// <param name="messageScrubbed">The message.</param>
+        void Verbose(string messageScrubbed);
     }
 }

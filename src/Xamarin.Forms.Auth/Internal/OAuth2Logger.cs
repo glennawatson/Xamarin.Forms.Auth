@@ -11,7 +11,7 @@ namespace Xamarin.Forms.Auth
     {
         private readonly IPlatformLogger _platformLogger;
 
-        internal MsalLogger(Guid correlationId, string component)
+        internal OAuth2Logger(Guid correlationId, string component)
         {
             CorrelationId = correlationId;
             _platformLogger = PlatformProxyFactory.GetPlatformProxy().PlatformLogger;

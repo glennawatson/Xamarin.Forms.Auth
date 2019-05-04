@@ -22,6 +22,9 @@ namespace Xamarin.Forms.Auth
         private IWebUIFactory _overloadWebUiFactory;
 
         /// <inheritdoc />
+        public IPlatformLogger PlatformLogger => _platformLogger.Value;
+
+        /// <inheritdoc />
         public Task<string> GetUserPrincipalNameAsync()
         {
             return Task.FromResult(string.Empty);
@@ -83,7 +86,7 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Considered PII, ensure that it is hashed.
         /// </summary>
-        /// <returns>Name of the calling application</returns>
+        /// <returns>Name of the calling application.</returns>
         public string GetCallingApplicationName()
         {
             return (NSString)NSBundle.MainBundle?.InfoDictionary?["CFBundleName"];
@@ -92,7 +95,7 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Considered PII, ensure that it is hashed.
         /// </summary>
-        /// <returns>Version of the calling application</returns>
+        /// <returns>Version of the calling application.</returns>
         public string GetCallingApplicationVersion()
         {
             return (NSString)NSBundle.MainBundle?.InfoDictionary?["CFBundleVersion"];
@@ -101,27 +104,11 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Considered PII. Please ensure that it is hashed.
         /// </summary>
-        /// <returns>Device identifier</returns>
+        /// <returns>Device identifier.</returns>
         public string GetDeviceId()
         {
             return UIDevice.CurrentDevice?.IdentifierForVendor?.AsString();
         }
-
-        public ILegacyCachePersistence CreateLegacyCachePersistence()
-        {
-            return new iOSLegacyCachePersistence();
-        }
-
-        public ITokenCacheAccessor CreateTokenCacheAccessor()
-        {
-            return new iOSTokenCacheAccessor();
-        }
-
-        /// <inheritdoc />
-        public ICryptographyManager CryptographyManager { get; } = new iOSCryptographyManager();
-
-        /// <inheritdoc />
-        public IPlatformLogger PlatformLogger => _platformLogger.Value;
 
         /// <inheritdoc />
         public IWebUIFactory GetWebUiFactory()

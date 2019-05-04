@@ -13,11 +13,6 @@ namespace Xamarin.Forms.Auth
     internal interface IPlatformProxy
     {
         /// <summary>
-        /// Gets the cryptography manager.
-        /// </summary>
-        ICryptographyManager CryptographyManager { get; }
-
-        /// <summary>
         /// Gets the platform logger.
         /// </summary>
         IPlatformLogger PlatformLogger { get; }

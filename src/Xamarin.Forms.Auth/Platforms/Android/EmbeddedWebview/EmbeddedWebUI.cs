@@ -12,27 +12,31 @@ namespace Xamarin.Forms.Auth
     internal class EmbeddedWebUI : WebviewBase
     {
         private readonly CoreUIParent _coreUIParent;
-        public RequestContext RequestContext { get; internal set; }
 
         public EmbeddedWebUI(CoreUIParent coreUIParent)
         {
             _coreUIParent = coreUIParent;
         }
 
-        public async override Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri, RequestContext requestContext)
+        /// <summary>
+        /// Gets or sets the request context. The request context countains what we are interested in querying.
+        /// </summary>
+        public RequestContext RequestContext { get; internal set; }
+
+        public override async Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri, RequestContext requestContext)
         {
             returnedUriReady = new SemaphoreSlim(0);
 
             try
             {
                 var agentIntent = new Intent(_coreUIParent.CallerActivity, typeof(AuthenticationAgentActivity));
-                agentIntent.PutExtra("Url", authorizationUri.AbsoluteUri);
-                agentIntent.PutExtra("Callback", redirectUri.AbsoluteUri);
+                agentIntent.PutExtra("Url", authorizationUri.AbsoluteUri)
+                    .PutExtra("Callback", redirectUri.AbsoluteUri);
                 _coreUIParent.CallerActivity.StartActivityForResult(agentIntent, 0);
             }
             catch (Exception ex)
             {
-                throw MsalExceptionFactory.GetClientException(
+                throw ExceptionFactory.GetClientException(
                     CoreErrorCodes.AuthenticationUiFailedError,
                     "AuthenticationActivity failed to start",
                     ex);

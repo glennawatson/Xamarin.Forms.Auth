@@ -19,10 +19,23 @@ namespace Xamarin.Forms.Auth
         private const string AboutBlankUri = "about:blank";
         private CoreWebViewClient _client;
 
+        public override void Finish()
+        {
+            if (_client.ReturnIntent != null)
+            {
+                SetResult(Result.Ok, _client.ReturnIntent);
+            }
+            else
+            {
+                SetResult(Result.Canceled, new Intent("ReturnFromEmbeddedWebview"));
+            }
+
+            base.Finish();
+        }
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-            // Create your application here
 
             WebView webView = new WebView(ApplicationContext);
             var relativeLayout = new RelativeLayout(ApplicationContext);
@@ -35,7 +48,7 @@ namespace Xamarin.Forms.Auth
             WebSettings webSettings = webView.Settings;
             string userAgent = webSettings.UserAgentString;
             webSettings.UserAgentString = userAgent + BrokerConstants.ClientTlsNotSupported;
-            MsalLogger.Default.Verbose("UserAgent:" + webSettings.UserAgentString);
+            OAuth2Logger.Default.Verbose("UserAgent:" + webSettings.UserAgentString);
 
             webSettings.JavaScriptEnabled = true;
 
@@ -49,23 +62,9 @@ namespace Xamarin.Forms.Auth
             webView.LoadUrl(url);
         }
 
-        public override void Finish()
-        {
-            if (_client.ReturnIntent != null)
-            {
-                SetResult(Result.Ok, _client.ReturnIntent);
-            }
-            else
-            {
-                SetResult(Result.Canceled, new Intent("ReturnFromEmbeddedWebview"));
-            }
-            base.Finish();
-        }
-
         private sealed class CoreWebViewClient : WebViewClient
         {
             private readonly string _callback;
-            private Activity Activity { get; set; }
 
             public CoreWebViewClient(string callback, Activity activity)
             {
@@ -74,6 +73,8 @@ namespace Xamarin.Forms.Auth
             }
 
             public Intent ReturnIntent { get; private set; }
+
+            private Activity Activity { get; set; }
 
             public override void OnLoadResource(WebView view, string url)
             {
@@ -84,7 +85,6 @@ namespace Xamarin.Forms.Auth
                     base.OnLoadResource(view, url);
                     Finish(Activity, url);
                 }
-
             }
 
             [Obsolete]
@@ -93,7 +93,7 @@ namespace Xamarin.Forms.Auth
                 Uri uri = new Uri(url);
                 if (url.StartsWith(BrokerConstants.BrowserExtPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    MsalLogger.Default.Verbose("It is browser launch request");
+                    OAuth2Logger.Default.Verbose("It is browser launch request");
                     OpenLinkInBrowser(url, Activity);
                     view.StopLoading();
                     Activity.Finish();
@@ -102,7 +102,7 @@ namespace Xamarin.Forms.Auth
 
                 if (url.StartsWith(BrokerConstants.BrowserExtInstallPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    MsalLogger.Default.Verbose("It is an azure authenticator install request");
+                    OAuth2Logger.Default.Verbose("It is an azure authenticator install request");
                     view.StopLoading();
                     Finish(Activity, url);
                     return true;
@@ -132,7 +132,6 @@ namespace Xamarin.Forms.Auth
                     return true;
                 }
 
-
                 if (!url.Equals(AboutBlankUri, StringComparison.OrdinalIgnoreCase) && !uri.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
                 {
                     UriBuilder errorUri = new UriBuilder(_callback)
@@ -148,19 +147,6 @@ namespace Xamarin.Forms.Auth
                 }
 
                 return false;
-            }
-
-            private void OpenLinkInBrowser(string url, Activity activity)
-            {
-                // Construct URL to launch external browser (use HTTPS)
-                var externalBrowserUrlBuilder = new UriBuilder(url)
-                {
-                    Scheme = Uri.UriSchemeHttps
-                };
-
-                string link = externalBrowserUrlBuilder.Uri.AbsoluteUri;
-                Intent intent = new Intent(Intent.ActionView, global::Android.Net.Uri.Parse(link));
-                activity.StartActivity(intent);
             }
 
             public override void OnPageFinished(WebView view, string url)
@@ -182,6 +168,19 @@ namespace Xamarin.Forms.Auth
                 }
 
                 base.OnPageStarted(view, url, favicon);
+            }
+
+            private void OpenLinkInBrowser(string url, Activity activity)
+            {
+                // Construct URL to launch external browser (use HTTPS)
+                var externalBrowserUrlBuilder = new UriBuilder(url)
+                {
+                    Scheme = Uri.UriSchemeHttps
+                };
+
+                string link = externalBrowserUrlBuilder.Uri.AbsoluteUri;
+                Intent intent = new Intent(Intent.ActionView, global::Android.Net.Uri.Parse(link));
+                activity.StartActivity(intent);
             }
 
             private void Finish(Activity activity, string url)

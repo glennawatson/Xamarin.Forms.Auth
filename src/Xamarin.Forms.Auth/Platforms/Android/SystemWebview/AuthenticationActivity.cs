@@ -70,7 +70,7 @@ namespace Xamarin.Forms.Auth
 
             if (_restarted)
             {
-                cancelRequest();
+                CancelRequest();
                 return;
             }
 
@@ -83,9 +83,9 @@ namespace Xamarin.Forms.Auth
                 Intent browserIntent = new Intent(Intent.ActionView, Uri.Parse(_requestUrl));
                 browserIntent.AddCategory(Intent.CategoryBrowsable);
 
-                MsalLogger.Default.Warning(
+                OAuth2Logger.Default.Warning(
                     "Browser with custom tabs package not available. " +
-                    "Launching with alternate browser. See https://aka.ms/msal-net-system-browsers for details.");
+                    "Launching with alternate browser.");
 
                 try
                 {
@@ -93,14 +93,15 @@ namespace Xamarin.Forms.Auth
                 }
                 catch (ActivityNotFoundException ex)
                 {
-                    throw MsalExceptionFactory.GetClientException(
+                    throw ExceptionFactory.GetClientException(
                            CoreErrorCodes.AndroidActivityNotFound,
-                           CoreErrorMessages.AndroidActivityNotFound, ex);
+                           CoreErrorMessages.AndroidActivityNotFound,
+                           ex);
                 }
             }
             else
             {
-                MsalLogger.Default.Info(
+                OAuth2Logger.Default.Info(
                     string.Format(
                     CultureInfo.CurrentCulture,
                     "Browser with custom tabs package available. Using {0}. ",
@@ -118,14 +119,11 @@ namespace Xamarin.Forms.Auth
             outState.PutString(AndroidConstants.RequestUrlKey, _requestUrl);
         }
 
-        /**
-         * Cancels the auth request.
-         */
-
-        private void cancelRequest()
+        private void CancelRequest()
         {
             ReturnToCaller(AndroidConstants.Cancel, new Intent());
         }
+
         private void ReturnToCaller(int resultCode, Intent data)
         {
             data.PutExtra(AndroidConstants.RequestId, _requestId);
@@ -136,8 +134,8 @@ namespace Xamarin.Forms.Auth
         private void SendError(string errorCode, string errorDescription)
         {
             Intent errorIntent = new Intent();
-            errorIntent.PutExtra(OAuth2ResponseBaseClaim.Error, errorCode);
-            errorIntent.PutExtra(OAuth2ResponseBaseClaim.ErrorDescription, errorDescription);
+            errorIntent.PutExtra(OAuth2ResponseBaseClaim.Error, errorCode)
+                .PutExtra(OAuth2ResponseBaseClaim.ErrorDescription, errorDescription);
             ReturnToCaller(AndroidConstants.AuthCodeError, errorIntent);
         }
 

@@ -21,9 +21,6 @@ namespace Xamarin.Forms.Auth
         private IWebUIFactory _overloadWebUiFactory;
 
         /// <inheritdoc />
-        public ICryptographyManager CryptographyManager { get; } = new AndroidCryptographyManager();
-
-        /// <inheritdoc />
         public IPlatformLogger PlatformLogger => _platformLogger.Value;
 
         /// <inheritdoc />
@@ -124,18 +121,6 @@ namespace Xamarin.Forms.Auth
             return global::Android.Provider.Settings.Secure.GetString(
                 global::Android.App.Application.Context.ContentResolver,
                 global::Android.Provider.Settings.Secure.AndroidId);
-        }
-
-        /// <inheritdoc />
-        public ILegacyCachePersistence CreateLegacyCachePersistence()
-        {
-            return new AndroidLegacyCachePersistence();
-        }
-
-        /// <inheritdoc />
-        public ITokenCacheAccessor CreateTokenCacheAccessor()
-        {
-            return new AndroidTokenCacheAccessor();
         }
 
         /// <inheritdoc />
