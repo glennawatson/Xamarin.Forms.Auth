@@ -1,265 +1,265 @@
 ﻿[assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2146:TypesMustBeAtLeastAsCriticalAsBaseTypesFxCopRule", Scope = "type",
-        Target = "Microsoft.Identity.Client.BrokerHelper")]
+        Target = "Xamarin.Auth.Forms.BrokerHelper")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2151:FieldsWithCriticalTypesShouldBeCriticalFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.WebUI.#authorizationResult")]
+        Target = "Xamarin.Auth.Forms.WebUI.#authorizationResult")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2146:TypesMustBeAtLeastAsCriticalAsBaseTypesFxCopRule", Scope = "type",
-        Target = "Microsoft.Identity.Client.CryptographyHelper")]
+        Target = "Xamarin.Auth.Forms.CryptographyHelper")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2146:TypesMustBeAtLeastAsCriticalAsBaseTypesFxCopRule", Scope = "type",
-        Target = "Microsoft.Identity.Client.DeviceAuthHelper")]
+        Target = "Xamarin.Auth.Forms.DeviceAuthHelper")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2146:TypesMustBeAtLeastAsCriticalAsBaseTypesFxCopRule", Scope = "type",
-        Target = "Microsoft.Identity.Client.Logger")]
+        Target = "Xamarin.Auth.Forms.Logger")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2146:TypesMustBeAtLeastAsCriticalAsBaseTypesFxCopRule", Scope = "type",
-        Target = "Microsoft.Identity.Client.PlatformParameters")]
+        Target = "Xamarin.Auth.Forms.PlatformParameters")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2146:TypesMustBeAtLeastAsCriticalAsBaseTypesFxCopRule", Scope = "type",
-        Target = "Microsoft.Identity.Client.TokenCachePlugin")]
+        Target = "Xamarin.Auth.Forms.TokenCachePlugin")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2146:TypesMustBeAtLeastAsCriticalAsBaseTypesFxCopRule", Scope = "type",
-        Target = "Microsoft.Identity.Client.WebUI")]
+        Target = "Xamarin.Auth.Forms.WebUI")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2146:TypesMustBeAtLeastAsCriticalAsBaseTypesFxCopRule", Scope = "type",
-        Target = "Microsoft.Identity.Client.WebUIFactory")]
+        Target = "Xamarin.Auth.Forms.WebUIFactory")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.AuthenticationAgentUIViewController+ReturnCodeCallback.#Invoke(Microsoft.Identity.Client.Internal.AuthorizationResult)"
+            "Xamarin.Auth.Forms.AuthenticationAgentUIViewController+ReturnCodeCallback.#Invoke(Xamarin.Auth.Forms.Internal.AuthorizationResult)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.Logger.#.ctor()")]
+        Target = "Xamarin.Auth.Forms.Logger.#.ctor()")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.AuthenticationAgentUIViewController.#ViewDidLoad()")]
+        Target = "Xamarin.Auth.Forms.AuthenticationAgentUIViewController.#ViewDidLoad()")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.AuthenticationAgentUIViewController.#CancelAuthentication(System.Object,System.EventArgs)"
+            "Xamarin.Auth.Forms.AuthenticationAgentUIViewController.#CancelAuthentication(System.Object,System.EventArgs)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.BrokerHelper.#PlatformParameters")]
+        Target = "Xamarin.Auth.Forms.BrokerHelper.#PlatformParameters")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.BrokerHelper.#PlatformParameters")]
-[assembly:
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
-        "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
-        Target =
-            "Microsoft.Identity.Client.BrokerHelper.#AcquireTokenUsingBroker(System.Collections.Generic.IDictionary`2<System.String,System.String>)"
-        )]
+        Target = "Xamarin.Auth.Forms.BrokerHelper.#PlatformParameters")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Error(Microsoft.Identity.Client.Internal.RequestContext,System.Exception,System.String)"
+            "Xamarin.Auth.Forms.BrokerHelper.#AcquireTokenUsingBroker(System.Collections.Generic.IDictionary`2<System.String,System.String>)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Verbose(Microsoft.Identity.Client.Internal.RequestContext,System.String,System.String)"
+            "Xamarin.Auth.Forms.Logger.#Error(Xamarin.Auth.Forms.Internal.RequestContext,System.Exception,System.String)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Information(Microsoft.Identity.Client.Internal.RequestContext,System.String,System.String)"
+            "Xamarin.Auth.Forms.Logger.#Verbose(Xamarin.Auth.Forms.Internal.RequestContext,System.String,System.String)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Warning(Microsoft.Identity.Client.Internal.RequestContext,System.String,System.String)"
-        )]
-[assembly:
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
-        "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.MsalInitializer.#Initialize()")]
-[assembly:
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
-        "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
-        Target =
-            "Microsoft.Identity.Client.TokenCachePlugin.#BeforeAccess(Microsoft.Identity.Client.TokenCacheNotificationArgs)"
+            "Xamarin.Auth.Forms.Logger.#Information(Xamarin.Auth.Forms.Internal.RequestContext,System.String,System.String)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.TokenCachePlugin.#AfterAccess(Microsoft.Identity.Client.TokenCacheNotificationArgs)"
+            "Xamarin.Auth.Forms.Logger.#Warning(Xamarin.Auth.Forms.Internal.RequestContext,System.String,System.String)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.WebUI.#.ctor(Microsoft.Identity.Client.IPlatformParameters)")]
+        Target = "Xamarin.Auth.Forms.MsalInitializer.#Initialize()")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.WebUI.#AcquireAuthorizationAsync(System.Uri,System.Uri,System.Collections.Generic.IDictionary`2<System.String,System.String>,Microsoft.Identity.Client.Internal.RequestContext)"
-        )]
-[assembly:
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
-        "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
-        Target =
-            "Microsoft.Identity.Client.WebUI.#SetAuthorizationResult(Microsoft.Identity.Client.Internal.AuthorizationResult)"
+            "Xamarin.Auth.Forms.TokenCachePlugin.#BeforeAccess(Xamarin.Auth.Forms.TokenCacheNotificationArgs)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.WebUI.#Authenticate(System.Uri,System.Uri,System.Collections.Generic.IDictionary`2<System.String,System.String>,Microsoft.Identity.Client.Internal.RequestContext)"
+            "Xamarin.Auth.Forms.TokenCachePlugin.#AfterAccess(Xamarin.Auth.Forms.TokenCacheNotificationArgs)"
+        )]
+[assembly:
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
+        "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
+        Target = "Xamarin.Auth.Forms.WebUI.#.ctor(Xamarin.Auth.Forms.IPlatformParameters)")]
+[assembly:
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
+        "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
+        Target =
+            "Xamarin.Auth.Forms.WebUI.#AcquireAuthorizationAsync(System.Uri,System.Uri,System.Collections.Generic.IDictionary`2<System.String,System.String>,Xamarin.Auth.Forms.Internal.RequestContext)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.WebUI.#CallbackMethod(Microsoft.Identity.Client.Internal.AuthorizationResult)")]
+            "Xamarin.Auth.Forms.WebUI.#SetAuthorizationResult(Xamarin.Auth.Forms.Internal.AuthorizationResult)"
+        )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.WebUIFactory.#CreateAuthenticationDialog(Microsoft.Identity.Client.IPlatformParameters)"
+            "Xamarin.Auth.Forms.WebUI.#Authenticate(System.Uri,System.Uri,System.Collections.Generic.IDictionary`2<System.String,System.String>,Xamarin.Auth.Forms.Internal.RequestContext)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
-        "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.BrokerHelper.#PlatformParameters")]
-[assembly:
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
-        "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.BrokerHelper.#PlatformParameters")]
-[assembly:
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
-        "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.BrokerHelper.#CanInvokeBroker")]
-[assembly:
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
-        "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
+        "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.BrokerHelper.#AcquireTokenUsingBroker(System.Collections.Generic.IDictionary`2<System.String,System.String>)"
+            "Xamarin.Auth.Forms.WebUI.#CallbackMethod(Xamarin.Auth.Forms.Internal.AuthorizationResult)")]
+[assembly:
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
+        "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
+        Target =
+            "Xamarin.Auth.Forms.WebUIFactory.#CreateAuthenticationDialog(Xamarin.Auth.Forms.IPlatformParameters)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.CryptographyHelper.#CreateBase64UrlEncodedSha256Hash(System.String)")]
+        Target = "Xamarin.Auth.Forms.BrokerHelper.#PlatformParameters")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
-        Target = "Microsoft.Identity.Client.DeviceAuthHelper.#CanHandleDeviceAuthChallenge")]
+        Target = "Xamarin.Auth.Forms.BrokerHelper.#PlatformParameters")]
+[assembly:
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
+        "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
+        Target = "Xamarin.Auth.Forms.BrokerHelper.#CanInvokeBroker")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.DeviceAuthHelper.#CreateDeviceAuthChallengeResponse(System.Collections.Generic.IDictionary`2<System.String,System.String>)"
+            "Xamarin.Auth.Forms.BrokerHelper.#AcquireTokenUsingBroker(System.Collections.Generic.IDictionary`2<System.String,System.String>)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
+        Target = "Xamarin.Auth.Forms.CryptographyHelper.#CreateBase64UrlEncodedSha256Hash(System.String)")]
+[assembly:
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
+        "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
+        Target = "Xamarin.Auth.Forms.DeviceAuthHelper.#CanHandleDeviceAuthChallenge")]
+[assembly:
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
+        "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Error(Microsoft.Identity.Client.Internal.RequestContext,System.Exception,System.String)"
+            "Xamarin.Auth.Forms.DeviceAuthHelper.#CreateDeviceAuthChallengeResponse(System.Collections.Generic.IDictionary`2<System.String,System.String>)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Verbose(Microsoft.Identity.Client.Internal.RequestContext,System.String,System.String)"
+            "Xamarin.Auth.Forms.Logger.#Error(Xamarin.Auth.Forms.Internal.RequestContext,System.Exception,System.String)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Information(Microsoft.Identity.Client.Internal.RequestContext,System.String,System.String)"
+            "Xamarin.Auth.Forms.Logger.#Verbose(Xamarin.Auth.Forms.Internal.RequestContext,System.String,System.String)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Warning(Microsoft.Identity.Client.Internal.RequestContext,System.String,System.String)"
+            "Xamarin.Auth.Forms.Logger.#Information(Xamarin.Auth.Forms.Internal.RequestContext,System.String,System.String)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.TokenCachePlugin.#BeforeAccess(Microsoft.Identity.Client.TokenCacheNotificationArgs)"
+            "Xamarin.Auth.Forms.Logger.#Warning(Xamarin.Auth.Forms.Internal.RequestContext,System.String,System.String)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.TokenCachePlugin.#AfterAccess(Microsoft.Identity.Client.TokenCacheNotificationArgs)"
+            "Xamarin.Auth.Forms.TokenCachePlugin.#BeforeAccess(Xamarin.Auth.Forms.TokenCacheNotificationArgs)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.WebUI.#AcquireAuthorizationAsync(System.Uri,System.Uri,System.Collections.Generic.IDictionary`2<System.String,System.String>,Microsoft.Identity.Client.Internal.RequestContext)"
+            "Xamarin.Auth.Forms.TokenCachePlugin.#AfterAccess(Xamarin.Auth.Forms.TokenCacheNotificationArgs)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.WebUIFactory.#CreateAuthenticationDialog(Microsoft.Identity.Client.IPlatformParameters)"
+            "Xamarin.Auth.Forms.WebUI.#AcquireAuthorizationAsync(System.Uri,System.Uri,System.Collections.Generic.IDictionary`2<System.String,System.String>,Xamarin.Auth.Forms.Internal.RequestContext)"
+        )]
+[assembly:
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
+        "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
+        Target =
+            "Xamarin.Auth.Forms.WebUIFactory.#CreateAuthenticationDialog(Xamarin.Auth.Forms.IPlatformParameters)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2132:DefaultConstructorsMustHaveConsistentTransparencyFxCopRule", Scope = "type",
-        Target = "Microsoft.Identity.Client.Logger")]
+        Target = "Xamarin.Auth.Forms.Logger")]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Error(Microsoft.Identity.Client.Internal.RequestContext,System.String,System.String)"
+            "Xamarin.Auth.Forms.Logger.#Error(Xamarin.Auth.Forms.Internal.RequestContext,System.String,System.String)"
         )]
 [assembly:
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
         "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member",
         Target =
-            "Microsoft.Identity.Client.Logger.#Error(Microsoft.Identity.Client.Internal.RequestContext,System.String,System.String)"
+            "Xamarin.Auth.Forms.Logger.#Error(Xamarin.Auth.Forms.Internal.RequestContext,System.String,System.String)"
         )]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.CryptographyHelper.#GenerateCodeVerifier()")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.CryptographyHelper.#GenerateCodeVerifier()")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.WebUI.#AcquireAuthorizationAsync(System.Uri,System.Uri,Microsoft.Identity.Client.Internal.RequestContext)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.WebUI.#AcquireAuthorizationAsync(System.Uri,System.Uri,Microsoft.Identity.Client.Internal.RequestContext)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.WebUI.#Authenticate(System.Uri,System.Uri,Microsoft.Identity.Client.Internal.RequestContext)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.WebUI.#DidFinish(SafariServices.SFSafariViewController)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.AuthenticationContinuationHelper.#SetAuthenticationContinuationEventArgs(Foundation.NSUrl,System.String)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#SaveAccessToken(Microsoft.Identity.Client.Internal.Cache.TokenCacheItem)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#SaveRefreshToken(Microsoft.Identity.Client.Internal.Cache.RefreshTokenCacheItem)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#DeleteAccessToken(Microsoft.Identity.Client.Internal.Cache.AccessTokenCacheKey)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#DeleteRefreshToken(Microsoft.Identity.Client.Internal.Cache.AccessTokenCacheKey)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#AllRefreshTokens()")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#GetAllAccessTokensForClient()")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#SaveAccessToken(Microsoft.Identity.Client.Internal.Cache.TokenCacheItem)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#SaveRefreshToken(Microsoft.Identity.Client.Internal.Cache.RefreshTokenCacheItem)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#DeleteAccessToken(Microsoft.Identity.Client.Internal.Cache.AccessTokenCacheKey)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#DeleteRefreshToken(Microsoft.Identity.Client.Internal.Cache.AccessTokenCacheKey)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#SaveAccessToken(Microsoft.Identity.Client.Internal.Cache.AccessTokenCacheItem)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#SaveAccessToken(Microsoft.Identity.Client.Internal.Cache.AccessTokenCacheItem)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#SaveAccessToken(System.String,System.String)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#SaveRefreshToken(System.String,System.String)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#DeleteAccessToken(System.String)")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Microsoft.Identity.Client.TokenCachePlugin.#DeleteRefreshToken(System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.CryptographyHelper.#GenerateCodeVerifier()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.CryptographyHelper.#GenerateCodeVerifier()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.WebUI.#AcquireAuthorizationAsync(System.Uri,System.Uri,Xamarin.Auth.Forms.Internal.RequestContext)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.WebUI.#AcquireAuthorizationAsync(System.Uri,System.Uri,Xamarin.Auth.Forms.Internal.RequestContext)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.WebUI.#Authenticate(System.Uri,System.Uri,Xamarin.Auth.Forms.Internal.RequestContext)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.WebUI.#DidFinish(SafariServices.SFSafariViewController)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.AuthenticationContinuationHelper.#SetAuthenticationContinuationEventArgs(Foundation.NSUrl,System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#SaveAccessToken(Xamarin.Auth.Forms.Internal.Cache.TokenCacheItem)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#SaveRefreshToken(Xamarin.Auth.Forms.Internal.Cache.RefreshTokenCacheItem)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#DeleteAccessToken(Xamarin.Auth.Forms.Internal.Cache.AccessTokenCacheKey)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#DeleteRefreshToken(Xamarin.Auth.Forms.Internal.Cache.AccessTokenCacheKey)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#AllRefreshTokens()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#GetAllAccessTokensForClient()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#SaveAccessToken(Xamarin.Auth.Forms.Internal.Cache.TokenCacheItem)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#SaveRefreshToken(Xamarin.Auth.Forms.Internal.Cache.RefreshTokenCacheItem)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#DeleteAccessToken(Xamarin.Auth.Forms.Internal.Cache.AccessTokenCacheKey)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#DeleteRefreshToken(Xamarin.Auth.Forms.Internal.Cache.AccessTokenCacheKey)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#SaveAccessToken(Xamarin.Auth.Forms.Internal.Cache.AccessTokenCacheItem)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2140:TransparentMethodsMustNotReferenceCriticalCodeFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#SaveAccessToken(Xamarin.Auth.Forms.Internal.Cache.AccessTokenCacheItem)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#SaveAccessToken(System.String,System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#SaveRefreshToken(System.String,System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#DeleteAccessToken(System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2134:MethodsMustOverrideWithConsistentTransparencyFxCopRule", Scope = "member", Target = "Xamarin.Auth.Forms.TokenCachePlugin.#DeleteRefreshToken(System.String)")]
 
 // This file is used by Code Analysis to maintain SuppressMessage
 // attributes that are applied to this project.

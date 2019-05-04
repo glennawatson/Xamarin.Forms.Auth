@@ -3,7 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Forms.Auth", "Xamarin.Forms.Auth\Xamarin.Forms.Auth.csproj", "{F00AE461-6168-425A-8FAF-CCB80C626D9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xamarin.Forms.Auth", "Xamarin.Forms.Auth\Xamarin.Forms.Auth.csproj", "{F00AE461-6168-425A-8FAF-CCB80C626D9F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CD2E562E-E40D-4D5A-8E26-0EF56192633E}"
+	ProjectSection(SolutionItems) = preProject
+		Analyzers.ruleset = Analyzers.ruleset
+		Directory.build.props = Directory.build.props
+		Directory.build.targets = Directory.build.targets
+		global.json = global.json
+		stylecop.json = stylecop.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,129 +1,77 @@
-﻿//----------------------------------------------------------------------
-//
-// Copyright (c) Microsoft Corporation.
-// All rights reserved.
-//
-// This code is licensed under the MIT License.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-//------------------------------------------------------------------------------
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
+// Glenn Watson licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Identity.Client.Core;
-using Microsoft.Identity.Client.Internal;
-using Microsoft.Identity.Client.Internal.Requests;
 
-using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Cache;
-using Microsoft.Identity.Client.Exceptions;
-using Microsoft.Identity.Client.Instance;
-using Microsoft.Identity.Client.OAuth2;
-using Microsoft.Identity.Client.TelemetryCore;
-using Microsoft.Identity.Client.Utils;
-using Microsoft.Identity.Client.PlatformsCommon.Factories;
-
-namespace Microsoft.Identity.Client
+namespace Xamarin.Forms.Auth
 {
-#if !DESKTOP && !NET_CORE
-#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
-#endif
     /// <summary>
     /// Token cache storing access and refresh tokens for accounts
-    /// This class is used in the constructors of <see cref="PublicClientApplication"/> and <see cref="ConfidentialClientApplication"/>.
     /// In the case of ConfidentialClientApplication, two instances are used, one for the user token cache, and one for the application
     /// token cache (in the case of applications using the client credential flows).
-    /// See also <see cref="TokenCacheExtensions"/> which contains extension methods used to customize the cache serialization
     /// </summary>
     public sealed class TokenCache
-#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
     {
         internal const string NullPreferredUsernameDisplayLabel = "Missing from the token response";
-        private const string MicrosoftLogin = "login.microsoftonline.com";
+        internal readonly object LockObject = new object();
+        private const int DefaultExpirationBufferInMinutes = 5;
+        private volatile bool _hasStateChanged;
 
-        private IServiceBundle _serviceBundle = Core.ServiceBundle.CreateDefault();
-
-        internal IServiceBundle ServiceBundle
-        {
-            get => _serviceBundle;
-            set
-            {
-                _serviceBundle = value;
-                TokenCacheAccessor.TelemetryManager = _serviceBundle.TelemetryManager;
-            }
-        }
-
+        /// <summary>
+        /// Initializes static members of the <see cref="TokenCache"/> class.
+        /// </summary>
         static TokenCache()
         {
             ModuleInitializer.EnsureModuleInitialized();
         }
 
-        private const int DefaultExpirationBufferInMinutes = 5;
-
-        internal TelemetryTokenCacheAccessor TokenCacheAccessor { get; }
-        internal ILegacyCachePersistence LegacyCachePersistence { get; set; }
-
         /// <summary>
-        /// Constructor
+        /// Initializes a new instance of the <see cref="TokenCache"/> class. 
         /// </summary>
         public TokenCache()
         {
             var proxy = PlatformProxyFactory.GetPlatformProxy();
-            TokenCacheAccessor = new TelemetryTokenCacheAccessor(proxy.CreateTokenCacheAccessor());
             LegacyCachePersistence = proxy.CreateLegacyCachePersistence();
         }
 
         /// <summary>
         /// Notification for certain token cache interactions during token acquisition. This delegate is
-        /// used in particular to provide a custom token cache serialization
+        /// used in particular to provide a custom token cache serialization.
         /// </summary>
-        /// <param name="args">Arguments related to the cache item impacted</param>
+        /// <param name="args">Arguments related to the cache item impacted.</param>
         public delegate void TokenCacheNotification(TokenCacheNotificationArgs args);
 
-        internal readonly object LockObject = new object();
-        private volatile bool _hasStateChanged;
+        internal ILegacyCachePersistence LegacyCachePersistence { get; set; }
 
+        /// <summary>
+        /// Gets or sets the client id.
+        /// </summary>
         internal string ClientId { get; set; }
 
         /// <summary>
-        /// Notification method called before any library method accesses the cache.
+        /// Gets or sets a notification method called before any library method accesses the cache.
         /// </summary>
         internal TokenCacheNotification BeforeAccess { get; set; }
 
         /// <summary>
-        /// Notification method called before any library method writes to the cache. This notification can be used to reload
+        /// Gets or sets a notification method called before any library method writes to the cache. This notification can be used to reload
         /// the cache state from a row in database and lock that row. That database row can then be unlocked in the
         /// <see cref="AfterAccess"/>notification.
         /// </summary>
         internal TokenCacheNotification BeforeWrite { get; set; }
 
         /// <summary>
-        /// Notification method called after any library method accesses the cache.
+        /// NGets or sets a notification method called after any library method accesses the cache.
         /// </summary>
         internal TokenCacheNotification AfterAccess { get; set; }
 
         /// <summary>
-        /// Gets or sets the flag indicating whether the state of the cache has changed.
+        /// Gets or sets a value indicating whether the state of the cache has changed.
         /// MSAL methods set this flag after any change.
         /// Caller applications should reset the flag after serializing and persisting the state of the cache.
         /// </summary>
@@ -157,7 +105,7 @@ namespace Microsoft.Identity.Client
 
         internal Tuple<MsalAccessTokenCacheItem, MsalIdTokenCacheItem> SaveAccessAndRefreshToken(
             AuthenticationRequestParameters requestParams,
-            MsalTokenResponse response)
+            OAuth2TokenResponse response)
         {
             // todo: could we look into modifying this to take tenantId to reduce the dependency on IValidatedAuthoritiesCache?
             var tenantId = Authority.CreateAuthority(ServiceBundle, requestParams.TenantUpdatedCanonicalAuthority, false)

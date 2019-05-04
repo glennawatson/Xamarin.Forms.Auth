@@ -1,31 +1,7 @@
-﻿//------------------------------------------------------------------------------
-//
-// Copyright (c) Microsoft Corporation.
-// All rights reserved.
-//
-// This code is licensed under the MIT License.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-//------------------------------------------------------------------------------
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
+// Glenn Watson licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -34,28 +10,14 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.CustomTabs;
-using Microsoft.Identity.Client.Core;
-using Microsoft.Identity.Client.Exceptions;
-using Microsoft.Identity.Client.Internal;
-using Microsoft.Identity.Client.OAuth2;
 using Uri = Android.Net.Uri;
 
-namespace Microsoft.Identity.Client.Platforms.Android.SystemWebview
+namespace Xamarin.Forms.Auth
 {
-    /// <summary>
-    /// </summary>
-    [Activity(Name = "microsoft.identity.client.AuthenticationActivity")]
+    [Activity(Name = "Xamarin.Auth.Forms.AuthenticationActivity")]
     [global::Android.Runtime.Preserve(AllMembers = true)]
     internal class AuthenticationActivity : Activity
     {
-        internal static RequestContext RequestContext { get; set; }
-
-        /// <summary>
-        /// Default Constructor
-        /// </summary>
-        public AuthenticationActivity()
-        { }
-
         private readonly string _customTabsServiceAction =
             "android.support.customtabs.action.CustomTabsService";
 
@@ -63,8 +25,8 @@ namespace Microsoft.Identity.Client.Platforms.Android.SystemWebview
         private int _requestId;
         private bool _restarted;
 
-        /// <summary>
-        /// </summary>
+        internal static RequestContext RequestContext { get; set; }
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -92,10 +54,6 @@ namespace Microsoft.Identity.Client.Platforms.Android.SystemWebview
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="intent"></param>
         protected override void OnNewIntent(Intent intent)
         {
             base.OnNewIntent(intent);
@@ -103,13 +61,9 @@ namespace Microsoft.Identity.Client.Platforms.Android.SystemWebview
 
             Intent resultIntent = new Intent();
             resultIntent.PutExtra(AndroidConstants.AuthorizationFinalUrl, url);
-            ReturnToCaller(AndroidConstants.AuthCodeReceived,
-                resultIntent);
+            ReturnToCaller(AndroidConstants.AuthCodeReceived, resultIntent);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         protected override void OnResume()
         {
             base.OnResume();
@@ -158,10 +112,6 @@ namespace Microsoft.Identity.Client.Platforms.Android.SystemWebview
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="outState"></param>
         protected override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
@@ -176,25 +126,12 @@ namespace Microsoft.Identity.Client.Platforms.Android.SystemWebview
         {
             ReturnToCaller(AndroidConstants.Cancel, new Intent());
         }
-
-        /**
-         * Return the error back to caller.
-         * @param resultCode The result code to return back.
-         * @param data {@link Intent} contains the detailed result.
-         */
-
         private void ReturnToCaller(int resultCode, Intent data)
         {
             data.PutExtra(AndroidConstants.RequestId, _requestId);
             SetResult((Result)resultCode, data);
             Finish();
         }
-
-        /**
-         * Send error back to caller with the error description.
-         * @param errorCode The error code to send back.
-         * @param errorDescription The error description to send back.
-         */
 
         private void SendError(string errorCode, string errorDescription)
         {

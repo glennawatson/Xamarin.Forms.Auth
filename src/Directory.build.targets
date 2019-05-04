@@ -4,22 +4,16 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <DefineConstants>$(DefineConstants);NET_45;XAML</DefineConstants>
+    <DefineConstants>$(DefineConstants);NET_45;XAML;DESKTOP</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="$(TargetFramework.StartsWith('uap'))">
     <DefineConstants>$(DefineConstants);NETFX_CORE;XAML;WINDOWS_UWP</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="$(TargetFramework.StartsWith('Xamarin.iOS'))">
-    <DefineConstants>$(DefineConstants);MONO;UIKIT;COCOA</DefineConstants>
+    <DefineConstants>$(DefineConstants);MONO;UIKIT;COCOA;iOS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="$(TargetFramework.StartsWith('Xamarin.Mac'))">
-    <DefineConstants>$(DefineConstants);MONO;COCOA</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('Xamarin.TVOS'))">
-    <DefineConstants>$(DefineConstants);MONO;UIKIT;COCOA</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('Xamarin.WatchOS'))">
-    <DefineConstants>$(DefineConstants);MONO;UIKIT;COCOA</DefineConstants>
+    <DefineConstants>$(DefineConstants);MONO;COCOA;MAC</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="$(TargetFramework.StartsWith('MonoAndroid'))">
     <DefineConstants>$(DefineConstants);MONO;ANDROID</DefineConstants>
@@ -27,4 +21,11 @@
   <PropertyGroup Condition="$(TargetFramework.StartsWith('tizen'))">
     <DefineConstants>$(DefineConstants);TIZEN</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
+    <DefineConstants>$(DefineConstants);NETSTANDARD1_3</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('netcoreapp'))">
+    <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>
+  </PropertyGroup>
+
 </Project>

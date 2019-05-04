@@ -1,30 +1,6 @@
-﻿//------------------------------------------------------------------------------
-//
-// Copyright (c) Microsoft Corporation.
-// All rights reserved.
-//
-// This code is licensed under the MIT License.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-//------------------------------------------------------------------------------
-
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
+// Glenn Watson licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for full license information.
 
 namespace Xamarin.Forms.Auth
 {
@@ -44,16 +20,10 @@ namespace Xamarin.Forms.Auth
         string Username { get; }
 
         /// <summary>
-        /// Gets a string containing the identity provider for this account, e.g. <c>login.microsoftonline.com</c>.
+        /// Gets a string containing the identity provider for this account.
         /// </summary>
         /// <remarks>This property replaces the <c>IdentityProvider</c> property of <c>IUser</c> in previous versions of MSAL.NET
-        /// except that IdentityProvider was a URL with information about the tenant (in addition to the cloud environment), whereas Environement is only the <see cref="System.Uri.Host"/></remarks>
+        /// except that IdentityProvider was a URL with information about the tenant (in addition to the cloud environment), whereas Environement is only the <see cref="System.Uri.Host"/>.</remarks>
         string Environment { get; }
-
-        /// <summary>
-        /// AccountId of the home account for the user. This uniquely identifies the user across AAD tenants.
-        /// </summary>
-        /// <remarks>Can be null, for example if this account was migrated to MSAL.NET from ADAL.NET v3's token cache</remarks>
-        AccountId HomeAccountId { get; }
-   }
+    }
 }

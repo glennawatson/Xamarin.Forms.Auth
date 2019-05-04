@@ -1,42 +1,15 @@
-﻿//------------------------------------------------------------------------------
-//
-// Copyright (c) Microsoft Corporation.
-// All rights reserved.
-//
-// This code is licensed under the MIT License.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-//------------------------------------------------------------------------------
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
+// Glenn Watson licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for full license information.
 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
-using Microsoft.Identity.Client.Core;
-using Microsoft.Identity.Client.Exceptions;
-using Microsoft.Identity.Client.Http;
-using Microsoft.Identity.Client.UI;
 using SafariServices;
 using UIKit;
 
-namespace Microsoft.Identity.Client.Platforms.iOS.SystemWebview
+namespace Xamarin.Forms.Auth
 {
     internal class SystemWebUI : WebviewBase, IDisposable
     {
@@ -45,24 +18,24 @@ namespace Microsoft.Identity.Client.Platforms.iOS.SystemWebview
         public override async Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri,
             RequestContext requestContext)
         {
-            viewController = null;
+            ViewController = null;
             InvokeOnMainThread(() =>
             {
                 UIWindow window = UIApplication.SharedApplication.KeyWindow;
-                viewController = CoreUIParent.FindCurrentViewController(window.RootViewController);
+                ViewController = CoreUIParent.FindCurrentViewController(window.RootViewController);
             });
 
-            returnedUriReady = new SemaphoreSlim(0);
+            ReturnedUriReady = new SemaphoreSlim(0);
             Authenticate(authorizationUri, redirectUri, requestContext);
-            await returnedUriReady.WaitAsync().ConfigureAwait(false);
+            await ReturnedUriReady.WaitAsync().ConfigureAwait(false);
 
             //dismiss safariviewcontroller
-            viewController.InvokeOnMainThread(() =>
+            ViewController.InvokeOnMainThread(() =>
             {
-                safariViewController?.DismissViewController(false, null);
+                SafariViewController?.DismissViewController(false, null);
             });
 
-            return authorizationResult;
+            return AuthorizationResult;
         }
 
         public void Authenticate(Uri authorizationUri, Uri redirectUri, RequestContext requestContext)
@@ -110,7 +83,7 @@ namespace Microsoft.Identity.Client.Platforms.iOS.SystemWebview
 #else
                 if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
                 {
-                    sfAuthenticationSession = new SFAuthenticationSession(new NSUrl(authorizationUri.AbsoluteUri),
+                    SfAuthenticationSession = new SFAuthenticationSession(new NSUrl(authorizationUri.AbsoluteUri),
                         redirectUri.Scheme, (callbackUrl, error) =>
                         {
                             if (error != null)
@@ -123,18 +96,18 @@ namespace Microsoft.Identity.Client.Platforms.iOS.SystemWebview
                             }
                         });
 
-                    sfAuthenticationSession.Start();
+                    SfAuthenticationSession.Start();
                 }
 #endif
                 else
                 {
-                    safariViewController = new SFSafariViewController(new NSUrl(authorizationUri.AbsoluteUri), false)
+                    SafariViewController = new SFSafariViewController(new NSUrl(authorizationUri.AbsoluteUri), false)
                     {
                         Delegate = this
                     };
-                    viewController.InvokeOnMainThread(() =>
+                    ViewController.InvokeOnMainThread(() =>
                     {
-                        viewController.PresentViewController(safariViewController, false, null);
+                        ViewController.PresentViewController(SafariViewController, false, null);
                     });
                 }
             }
@@ -150,13 +123,13 @@ namespace Microsoft.Identity.Client.Platforms.iOS.SystemWebview
 
         public void ProcessCompletionHandlerError(NSError error)
         {
-            if (returnedUriReady != null)
+            if (ReturnedUriReady != null)
             {
                 // The authorizationResult is set on the class and sent back to the InteractiveRequest
                 // There it's processed in VerifyAuthorizationResult() and an MsalClientException
                 // will be thrown.
-                authorizationResult = new AuthorizationResult(AuthorizationStatus.UserCancel, null);
-                returnedUriReady.Release();
+                AuthorizationResult = new AuthorizationResult(AuthorizationStatus.UserCancel, null);
+                ReturnedUriReady.Release();
             }
         }
 
@@ -165,10 +138,10 @@ namespace Microsoft.Identity.Client.Platforms.iOS.SystemWebview
         {
             controller.DismissViewController(true, null);
 
-            if (returnedUriReady != null)
+            if (ReturnedUriReady != null)
             {
-                authorizationResult = new AuthorizationResult(AuthorizationStatus.UserCancel, null);
-                returnedUriReady.Release();
+                AuthorizationResult = new AuthorizationResult(AuthorizationStatus.UserCancel, null);
+                ReturnedUriReady.Release();
             }
         }
 

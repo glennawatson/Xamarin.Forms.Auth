@@ -1,29 +1,6 @@
-﻿//----------------------------------------------------------------------
-//
-// Copyright (c) Microsoft Corporation.
-// All rights reserved.
-//
-// This code is licensed under the MIT License.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-//------------------------------------------------------------------------------
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
+// Glenn Watson licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
@@ -43,13 +20,20 @@ namespace Xamarin.Forms.Auth
         /// Constructor meant to help application developers test their apps. Allows mocking of authentication flows.
         /// App developers should never new-up <see cref="AuthenticationResult"/> in product code.
         /// </summary>
+        /// <param name="accessToken">The access token.</param>
+        /// <param name="isExtendedLifeTimeToken"></param>
+        /// <param name="uniqueId"></param>
+        /// <param name="expiresOn"></param>
+        /// <param name="extendedExpiresOn"></param>
+        /// <param name="account"></param>
+        /// <param name="idToken"></param>
+        /// <param name="scopes"></param>
         public AuthenticationResult(
             string accessToken,
             bool isExtendedLifeTimeToken,
             string uniqueId,
             DateTimeOffset expiresOn,
             DateTimeOffset extendedExpiresOn,
-            string tenantId,
             IAccount account,
             string idToken,
             IEnumerable<string> scopes)
@@ -59,7 +43,6 @@ namespace Xamarin.Forms.Auth
             UniqueId = uniqueId;
             ExpiresOn = expiresOn;
             ExtendedExpiresOn = extendedExpiresOn;
-            TenantId = tenantId;
             Account = account;
             IdToken = idToken;
             Scopes = scopes;
@@ -83,7 +66,6 @@ namespace Xamarin.Forms.Auth
             UniqueId = msalIdTokenCacheItem?.IdToken?.GetUniqueId();
             ExpiresOn = msalAccessTokenCacheItem.ExpiresOn;
             ExtendedExpiresOn = msalAccessTokenCacheItem.ExtendedExpiresOn;
-            TenantId = msalIdTokenCacheItem?.IdToken?.TenantId;
             IdToken = msalIdTokenCacheItem?.Secret;
             Scopes = msalAccessTokenCacheItem.ScopeSet;
             IsExtendedLifeTimeToken = msalAccessTokenCacheItem.IsExtendedLifeTimeToken;
