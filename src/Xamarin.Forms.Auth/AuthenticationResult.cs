@@ -52,25 +52,6 @@ namespace Xamarin.Forms.Auth
         {
         }
 
-        internal AuthenticationResult(MsalAccessTokenCacheItem msalAccessTokenCacheItem, MsalIdTokenCacheItem msalIdTokenCacheItem)
-        {
-            if (msalAccessTokenCacheItem.HomeAccountId != null)
-            {
-                Account = new Account(
-                    msalAccessTokenCacheItem.HomeAccountId,
-                    msalIdTokenCacheItem?.IdToken?.PreferredUsername,
-                    msalAccessTokenCacheItem.Environment);
-            }
-
-            AccessToken = msalAccessTokenCacheItem.Secret;
-            UniqueId = msalIdTokenCacheItem?.IdToken?.GetUniqueId();
-            ExpiresOn = msalAccessTokenCacheItem.ExpiresOn;
-            ExtendedExpiresOn = msalAccessTokenCacheItem.ExtendedExpiresOn;
-            IdToken = msalIdTokenCacheItem?.Secret;
-            Scopes = msalAccessTokenCacheItem.ScopeSet;
-            IsExtendedLifeTimeToken = msalAccessTokenCacheItem.IsExtendedLifeTimeToken;
-        }
-
         /// <summary>
         /// Gets the access token that can be used as a bearer token to access protected web APIs
         /// </summary>

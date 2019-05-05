@@ -11,43 +11,22 @@ using System.Threading.Tasks;
 
 namespace Xamarin.Forms.Auth
 {
-#if !DESKTOP && !NET_CORE
-#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
-#endif
-    /// <Summary>
-    /// Abstract class containing common API methods and properties. Both <see cref="Xamarin.Auth.Forms.PublicClientApplication"/> and <see cref="Xamarin.Auth.Forms.ConfidentialClientApplication"/>
-    /// extend this class. For details see https://aka.ms/msal-net-client-applications
-    /// </Summary>
+    /// <summary>
+    /// Abstract class containing common API methods and properties.
+    /// </summary>
     public abstract partial class ClientApplicationBase
-#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
     {
         static ClientApplicationBase()
         {
             ModuleInitializer.EnsureModuleInitialized();
         }
 
-        private TokenCache _userTokenCache;
-
-        /// <Summary>
-        /// Default Authority used for interactive calls.
-        /// </Summary>
-        internal const string DefaultAuthority = "https://login.microsoftonline.com/common/";
-
-        internal IServiceBundle ServiceBundle { get; }
-
-        internal ITelemetryReceiver TelemetryReceiver
-        {
-            get => ServiceBundle.TelemetryManager.TelemetryReceiver;
-            set => ServiceBundle.TelemetryManager.TelemetryReceiver = value;
-        }
-
-        ///  <summary>
-        ///  Constructor of the base application
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClientApplicationBase"/> class.
         ///  </summary>
-        ///  <param name="clientId">Client ID (also known as <i>Application ID</i>) of the application as registered in the
-        ///  application registration portal (https://aka.ms/msal-net-register-app)</param>
-        ///  <param name="authority">URL of the security token service (STS) from which MSAL.NET will acquire the tokens.
-        ///
+        /// <param name="clientId">Client ID (also known as <i>Application ID</i>) of the application as registered in the
+        ///  application registration portal (https://aka.ms/msal-net-register-app).</param>
+        /// <param name="authority">URL of the security token service (STS) from which MSAL.NET will acquire the tokens.
         ///  Usual authorities endpoints for the Azure public Cloud are:
         ///  <list type="bullet">
         ///  <item><description><c>https://login.microsoftonline.com/tenant/</c> where <c>tenant</c> is the tenant ID of the Azure AD tenant
@@ -56,73 +35,42 @@ namespace Xamarin.Forms.Auth
         ///  <item><description><c>https://login.microsoftonline.com/organizations/</c> to sign-in users with any work and school accounts</description></item>
         ///  <item><description><c>https://login.microsoftonline.com/consumers/</c> to sign-in users with only personal Microsoft accounts (live)</description></item>
         ///  </list>
-        ///  Note that this setting needs to be consistent with what is declared in the application registration portal
+        ///  Note that this setting needs to be consistent with what is declared in the application registration portal.
         ///  </param>
-        ///  <param name="redirectUri">also named <i>Reply URI</i>, the redirect URI is the URI where the STS will call back the application with the security token. For details see https://aka.ms/msal-net-client-applications</param>
-        ///  <param name="validateAuthority">Boolean telling MSAL.NET if the authority needs to be verified against a list of known authorities.
-        ///  This should be set to <c>false</c> for Azure AD B2C authorities as those are customer specific (a list of known B2C authorities
-        ///  cannot be maintained by MSAL.NET</param>
-        /// <param name="serviceBundle"></param>
-        internal ClientApplicationBase(string clientId, string authority, string redirectUri,
-            bool validateAuthority, IServiceBundle serviceBundle)
+        /// <param name="redirectUri">also named <i>Reply URI</i>, the redirect URI is the URI where the STS will call back the application with the security token.</param>
+        /// <param name="serviceBundle">The service bundle.</param>
+        internal ClientApplicationBase(string clientId, Uri authority, Uri redirectUri, IServiceBundle serviceBundle)
         {
-            ServiceBundle = serviceBundle ?? Core.ServiceBundle.CreateDefault();
+            ServiceBundle = serviceBundle ?? Auth.ServiceBundle.CreateDefault();
 
             ClientId = clientId;
-            Authority authorityInstance = Instance.Authority.CreateAuthority(ServiceBundle, authority, validateAuthority);
-            Authority = authorityInstance.CanonicalAuthority;
+            Authority = authority;
             RedirectUri = redirectUri;
-            ValidateAuthority = validateAuthority;
-            if (UserTokenCache != null)
-            {
-                UserTokenCache.ClientId = clientId;
-            }
 
-            RequestContext requestContext = new RequestContext(ClientId, new MsalLogger(Guid.Empty, null));
-
-            requestContext.Logger.Info(string.Format(CultureInfo.InvariantCulture,
-                "MSAL {0} with assembly version '{1}', file version '{2}' and informational version '{3}' is running...",
-                PlatformProxyFactory.GetPlatformProxy().GetProductName(), MsalIdHelper.GetMsalVersion(),
-                AssemblyUtils.GetAssemblyFileVersionAttribute(), AssemblyUtils.GetAssemblyInformationalVersion()));
+            RequestContext requestContext = new RequestContext(ClientId, new OAuth2Logger(Guid.Empty, null));
         }
 
         /// <summary>
-        /// Identifier of the component (libraries/SDK) consuming MSAL.NET.
-        /// This will allow for disambiguation between MSAL usage by the app vs MSAL usage by component libraries.
+        /// Gets or sets the identifier of the component (libraries/SDK) consuming this library.
+        /// This will allow for disambiguation between this library usage by the app vs library usage by component libraries.
         /// </summary>
         public string Component { get; set; }
 
-        /// <Summary>
-        /// Gets the URL of the authority, or security token service (STS) from which MSAL.NET will acquire security tokens
-        /// The return value of this property is either the value provided by the developer in the constructor of the application, or otherwise
-        /// the value of the <see cref="DefaultAuthority"/> static member (that is <c>https://login.microsoftonline.com/common/</c>)
-        /// </Summary>
-        public string Authority { get; }
+        /// <summary>
+        /// Gets the URL of the authority, or security token service (STS) from which library will acquire security tokens.
+        /// </summary>
+        public Uri Authority { get; }
 
         /// <summary>
         /// Gets the Client ID (also known as <i>Application ID</i>) of the application as registered in the application registration portal (https://aka.ms/msal-net-register-app)
-        /// and as passed in the constructor of the application
+        /// and as passed in the constructor of the application.
         /// </summary>
         public string ClientId { get; }
 
-#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
         /// <summary>
-        /// The redirect URI (also known as Reply URI or Reply URL), is the URI at which Azure AD will contact back the application with the tokens.
-        /// This redirect URI needs to be registered in the app registration (https://aka.ms/msal-net-register-app).
-        /// In MSAL.NET, <see cref="T:PublicClientApplication"/> define the following default RedirectUri values:
-        /// <list type="bullet">
-        /// <item><description><c>urn:ietf:wg:oauth:2.0:oob</c> for desktop (.NET Framework and .NET Core) applications</description></item>
-        /// <item><description><c>msal{ClientId}</c> for Xamarin iOS and Xamarin Android (as this will be used by the system web browser by default on these
-        /// platforms to call back the application)
-        /// </description></item>
-        /// </list>
-        /// These default URIs could change in the future.
-        /// In <see cref="Xamarin.Auth.Forms.ConfidentialClientApplication"/>, this can be the URL of the Web application / Web API.
+        /// Gets or sets The redirect URI (also known as Reply URI or Reply URL), is the URI at which OAuth2 will contact back the application with the tokens.
         /// </summary>
-        /// <remarks>This is especially important when you deploy an application that you have initially tested locally;
-        /// you then need to add the reply URL of the deployed application in the application registration portal</remarks>
-        public string RedirectUri { get; set; }
-#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
+        public Uri RedirectUri { get; set; }
 
         /// <summary>
         /// Sets or Gets a custom query parameters that may be sent to the STS for dogfood testing or debugging. This is a string of segments
@@ -132,43 +80,15 @@ namespace Xamarin.Forms.Auth
         /// </summary>
         public string SliceParameters { get; set; }
 
-        /// <Summary>
-        /// Token Cache instance for storing User tokens.
-        /// </Summary>
-        internal TokenCache UserTokenCache
-        {
-            get => _userTokenCache;
-            set
-            {
-                _userTokenCache = value;
-                if (_userTokenCache != null)
-                {
-                    _userTokenCache.ClientId = ClientId;
-                    _userTokenCache.ServiceBundle = ServiceBundle;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets/sets a boolean value telling the application if the authority needs to be verified against a list of known authorities. The default
-        /// value is <c>true</c>. It should currently be set to <c>false</c> for Azure AD B2C authorities as those are customer specific
-        /// (a list of known B2C authorities cannot be maintained by MSAL.NET). This property can be set just after the construction of the application
-        /// and before an operation acquiring a token or interacting with the STS.
-        /// </summary>
-        public bool ValidateAuthority { get; set; }
-
-        /// <summary>
-        /// ExtendedLifeTimeEnabled is a Boolean that first party applications (read Office) can set to true in case when the STS has an outage,
-        /// to be more resilient.
-        /// </summary>
-        private bool ExtendedLifeTimeEnabled { get; set; }
+        internal IServiceBundle ServiceBundle { get; }
 
         /// <summary>
         /// Returns all the available <see cref="IAccount">accounts</see> in the user token cache for the application.
         /// </summary>
+        /// <returns>A list of valid accounts.</returns>
         public Task<IEnumerable<IAccount>> GetAccountsAsync()
         {
-            RequestContext requestContext = new RequestContext(ClientId, new MsalLogger(Guid.Empty, null));
+            RequestContext requestContext = new RequestContext(ClientId, new OAuth2Logger(Guid.Empty, null));
             IEnumerable<IAccount> accounts = Enumerable.Empty<IAccount>();
             if (UserTokenCache == null)
             {
@@ -176,7 +96,7 @@ namespace Xamarin.Forms.Auth
             }
             else
             {
-                accounts = UserTokenCache.GetAccounts(Authority, ValidateAuthority, requestContext);
+                accounts = UserTokenCache.GetAccounts(Authority, requestContext);
             }
 
             return Task.FromResult(accounts);
@@ -214,7 +134,7 @@ namespace Xamarin.Forms.Auth
         {
             return
                 await
-                    AcquireTokenSilentCommonAsync(null, scopes, account, false, ApiEvent.ApiIds.AcquireTokenSilentWithoutAuthority)
+                    AcquireTokenSilentCommonAsync(Authority, scopes, account, false)
                         .ConfigureAwait(false);
         }
 
@@ -240,25 +160,18 @@ namespace Xamarin.Forms.Auth
         ///
         /// See https://aka.ms/msal-net-acquiretokensilent for more details
         /// </remarks>
-        public async Task<AuthenticationResult> AcquireTokenSilentAsync(IEnumerable<string> scopes, IAccount account,
-            string authority, bool forceRefresh)
+        public async Task<AuthenticationResult> AcquireTokenSilentAsync(IEnumerable<string> scopes, IAccount account, Uri authority, bool forceRefresh)
         {
-            Authority authorityInstance = null;
-            if (!string.IsNullOrEmpty(authority))
-            {
-                authorityInstance = Instance.Authority.CreateAuthority(ServiceBundle, authority, ValidateAuthority);
-            }
-
             return
                 await
-                    AcquireTokenSilentCommonAsync(authorityInstance, scopes, account,
-                        forceRefresh, ApiEvent.ApiIds.AcquireTokenSilentWithAuthority).ConfigureAwait(false);
+                    AcquireTokenSilentCommonAsync(authority, scopes, account, forceRefresh).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Removes all tokens in the cache for the specified account.
         /// </summary>
-        /// <param name="account">Instance of the account that needs to be removed</param>
+        /// <param name="account">Instance of the account that needs to be removed.</param>
+        /// <returns>A task to monitor the progress of the action.</returns>
         public Task RemoveAsync(IAccount account)
         {
             RequestContext requestContext = CreateRequestContext();
@@ -270,37 +183,20 @@ namespace Xamarin.Forms.Auth
             return Task.FromResult(0);
         }
 
-        internal Authority GetAuthority(IAccount account)
-        {
-            var authority = Instance.Authority.CreateAuthority(ServiceBundle, Authority, ValidateAuthority);
-            var tenantId = authority.GetTenantId();
-
-            if (Instance.Authority.TenantlessTenantNames.Contains(tenantId)
-                && account.HomeAccountId?.TenantId != null)
-            {
-                authority.UpdateTenantId(account.HomeAccountId.TenantId);
-            }
-
-            return authority;
-        }
-
-        internal async Task<AuthenticationResult> AcquireTokenSilentCommonAsync(Authority authority,
-            IEnumerable<string> scopes, IAccount account, bool forceRefresh, ApiEvent.ApiIds apiId)
+        internal async Task<AuthenticationResult> AcquireTokenSilentCommonAsync(
+            Uri authority,
+            IEnumerable<string> scopes,
+            IAccount account,
+            bool forceRefresh)
         {
             if (account == null)
             {
-                throw new MsalUiRequiredException(MsalUiRequiredException.UserNullError, MsalErrorMessage.MsalUiRequiredMessage);
-            }
-
-            if (authority == null)
-            {
-                authority = GetAuthority(account);
+                throw new AuthUiRequiredException(AuthUiRequiredException.UserNullError, "The account is required to be able to retrieve a token.");
             }
 
             var handler = new SilentRequest(
                 ServiceBundle,
-                CreateRequestParameters(authority, scopes, account, UserTokenCache),
-                apiId,
+                CreateRequestParameters(authority, scopes, account),
                 forceRefresh);
 
             return await handler.RunAsync(CancellationToken.None).ConfigureAwait(false);
@@ -309,65 +205,59 @@ namespace Xamarin.Forms.Auth
         internal async Task<AuthenticationResult> AcquireByRefreshTokenCommonAsync(IEnumerable<string> scopes, string userProvidedRefreshToken)
         {
             var context = CreateRequestContext();
-            SortedSet<string> _scopes;
+            SortedSet<string> scopesToPass;
 
-            if (scopes == null || scopes.Count() == 0)
+            if (scopes == null || !scopes.Any())
             {
-                _scopes = new SortedSet<string>();
-                _scopes.Add(ClientId + "/.default");
+                scopesToPass = new SortedSet<string>();
+                scopesToPass.Add(ClientId + "/.default");
                 context.Logger.Info(LogMessages.NoScopesProvidedForRefreshTokenRequest);
             }
             else
             {
-                _scopes = ScopeHelper.CreateSortedSetFromEnumerable(scopes);
+                scopesToPass = ScopeHelper.CreateSortedSetFromEnumerable(scopes);
                 context.Logger.Info(string.Format(CultureInfo.InvariantCulture, LogMessages.UsingXScopesForRefreshTokenRequest, scopes.Count()));
             }
 
             var reqParams = new AuthenticationRequestParameters
             {
                 SliceParameters = SliceParameters,
-                Authority = Instance.Authority.CreateAuthority(ServiceBundle, Authority, false),
+                Authority = Authority,
                 ClientId = ClientId,
-                TokenCache = UserTokenCache,
-                Scope = _scopes,
-                RedirectUri = new Uri(RedirectUri),
+                Scope = scopesToPass,
+                RedirectUri = RedirectUri,
                 RequestContext = context,
-                ValidateAuthority = ValidateAuthority,
-                IsExtendedLifeTimeEnabled = ExtendedLifeTimeEnabled,
                 IsRefreshTokenRequest = true
             };
 
             var handler = new ByRefreshTokenRequest(
                 ServiceBundle,
                 reqParams,
-                ApiEvent.ApiIds.AcquireTokenByRefreshToken,
                 userProvidedRefreshToken);
 
             return await handler.RunAsync(CancellationToken.None).ConfigureAwait(false);
         }
 
-        internal virtual AuthenticationRequestParameters CreateRequestParameters(Authority authority,
+        internal virtual AuthenticationRequestParameters CreateRequestParameters(
+            Uri authority,
             IEnumerable<string> scopes,
-            IAccount account, TokenCache cache)
+            IAccount account)
         {
             return new AuthenticationRequestParameters
             {
                 SliceParameters = SliceParameters,
                 Authority = authority,
                 ClientId = ClientId,
-                TokenCache = cache,
                 Account = account,
                 Scope = ScopeHelper.CreateSortedSetFromEnumerable(scopes),
-                RedirectUri = new Uri(RedirectUri),
+                RedirectUri = RedirectUri,
                 RequestContext = CreateRequestContext(),
-                ValidateAuthority = ValidateAuthority,
-                IsExtendedLifeTimeEnabled = ExtendedLifeTimeEnabled
             };
         }
 
         private RequestContext CreateRequestContext()
         {
-            return new RequestContext(ClientId, new MsalLogger(Guid.NewGuid(), Component));
+            return new RequestContext(ClientId, new OAuth2Logger(Guid.NewGuid(), Component));
         }
     }
 }

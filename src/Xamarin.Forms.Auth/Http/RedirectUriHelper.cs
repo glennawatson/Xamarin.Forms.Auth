@@ -5,25 +5,23 @@
 using System;
 using System.Globalization;
 
-using Microsoft.Identity.Client.Exceptions;
-
 namespace Xamarin.Forms.Auth
 {
-    internal class RedirectUriHelper
+    internal static class RedirectUriHelper
     {
         /// <summary>
         /// Check common redirect uri problems.
         /// Optionally check that the redirect uri is not the OAuth2 standard redirect uri urn:ietf:wg:oauth:2.0:oob
         /// when using a system browser, because the browser cannot redirect back to the app.
         /// </summary>
-        public static void Validate(Uri redirectUri, bool usesSystemBrowser = false)
+        /// <param name="redirectUri">The URI to validate.</param>
+        public static void Validate(Uri redirectUri)
         {
             if (redirectUri == null)
             {
                 throw ExceptionFactory.GetClientException(
                     CoreErrorCodes.NoRedirectUri,
                     CoreErrorMessages.NoRedirectUri);
-
             }
 
             if (!string.IsNullOrWhiteSpace(redirectUri.Fragment))
@@ -32,19 +30,6 @@ namespace Xamarin.Forms.Auth
                     CoreErrorMessages.RedirectUriContainsFragment,
                     nameof(redirectUri));
             }
-
-            // Currently only MSAL supports the system browser, on Android and iOS
-            if (usesSystemBrowser &&
-                Constants.DefaultRedirectUri.Equals(redirectUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase))
-            {
-                throw ExceptionFactory.GetClientException(
-                    CoreErrorCodes.DefaultRedirectUriIsInvalid,
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        CoreErrorMessages.DefaultRedirectUriIsInvalid,
-                        Constants.DefaultRedirectUri));
-            }
         }
-
     }
 }

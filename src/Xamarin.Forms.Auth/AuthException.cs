@@ -6,8 +6,6 @@ using System;
 using System.Globalization;
 using System.Runtime.Serialization;
 
-using Xamarin.Forms.Auth.Exceptions;
-
 namespace Xamarin.Forms.Auth
 {
     /// <summary>

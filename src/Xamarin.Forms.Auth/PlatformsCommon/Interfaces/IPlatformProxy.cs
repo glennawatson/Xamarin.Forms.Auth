@@ -87,13 +87,6 @@ namespace Xamarin.Forms.Auth
         string GetBrokerOrRedirectUri(Uri redirectUri);
 
         /// <summary>
-        /// Gets the default redirect uri for the platform, which sometimes includes the clientId.
-        /// </summary>
-        /// <param name="clientId">The id of the client.</param>
-        /// <returns>The redirect uri.</returns>
-        string GetDefaultRedirectUri(string clientId);
-
-        /// <summary>
         /// Gets the product name.
         /// </summary>
         /// <returns>The product name.</returns>

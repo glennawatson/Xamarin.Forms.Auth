@@ -7,11 +7,6 @@ using System.Net.Http.Headers;
 
 namespace Xamarin.Forms.Auth
 {
-    internal interface IHttpClientFactory
-    {
-        HttpClient HttpClient { get; }
-    }
-
     internal class HttpClientFactory : IHttpClientFactory
     {
         // The HttpClient is a singleton per ClientApplication so that we don't have a process wide singleton.

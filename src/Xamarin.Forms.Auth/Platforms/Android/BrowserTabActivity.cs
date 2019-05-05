@@ -17,6 +17,7 @@ namespace Xamarin.Forms.Auth
     /// </summary>
     public class BrowserTabActivity : Activity
     {
+        /// <inheritdoc/>
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

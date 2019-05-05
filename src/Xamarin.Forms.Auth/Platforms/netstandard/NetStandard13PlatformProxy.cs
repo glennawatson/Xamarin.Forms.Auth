@@ -14,10 +14,14 @@ namespace Xamarin.Forms.Auth
     {
         private readonly Lazy<IPlatformLogger> _platformLogger =
             new Lazy<IPlatformLogger>(() => new EventSourcePlatformLogger());
+
         private IWebUIFactory _overloadWebUiFactory;
 
+        /// <inheritdoc />
+        public IPlatformLogger PlatformLogger => _platformLogger.Value;
+
         /// <summary>
-        /// Get the user logged in
+        /// Get the user logged in.
         /// </summary>
         public Task<string> GetUserPrincipalNameAsync()
         {
@@ -33,12 +37,6 @@ namespace Xamarin.Forms.Auth
         public string GetBrokerOrRedirectUri(Uri redirectUri)
         {
             return redirectUri.OriginalString;
-        }
-
-        /// <inheritdoc />
-        public string GetDefaultRedirectUri(string clientId)
-        {
-            return Constants.DefaultRedirectUri;
         }
 
         /// <inheritdoc />
@@ -103,23 +101,6 @@ namespace Xamarin.Forms.Auth
         {
             return null;
         }
-
-        public ILegacyCachePersistence CreateLegacyCachePersistence()
-        {
-            return new InMemoryLegacyCachePersistance();
-        }
-
-        public ITokenCacheAccessor CreateTokenCacheAccessor()
-        {
-            return new TokenCacheAccessor();
-        }
-
-        /// <inheritdoc />
-        public ICryptographyManager CryptographyManager { get; } =
-            new NetStandard13CryptographyManager();
-
-        /// <inheritdoc />
-        public IPlatformLogger PlatformLogger => _platformLogger.Value;
 
         /// <inheritdoc />
         public IWebUIFactory GetWebUiFactory()

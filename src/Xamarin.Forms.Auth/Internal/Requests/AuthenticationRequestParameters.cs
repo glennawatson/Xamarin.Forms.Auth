@@ -16,12 +16,6 @@ namespace Xamarin.Forms.Auth
 
         public string TenantUpdatedCanonicalAuthority { get; set; }
 
-        public bool ValidateAuthority { get; set; }
-
-        public TokenCache TokenCache { get; set; }
-
-        public bool IsExtendedLifeTimeEnabled { get; set; }
-
         public SortedSet<string> Scope { get; set; }
 
         public string ClientId { get; set; }
@@ -55,7 +49,6 @@ namespace Xamarin.Forms.Auth
             builder.AppendLine("Client Id - " + ClientId)
                 .AppendLine("Scopes - " + Scope?.AsSingleString())
                 .AppendLine("Redirect Uri - " + RedirectUri?.OriginalString)
-                .AppendLine("Validate Authority? - " + ValidateAuthority)
                 .AppendLine("LoginHint provided? - " + !string.IsNullOrEmpty(LoginHint))
                 .AppendLine("User provided? - " + (Account != null));
             Dictionary<string, string> dict = CoreHelpers.ParseKeyValueList(ExtraQueryParameters, '&', true, RequestContext);
@@ -70,7 +63,6 @@ namespace Xamarin.Forms.Auth
                 Environment.NewLine + "=== Request Data ===" + Environment.NewLine + "Authority Provided? - " +
                 (Authority != null) + Environment.NewLine);
             builder.AppendLine("Scopes - " + Scope?.AsSingleString())
-                .AppendLine("Validate Authority? - " + ValidateAuthority)
                 .AppendLine("LoginHint provided? - " + !string.IsNullOrEmpty(LoginHint))
                 .AppendLine("User provided? - " + (Account != null));
             dict = CoreHelpers.ParseKeyValueList(ExtraQueryParameters, '&', true, RequestContext);

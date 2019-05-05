@@ -5,21 +5,16 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Identity.Client.Core;
-using Microsoft.Identity.Client.Cache;
-using Microsoft.Identity.Client.OAuth2;
-using Microsoft.Identity.Client.TelemetryCore;
 
-namespace Microsoft.Identity.Client.Internal.Requests
+namespace Xamarin.Forms.Auth
 {
     internal class SilentRequest : RequestBase
     {
         public SilentRequest(
             IServiceBundle serviceBundle,
             AuthenticationRequestParameters authenticationRequestParameters,
-            ApiEvent.ApiIds apiId,
             bool forceRefresh)
-            : base(serviceBundle, authenticationRequestParameters, apiId)
+            : base(serviceBundle, authenticationRequestParameters)
         {
             ForceRefresh = forceRefresh;
         }
