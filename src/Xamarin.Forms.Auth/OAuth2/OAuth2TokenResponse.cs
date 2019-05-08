@@ -92,5 +92,11 @@ namespace Xamarin.Forms.Auth
         /// </summary>
         [JsonIgnore]
         public DateTimeOffset AccessTokenExtendedExpiresOn { get; private set; }
+
+        /// <summary>
+        /// Gets the ID token as a parsed object.
+        /// </summary>
+        /// <returns>The ID token.</returns>
+        public IdToken GetIdToken() => Auth.IdToken.Parse(IdToken);
     }
 }
