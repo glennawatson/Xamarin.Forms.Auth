@@ -13,19 +13,17 @@ namespace Xamarin.Forms.Auth
 {
     internal abstract class RequestBase
     {
-        private TokenCache _tokenCache;
-
         protected RequestBase(
             IServiceBundle serviceBundle,
             AuthenticationRequestParameters authenticationRequestParameters)
         {
             ServiceBundle = serviceBundle;
-            TokenCache = authenticationRequestParameters.TokenCache;
+            TokenCache = serviceBundle.PlatformProxy.TokenCache;
 
             AuthenticationRequestParameters = authenticationRequestParameters;
             if (authenticationRequestParameters.Scope == null || authenticationRequestParameters.Scope.Count == 0)
             {
-                throw new ArgumentNullException(nameof(authenticationRequestParameters.Scope));
+                throw new ArgumentNullException(nameof(authenticationRequestParameters), nameof(authenticationRequestParameters.Scope));
             }
 
             ValidateScopeInput(authenticationRequestParameters.Scope);
@@ -35,78 +33,41 @@ namespace Xamarin.Forms.Auth
 
         internal AuthenticationRequestParameters AuthenticationRequestParameters { get; }
 
-        internal TokenCache TokenCache
+        internal ITokenCache TokenCache
         {
-            get => _tokenCache;
-            set
-            {
-                _tokenCache = value;
-                if (_tokenCache != null)
-                {
-                    _tokenCache.ServiceBundle = ServiceBundle;
-                }
-            }
+            get;
+            set;
         }
 
         protected IServiceBundle ServiceBundle { get; }
 
-        public async Task<AuthenticationResult> RunAsync(CancellationToken cancellationToken)
+        public async Task<OAuth2TokenResponse> RunAsync(CancellationToken cancellationToken)
         {
-            var authenticationResult = await ExecuteAsync(cancellationToken).ConfigureAwait(false);
-            LogReturnedToken(authenticationResult);
-            return authenticationResult;
+            var tokenResponse = await ExecuteAsync(cancellationToken).ConfigureAwait(false);
+            LogReturnedToken(tokenResponse);
+            return tokenResponse;
         }
 
-        internal abstract Task<AuthenticationResult> ExecuteAsync(CancellationToken cancellationToken);
+        internal abstract Task<OAuth2TokenResponse> ExecuteAsync(CancellationToken cancellationToken);
 
-        protected AuthenticationResult CacheTokenResponseAndCreateAuthenticationResult(OAuth2TokenResponse tokenResponse)
+        protected static SortedSet<string> GetDecoratedScope(SortedSet<string> inputScope)
+        {
+            SortedSet<string> set = new SortedSet<string>(inputScope.ToArray());
+            set.UnionWith(ScopeHelper.CreateSortedSetFromEnumerable(OAuth2Value.ReservedScopes));
+            return set;
+        }
+
+        protected async Task CacheTokenResponse(OAuth2TokenResponse tokenResponse)
         {
             // developer passed in user object.
             AuthenticationRequestParameters.RequestContext.Logger.Info("Checking client info returned from the server..");
-
-            ClientInfo fromServer = null;
-
-            if (!AuthenticationRequestParameters.IsClientCredentialRequest && !AuthenticationRequestParameters.IsRefreshTokenRequest)
-            {
-                // client_info is not returned from client credential flows because there is no user present.
-                fromServer = ClientInfo.CreateFromJson(tokenResponse.ClientInfo);
-            }
-
-            ValidateAccountIdentifiers(fromServer);
-
-            IdToken idToken = IdToken.Parse(tokenResponse.IdToken);
-
-            AuthenticationRequestParameters.TenantUpdatedCanonicalAuthority = Authority.UpdateTenantId(
-                AuthenticationRequestParameters.Authority.CanonicalAuthority, idToken?.TenantId);
 
             if (TokenCache != null)
             {
                 AuthenticationRequestParameters.RequestContext.Logger.Info("Saving Token Response to cache..");
 
-                var tuple = TokenCache.SaveAccessAndRefreshToken(AuthenticationRequestParameters, tokenResponse);
-                return new AuthenticationResult(tuple.Item1, tuple.Item2);
+                await TokenCache.SaveAccessAndRefreshToken(AuthenticationRequestParameters.Authority, AuthenticationRequestParameters.ClientId, tokenResponse).ConfigureAwait(false);
             }
-            else
-            {
-                return new AuthenticationResult(
-                    new MsalAccessTokenCacheItem(
-                        AuthenticationRequestParameters.Authority.Host,
-                        AuthenticationRequestParameters.ClientId,
-                        tokenResponse,
-                        idToken?.TenantId),
-                    new MsalIdTokenCacheItem(
-                        AuthenticationRequestParameters.Authority.Host,
-                        AuthenticationRequestParameters.ClientId,
-                        tokenResponse,
-                        idToken?.TenantId));
-            }
-        }
-
-        protected SortedSet<string> GetDecoratedScope(SortedSet<string> inputScope)
-        {
-            SortedSet<string> set = new SortedSet<string>(inputScope.ToArray());
-            set.UnionWith(ScopeHelper.CreateSortedSetFromEnumerable(OAuth2Value.ReservedScopes));
-            return set;
         }
 
         protected void ValidateScopeInput(SortedSet<string> scopesToValidate)
@@ -133,25 +94,23 @@ namespace Xamarin.Forms.Auth
             client.AddBodyParameter(OAuth2Parameter.ClientId, AuthenticationRequestParameters.ClientId);
             client.AddBodyParameter(OAuth2Parameter.ClientInfo, "1");
 
-            client.AddBodyParameter(OAuth2Parameter.Scope,
-                GetDecoratedScope(AuthenticationRequestParameters.Scope).AsSingleString());
+            client.AddBodyParameter(OAuth2Parameter.Scope, GetDecoratedScope(AuthenticationRequestParameters.Scope).AsSingleString());
 
             foreach (var kvp in additionalBodyParameters)
             {
                 client.AddBodyParameter(kvp.Key, kvp.Value);
             }
 
-            return await SendHttpMessageAsync(client).ConfigureAwait(false);
+            return await SendHttpMessageAsync(client, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<OAuth2TokenResponse> SendHttpMessageAsync(OAuth2Client client)
+        private async Task<OAuth2TokenResponse> SendHttpMessageAsync(OAuth2Client client, CancellationToken token)
         {
             UriBuilder builder = new UriBuilder(AuthenticationRequestParameters.Authority);
             builder.AppendQueryParameters(AuthenticationRequestParameters.SliceParameters);
             OAuth2TokenResponse tokenResponse =
                 await client
-                    .GetTokenAsync(builder.Uri,
-                        AuthenticationRequestParameters.RequestContext)
+                    .GetTokenAsync(builder.Uri, AuthenticationRequestParameters.RequestContext, token)
                     .ConfigureAwait(false);
 
             if (string.IsNullOrEmpty(tokenResponse.Scope))
@@ -163,7 +122,7 @@ namespace Xamarin.Forms.Auth
             return tokenResponse;
         }
 
-        private void LogReturnedToken(AuthenticationResult result)
+        private void LogReturnedToken(OAuth2TokenResponse result)
         {
             if (result.AccessToken != null)
             {
@@ -171,7 +130,7 @@ namespace Xamarin.Forms.Auth
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "=== Token Acquisition finished successfully. An access token was returned with Expiration Time: {0} ===",
-                        result.ExpiresOn));
+                        result.ExpiresIn));
             }
         }
     }

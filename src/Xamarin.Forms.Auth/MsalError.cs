@@ -5,7 +5,7 @@
 namespace Xamarin.Forms.Auth
 {
     /// <summary>
-    /// Error code returned as a property in MsalException
+    /// Error code returned as a property in MsalException.
     /// </summary>
     public static class MsalError
     {
@@ -65,12 +65,12 @@ namespace Xamarin.Forms.Auth
         public const string AuthenticationUiFailed = "authentication_ui_failed";
 
         /// <summary>
-        /// Non https redirect failed
+        /// Non https redirect failed.
         /// </summary>
         public const string NonHttpsRedirectNotSupported = "non_https_redirect_failed";
 
         /// <summary>
-        /// Internal error
+        /// Internal error.
         /// </summary>
         public const string InternalError = "internal_error";
 
@@ -135,17 +135,17 @@ namespace Xamarin.Forms.Auth
         public const string InvalidRequest = "invalid_request";
 
         /// <summary>
-        /// Cannot access the user from the OS (UWP)
+        /// Cannot access the user from the OS (UWP).
         /// </summary>
         public const string UapCannotFindDomainUser = "user_information_access_failed";
 
         /// <summary>
-        /// Cannot get the user from the OS (UWP)
+        /// Cannot get the user from the OS (UWP).
         /// </summary>
         public const string UapCannotFindUpn = "uap_cannot_find_upn";
 
         /// <summary>
-        /// An error response was returned by the OAuth2 server and it could not be parsed
+        /// An error response was returned by the OAuth2 server and it could not be parsed.
         /// </summary>
         public const string NonParsableOAuthError = "non_parsable_oauth_error";
 
@@ -158,17 +158,17 @@ namespace Xamarin.Forms.Auth
         public const string CodeExpired = "code_expired";
 
         /// <summary>
-        /// Integrated Windows Auth is only supported for "federated" users
+        /// Integrated Windows Auth is only supported for "federated" users.
         /// </summary>
         public const string IntegratedWindowsAuthNotSupportedForManagedUser = "integrated_windows_auth_not_supported_managed_user";
 
         /// <summary>
-        /// On Android, the UIParent constructor with an Activity parameter must be used. See https://aka.ms/msal-interactive-android
+        /// On Android, the UIParent constructor with an Activity parameter must be used. See https://aka.ms/msal-interactive-android.
         /// </summary>
         public const string ActivityRequired = "activity_required";
 
         /// <summary>
-        /// Error code used when the http response returns HttpStatusCode.NotFound
+        /// Error code used when the http response returns HttpStatusCode.NotFound.
         /// </summary>
         public const string HttpStatusNotFound = "not_found";
 
@@ -176,7 +176,7 @@ namespace Xamarin.Forms.Auth
         /// ErrorCode used when the http response returns something different from 200 (OK).
         /// </summary>
         /// <remarks>
-        /// HttpStatusCode.NotFound have a specific error code. <see cref="MsalError.HttpStatusNotFound"/>
+        /// HttpStatusCode.NotFound have a specific error code. <see cref="MsalError.HttpStatusNotFound"/>.
         /// </remarks>
         public const string HttpStatusCodeNotOk = "http_status_not_200";
     }

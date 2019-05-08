@@ -15,7 +15,7 @@ namespace Xamarin.Forms.Auth
     ///     use this it would require IL weaving, which does not seem to work on all target frameworks.
     ///     Instead, call <see cref="EnsureModuleInitialized" /> from static ctors of public entry points.
     /// </remarks>
-    internal class ModuleInitializer
+    internal static class ModuleInitializer
     {
         private static readonly object LockObj = new object();
         private static volatile bool _isInitialized = false;
@@ -52,9 +52,6 @@ namespace Xamarin.Forms.Auth
 
         private static void InitializeModule()
         {
-            // initialize the telemetry instance so statics get created
-            Telemetry.GetInstance();
-
             OAuth2Logger.Default = new OAuth2Logger(Guid.Empty, null);
             _isInitialized = true;
         }

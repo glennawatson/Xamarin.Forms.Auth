@@ -20,7 +20,7 @@ namespace Xamarin.Forms.Auth
     /// https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens#payload-claims
     /// Also contains some additional values available from the Microsoft standard.
     /// </summary>
-    internal class IdToken
+    public class IdToken
     {
         /// <summary>
         /// Gets or sets the security token service (STS) that constructs and returns the token,
@@ -121,6 +121,11 @@ namespace Xamarin.Forms.Auth
         [JsonExtensionData]
         public IDictionary<string, JToken> AdditionalData { get; set; }
 
+        /// <summary>
+        /// Parse a token from a string value.
+        /// </summary>
+        /// <param name="token">The string value to parse.</param>
+        /// <returns>The constructed id token.</returns>
         public static IdToken Parse(string token)
         {
             if (string.IsNullOrEmpty(token))
@@ -143,6 +148,10 @@ namespace Xamarin.Forms.Auth
             }
         }
 
+        /// <summary>
+        /// Gets the unique id associated with this id token.
+        /// </summary>
+        /// <returns>The unique id.</returns>
         public string GetUniqueId()
         {
             return ObjectId ?? Subject;

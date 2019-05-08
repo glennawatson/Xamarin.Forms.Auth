@@ -5,7 +5,7 @@
 namespace Xamarin.Forms.Auth
 {
     /// <summary>
-    /// OAuth2 errors that are only used internally. All error codes used when propagating exceptions should 
+    /// OAuth2 errors that are only used internally. All error codes used when propagating exceptions should
     /// be made public.
     /// </summary>
     internal static class OAuth2Error

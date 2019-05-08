@@ -8,21 +8,39 @@ using Newtonsoft.Json;
 
 namespace Xamarin.Forms.Auth
 {
-    internal class OAuth2ResponseBase
+    /// <summary>
+    /// A response from the OAuth2 authentication.
+    /// </summary>
+    public class OAuth2ResponseBase
     {
-        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.Error)]
+        /// <summary>
+        /// Gets or sets any error string.
+        /// </summary>
+        [JsonProperty(PropertyName = "error")]
         public string Error { get; set; }
 
-        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.ErrorDescription)]
+        /// <summary>
+        /// Gets or sets any error description.
+        /// </summary>
+        [JsonProperty(PropertyName = "error_description")]
         public string ErrorDescription { get; set; }
 
-        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.ErrorCodes)]
+        /// <summary>
+        /// Gets or sets any error codes.
+        /// </summary>
+        [JsonProperty(PropertyName = "error_codes")]
         public string[] ErrorCodes { get; set; }
 
-        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.CorrelationId)]
+        /// <summary>
+        /// Gets or sets the correlation id.
+        /// </summary>
+        [JsonProperty(PropertyName = "correlation_id")]
         public string CorrelationId { get; set; }
 
-        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.Claims)]
+        /// <summary>
+        /// Gets or sets any claims.
+        /// </summary>
+        [JsonProperty(PropertyName = "claims")]
         public string Claims { get; set; }
     }
 }

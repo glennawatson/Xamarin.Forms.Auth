@@ -2,6 +2,7 @@
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,58 +22,54 @@ namespace Xamarin.Forms.Auth
 
         public bool ForceRefresh { get; }
 
-        internal override async Task<AuthenticationResult> ExecuteAsync(CancellationToken cancellationToken)
+        internal override async Task<OAuth2TokenResponse> ExecuteAsync(CancellationToken cancellationToken)
         {
             if (TokenCache == null)
             {
-                throw new MsalUiRequiredException(
-                    MsalUiRequiredException.TokenCacheNullError,
+                throw new AuthUiRequiredException(
+                    AuthUiRequiredException.TokenCacheNullError,
                     "Token cache is set to null. Silent requests cannot be executed.");
             }
 
-            MsalAccessTokenCacheItem msalAccessTokenItem = null;
+            OAuth2TokenResponse tokenResponse = null;
 
             // Look for access token
             if (!ForceRefresh)
             {
-                msalAccessTokenItem =
-                    await TokenCache.FindAccessTokenAsync(AuthenticationRequestParameters).ConfigureAwait(false);
+                tokenResponse =
+                    await TokenCache.GetAccessToken(AuthenticationRequestParameters.Authority, AuthenticationRequestParameters.ClientId).ConfigureAwait(false);
             }
 
-            if (msalAccessTokenItem != null)
+            if (tokenResponse != null && tokenResponse.AccessTokenExpiresOn < DateTimeOffset.UtcNow)
             {
-                var msalIdTokenItem = TokenCache.GetIdTokenCacheItem(
-                    msalAccessTokenItem.GetIdTokenItemKey(),
-                    AuthenticationRequestParameters.RequestContext);
-
-                return new AuthenticationResult(msalAccessTokenItem, msalIdTokenItem);
+                return tokenResponse;
             }
 
-            var msalRefreshTokenItem =
-                await TokenCache.FindRefreshTokenAsync(AuthenticationRequestParameters).ConfigureAwait(false);
+            var refreshToken = tokenResponse?.RefreshToken;
 
-            if (msalRefreshTokenItem == null)
+            if (refreshToken == null)
             {
                 AuthenticationRequestParameters.RequestContext.Logger.Verbose("No Refresh Token was found in the cache");
 
-                throw new MsalUiRequiredException(
-                    MsalUiRequiredException.NoTokensFoundError,
+                throw new AuthUiRequiredException(
+                    AuthUiRequiredException.NoTokensFoundError,
                     "No Refresh Token found in the cache");
             }
 
             AuthenticationRequestParameters.RequestContext.Logger.Verbose("Refreshing access token...");
-            await ResolveAuthorityEndpointsAsync().ConfigureAwait(false);
-            var msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(msalRefreshTokenItem.Secret), cancellationToken)
+            var msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(refreshToken), cancellationToken)
                                         .ConfigureAwait(false);
 
             if (msalTokenResponse.RefreshToken == null)
             {
-                msalTokenResponse.RefreshToken = msalRefreshTokenItem.Secret;
+                msalTokenResponse.RefreshToken = refreshToken;
                 AuthenticationRequestParameters.RequestContext.Logger.Info(
                     "Refresh token was missing from the token refresh response, so the refresh token in the request is returned instead");
             }
 
-            return CacheTokenResponseAndCreateAuthenticationResult(msalTokenResponse);
+            await CacheTokenResponse(msalTokenResponse).ConfigureAwait(false);
+
+            return msalTokenResponse;
         }
 
         private Dictionary<string, string> GetBodyParameters(string refreshTokenSecret)

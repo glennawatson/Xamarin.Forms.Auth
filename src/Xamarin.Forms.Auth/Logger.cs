@@ -8,7 +8,7 @@ namespace Xamarin.Forms.Auth
 {
     /// <summary>
     /// Static class that allows application developers to set a callback to handle logs, specify the level
-    /// of logs desired and if they accept to log Personally Identifiable Information (PII) or not
+    /// of logs desired and if they accept to log Personally Identifiable Information (PII) or not.
     /// </summary>
     /// <example>
     /// <code>
@@ -28,7 +28,7 @@ namespace Xamarin.Forms.Auth
     ///  Logger.LogCallback = Log;
     ///  Logger.Level = LogLevel.Info;
     ///  Logger.PiiLoggingEnabled = true;
-    ///  AuthenticationResult result = await application.AcquireTokenAsync(
+    ///  OAuth2TokenResponse result = await application.AcquireTokenAsync(
     ///                                             new string[] { "User.Read" });
     ///  ...
     /// }
@@ -43,7 +43,7 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Gets or sets a callback instance that you can set in your app to consume and publish logs in a custom manner.
         /// </summary>
-        /// <exception cref="ArgumentException">will be thrown if the LogCallback was already set</exception>
+        /// <exception cref="ArgumentException">will be thrown if the LogCallback was already set.</exception>
         public static LogCallback LogCallback
         {
             get

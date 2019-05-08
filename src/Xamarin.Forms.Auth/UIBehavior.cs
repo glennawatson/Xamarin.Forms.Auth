@@ -2,13 +2,15 @@
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
+using System;
+
 namespace Xamarin.Forms.Auth
 {
     /// <summary>
     /// Structure containing static members that you can use to specify how the interactive overrides
     /// of AcquireTokenAsync in <see cref="PublicClientApplication"/> should prompt the user.
     /// </summary>
-    /// <remarks>Only the .NET Framework platforms allows <c>UIBehavior.Never</c></remarks>
+    /// <remarks>Only the .NET Framework platforms allows <c>UIBehavior.Never</c>.</remarks>
 
     // Hide this for .net core at build time, but it needs to be public at runtime to support NetStandard
 #if NET_CORE_BUILDTIME
@@ -16,7 +18,7 @@ namespace Xamarin.Forms.Auth
 #else
     public
 #endif
-        struct UIBehavior
+        struct UIBehavior : IEquatable<UIBehavior>
     {
         /// <summary>
         /// AcquireToken will send <c>prompt=select_account</c> to Azure AD's authorize endpoint
@@ -56,52 +58,62 @@ namespace Xamarin.Forms.Auth
         public static readonly UIBehavior Never = new UIBehavior("attempt_none");
 #endif
 
-        internal string PromptValue { get; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UIBehavior"/> struct.
+        /// </summary>
+        /// <param name="promptValue">The value to prompt for.</param>
         private UIBehavior(string promptValue)
         {
             PromptValue = promptValue;
         }
 
-        /// <summary>
-        /// Equals method override to compare UIBehavior structs
-        /// </summary>
-        /// <param name="obj">object to compare against</param>
-        /// <returns>true if object are equal.</returns>
-        public override bool Equals(object obj)
-        {
-            return obj is UIBehavior && this == (UIBehavior)obj;
-        }
+        internal string PromptValue { get; }
 
         /// <summary>
-        /// Override to compute hashcode
+        /// operator overload to equality check.
         /// </summary>
-        /// <returns>hash code of the PromptValue</returns>
-        public override int GetHashCode()
-        {
-            return PromptValue.GetHashCode();
-        }
-
-        /// <summary>
-        /// operator overload to equality check
-        /// </summary>
-        /// <param name="x">first value</param>
-        /// <param name="y">second value</param>
-        /// <returns>true if the objects are equal</returns>
+        /// <param name="x">first value.</param>
+        /// <param name="y">second value.</param>
+        /// <returns>true if the objects are equal.</returns>
         public static bool operator ==(UIBehavior x, UIBehavior y)
         {
             return x.PromptValue == y.PromptValue;
         }
 
         /// <summary>
-        /// operator overload to equality check
+        /// operator overload to equality check.
         /// </summary>
-        /// <param name="x">first value</param>
-        /// <param name="y">second value</param>
-        /// <returns>true if the objects are not equal</returns>
+        /// <param name="x">first value.</param>
+        /// <param name="y">second value.</param>
+        /// <returns>true if the objects are not equal.</returns>
         public static bool operator !=(UIBehavior x, UIBehavior y)
         {
             return !(x == y);
+        }
+
+        /// <summary>
+        /// Equals method override to compare UIBehavior structs.
+        /// </summary>
+        /// <param name="obj">object to compare against.</param>
+        /// <returns>true if object are equal.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj is UIBehavior other && Equals(other);
+        }
+
+        /// <summary>
+        /// Override to compute hashcode.
+        /// </summary>
+        /// <returns>hash code of the PromptValue.</returns>
+        public override int GetHashCode()
+        {
+            return PromptValue != null ? PromptValue.GetHashCode(StringComparison.InvariantCulture) : 0;
+        }
+
+        /// <inheritdoc />
+        public bool Equals(UIBehavior other)
+        {
+            return string.Equals(PromptValue, other.PromptValue, StringComparison.InvariantCulture);
         }
     }
 }

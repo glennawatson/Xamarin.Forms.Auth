@@ -20,7 +20,7 @@ namespace Xamarin.Forms.Auth
         }
 
         /// <summary>
-        ///     Gets the platform proxy, which can be used to perform platform specific operations
+        ///     Gets the platform proxy, which can be used to perform platform specific operations.
         /// </summary>
         public static IPlatformProxy GetPlatformProxy()
         {

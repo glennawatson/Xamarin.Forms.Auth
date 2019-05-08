@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Xamarin.Forms.Auth
@@ -21,12 +22,14 @@ namespace Xamarin.Forms.Auth
         /// <param name="headers">The headers to use.</param>
         /// <param name="bodyParameters">Parameters for the body.</param>
         /// <param name="requestContext">The context with information about the request.</param>
+        /// <param name="token">A cancellation token for cancelling a request.</param>
         /// <returns>The response.</returns>
         Task<HttpResponse> SendPostAsync(
             Uri endpoint,
             IDictionary<string, string> headers,
             IDictionary<string, string> bodyParameters,
-            RequestContext requestContext);
+            RequestContext requestContext,
+            CancellationToken token);
 
         /// <summary>
         /// Sends the message request using POST.
@@ -35,12 +38,14 @@ namespace Xamarin.Forms.Auth
         /// <param name="headers">The headers to use.</param>
         /// <param name="body">The body to send..</param>
         /// <param name="requestContext">The context with information about the request.</param>
+        /// <param name="token">A cancellation token for cancelling a request.</param>
         /// <returns>The response.</returns>
         Task<HttpResponse> SendPostAsync(
             Uri endpoint,
             IDictionary<string, string> headers,
             HttpContent body,
-            RequestContext requestContext);
+            RequestContext requestContext,
+            CancellationToken token);
 
         /// <summary>
         /// Sends the message request using GET.
@@ -48,11 +53,13 @@ namespace Xamarin.Forms.Auth
         /// <param name="endpoint">The end point where to end the message.</param>
         /// <param name="headers">The headers to use.</param>
         /// <param name="requestContext">The context with information about the request.</param>
+        /// <param name="token">A cancellation token for cancelling a request.</param>
         /// <returns>The response.</returns>
         Task<HttpResponse> SendGetAsync(
             Uri endpoint,
             Dictionary<string, string> headers,
-            RequestContext requestContext);
+            RequestContext requestContext,
+            CancellationToken token);
 
         /// <summary>
         /// Sends the message request using POST which requires a response.
@@ -61,11 +68,13 @@ namespace Xamarin.Forms.Auth
         /// <param name="headers">The headers to use.</param>
         /// <param name="body">The body to send..</param>
         /// <param name="requestContext">The context with information about the request.</param>
+        /// <param name="token">A cancellation token for cancelling a request.</param>
         /// <returns>The response.</returns>
         Task<IHttpWebResponse> SendPostForceResponseAsync(
             Uri uri,
             Dictionary<string, string> headers,
             StringContent body,
-            RequestContext requestContext);
+            RequestContext requestContext,
+            CancellationToken token);
     }
 }

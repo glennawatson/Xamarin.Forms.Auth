@@ -7,10 +7,24 @@ using System.Net.Http.Headers;
 
 namespace Xamarin.Forms.Auth
 {
-    internal interface IHttpWebResponse 
+    /// <summary>
+    /// A response from a HTTP request.
+    /// </summary>
+    internal interface IHttpWebResponse
     {
+        /// <summary>
+        /// Gets the status code from the request.
+        /// </summary>
         HttpStatusCode StatusCode { get; }
+
+        /// <summary>
+        /// Gets the headers sent in the response.
+        /// </summary>
         HttpResponseHeaders Headers { get; }
+
+        /// <summary>
+        /// Gets the body of the response.
+        /// </summary>
         string Body { get; }
     }
 }

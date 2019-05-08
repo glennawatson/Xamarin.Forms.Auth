@@ -24,6 +24,9 @@ namespace Xamarin.Forms.Auth
         public IPlatformLogger PlatformLogger => _platformLogger.Value;
 
         /// <inheritdoc />
+        public ITokenCache TokenCache { get; } = new EssentialsTokenCache();
+
+        /// <inheritdoc />
         public Task<string> GetUserPrincipalNameAsync()
         {
             return Task.FromResult(string.Empty);

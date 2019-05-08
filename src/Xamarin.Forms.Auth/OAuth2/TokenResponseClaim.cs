@@ -4,7 +4,7 @@
 
 namespace Xamarin.Forms.Auth
 {
-    internal class TokenResponseClaim : OAuth2ResponseBaseClaim
+    internal static class TokenResponseClaim
     {
         public const string Code = "code";
         public const string TokenType = "token_type";

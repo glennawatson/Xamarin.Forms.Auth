@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
@@ -98,12 +99,12 @@ namespace Xamarin.Forms.Auth
             _bodyParameters[key] = value;
         }
 
-        public async Task<OAuth2TokenResponse> GetTokenAsync(Uri endPoint, RequestContext requestContext)
+        public async Task<OAuth2TokenResponse> GetTokenAsync(Uri endPoint, RequestContext requestContext, CancellationToken token)
         {
-            return await ExecuteRequestAsync<OAuth2TokenResponse>(endPoint, HttpMethod.Post, requestContext).ConfigureAwait(false);
+            return await ExecuteRequestAsync<OAuth2TokenResponse>(endPoint, HttpMethod.Post, requestContext, token).ConfigureAwait(false);
         }
 
-        internal async Task<T> ExecuteRequestAsync<T>(Uri endPoint, HttpMethod method, RequestContext requestContext)
+        internal async Task<T> ExecuteRequestAsync<T>(Uri endPoint, HttpMethod method, RequestContext requestContext, CancellationToken token)
         {
             bool addCorrelationId =
                 requestContext != null && !string.IsNullOrEmpty(requestContext.Logger.CorrelationId.ToString());
@@ -118,12 +119,12 @@ namespace Xamarin.Forms.Auth
             HttpResponse response;
             if (method == HttpMethod.Post)
             {
-                response = await _httpManager.SendPostAsync(endpointUri, _headers, _bodyParameters, requestContext)
+                response = await _httpManager.SendPostAsync(endpointUri, _headers, _bodyParameters, requestContext, token)
                                             .ConfigureAwait(false);
             }
             else
             {
-                response = await _httpManager.SendGetAsync(endpointUri, _headers, requestContext).ConfigureAwait(false);
+                response = await _httpManager.SendGetAsync(endpointUri, _headers, requestContext, token).ConfigureAwait(false);
             }
 
             return CreateResponse<T>(response, requestContext, addCorrelationId);
@@ -131,7 +132,6 @@ namespace Xamarin.Forms.Auth
 
         private static Exception ExtractErrorsFromTheResponse(HttpResponse response, ref bool shouldLogAsError)
         {
-
             // In cases where the end-point is not found (404) response.body will be empty.
             if (string.IsNullOrWhiteSpace(response.Body))
             {

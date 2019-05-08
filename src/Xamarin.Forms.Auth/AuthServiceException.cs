@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization;
@@ -13,6 +14,8 @@ namespace Xamarin.Forms.Auth
     /// Exception type thrown when service returns an error response or other networking errors occur.
     /// </summary>
     [Serializable]
+    [SuppressMessage("Design", "CA1032: Implement constructors", Justification = "Not needed")]
+    [SuppressMessage("Design", "CA2229: Implement constructors", Justification = "Not needed")]
     public class AuthServiceException : AuthException
     {
         /// <summary>
@@ -30,7 +33,7 @@ namespace Xamarin.Forms.Auth
 
         /// <summary>
         /// Upn required.
-        /// <para>What happens.</para> An override of a token acquisition operation was called in <see cref="T:PublicClientApplication"/> which
+        /// <para>What happens.</para> An override of a token acquisition operation was called in <see cref="PublicClientApplication"/> which
         /// takes a <c>loginHint</c> as a parameters, but this login hint was not using the UserPrincipalName (UPN) format, e.g. <c>john.doe@contoso.com</c>
         /// expected by the service.
         /// <para>Remediation.</para> Make sure in your code that you enforce <c>loginHint</c> to be a UPN.
@@ -152,7 +155,7 @@ namespace Xamarin.Forms.Auth
 
         /// <summary>
         /// Gets the status code returned from http layer. This status code is either the <c>HttpStatusCode</c> in the inner
-        /// <see cref="T:System.Net.Http.HttpRequestException"/> response or the the NavigateError Event Status Code in a browser based flow (See
+        /// <see cref="System.Net.Http.HttpRequestException"/> response or the the NavigateError Event Status Code in a browser based flow (See
         /// http://msdn.microsoft.com/en-us/library/bb268233(v=vs.85).aspx).
         /// You can use this code for purposes such as implementing retry logic or error investigation.
         /// </summary>

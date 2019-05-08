@@ -6,40 +6,30 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using JWT;
 
 namespace Xamarin.Forms.Auth
 {
     internal class InteractiveRequest : RequestBase
     {
+        private const int CodeVerifierByteSize = 32;
+        private static readonly IBase64UrlEncoder _urlEncoder = new JwtBase64UrlEncoder();
         private readonly SortedSet<string> _extraScopesToConsent;
         private readonly UIBehavior _uiBehavior;
         private readonly IWebUI _webUi;
-        private AuthorizationResult _authorizationResult;
         private string _codeVerifier;
         private string _state;
+        private AuthorizationResult _authorizationResult;
 
         public InteractiveRequest(
             IServiceBundle serviceBundle,
             AuthenticationRequestParameters authenticationRequestParameters,
-            IEnumerable<string> extraScopesToConsent,
-            UIBehavior uiBehavior,
-            IWebUI webUi)
-            : this(
-                serviceBundle,
-                authenticationRequestParameters,
-                extraScopesToConsent,
-                authenticationRequestParameters.Account?.Username,
-                uiBehavior,
-                webUi)
-        {
-        }
-
-        public InteractiveRequest(
-            IServiceBundle serviceBundle,
-            AuthenticationRequestParameters authenticationRequestParameters,
-            IEnumerable<string> extraScopesToConsent,
+            IReadOnlyCollection<string> extraScopesToConsent,
             string loginHint,
             UIBehavior uiBehavior,
             IWebUI webUi)
@@ -71,20 +61,45 @@ namespace Xamarin.Forms.Auth
                 "UIBehavior - " + _uiBehavior.PromptValue);
         }
 
-        internal override async Task<AuthenticationResult> ExecuteAsync(CancellationToken cancellationToken)
+        internal override async Task<OAuth2TokenResponse> ExecuteAsync(CancellationToken cancellationToken)
         {
-            await ResolveAuthorityEndpointsAsync().ConfigureAwait(false);
             await AcquireAuthorizationAsync().ConfigureAwait(false);
             VerifyAuthorizationResult();
-            var msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(), cancellationToken).ConfigureAwait(false);
-            return CacheTokenResponseAndCreateAuthenticationResult(msalTokenResponse);
+            var tokenResponse = await SendTokenRequestAsync(GetBodyParameters(), cancellationToken).ConfigureAwait(false);
+            await CacheTokenResponse(tokenResponse).ConfigureAwait(false);
+            return tokenResponse;
+        }
+
+        private static string GenerateCodeVerifier()
+        {
+            byte[] buffer = new byte[CodeVerifierByteSize];
+            using (var randomSource = new RNGCryptoServiceProvider())
+            {
+                randomSource.GetBytes(buffer);
+            }
+
+            return _urlEncoder.Encode(buffer);
+        }
+
+        private static string CreateBase64UrlEncodedSha256Hash(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return null;
+            }
+
+            using (SHA256Managed sha = new SHA256Managed())
+            {
+                UTF8Encoding encoding = new UTF8Encoding();
+                return _urlEncoder.Encode(sha.ComputeHash(encoding.GetBytes(input)));
+            }
         }
 
         private async Task AcquireAuthorizationAsync()
         {
             var authorizationUri = CreateAuthorizationUri(true, true);
 
-            await _webUi.AcquireAuthorizationAsync(
+            _authorizationResult = await _webUi.AcquireAuthorizationAsync(
                                        authorizationUri,
                                        AuthenticationRequestParameters.RedirectUri,
                                        AuthenticationRequestParameters.RequestContext).ConfigureAwait(false);
@@ -109,10 +124,8 @@ namespace Xamarin.Forms.Auth
 
             if (addVerifier)
             {
-                _codeVerifier = ServiceBundle.PlatformProxy.CryptographyManager.GenerateCodeVerifier();
-                string codeVerifierHash = ServiceBundle.PlatformProxy.CryptographyManager.CreateBase64UrlEncodedSha256Hash(_codeVerifier);
-
-                requestParameters[OAuth2Parameter.CodeChallenge] = codeVerifierHash;
+                _codeVerifier = GenerateCodeVerifier();
+                requestParameters[OAuth2Parameter.CodeChallenge] = CreateBase64UrlEncodedSha256Hash(_codeVerifier);
                 requestParameters[OAuth2Parameter.CodeChallengeMethod] = OAuth2Value.CodeChallengeMethodValue;
             }
 
@@ -120,15 +133,6 @@ namespace Xamarin.Forms.Auth
             {
                 _state = Guid.NewGuid().ToString();
                 requestParameters[OAuth2Parameter.State] = _state;
-            }
-
-            // Add uid/utid values to QP if user object was passed in.
-            if (AuthenticationRequestParameters.Account != null)
-            {
-                if (!string.IsNullOrEmpty(AuthenticationRequestParameters.Account.Username))
-                {
-                    requestParameters[OAuth2Parameter.LoginHint] = AuthenticationRequestParameters.Account.Username;
-                }
             }
 
             CheckForDuplicateQueryParameters(AuthenticationRequestParameters.ExtraQueryParameters, requestParameters);
@@ -191,7 +195,7 @@ namespace Xamarin.Forms.Auth
             if (AuthenticationRequestParameters.RequestContext?.Logger?.CorrelationId != Guid.Empty)
             {
                 authorizationRequestParameters[OAuth2Parameter.CorrelationId] =
-                    AuthenticationRequestParameters.RequestContext.Logger.CorrelationId.ToString();
+                    AuthenticationRequestParameters.RequestContext?.Logger?.CorrelationId.ToString();
             }
 
             if (_uiBehavior.PromptValue != UIBehavior.NoPrompt.PromptValue)

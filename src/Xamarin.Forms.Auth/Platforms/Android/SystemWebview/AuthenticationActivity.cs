@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using Android.App;
@@ -14,6 +15,7 @@ using Uri = Android.Net.Uri;
 
 namespace Xamarin.Forms.Auth
 {
+    [SuppressMessage("Design", "warning CA1812: AuthenticationActivity is an internal class that is apparently never instantiated.", Justification = "Used by Android reflectively")]
     [Activity(Name = "Xamarin.Auth.Forms.AuthenticationActivity")]
     [global::Android.Runtime.Preserve(AllMembers = true)]
     internal class AuthenticationActivity : Activity
@@ -134,8 +136,8 @@ namespace Xamarin.Forms.Auth
         private void SendError(string errorCode, string errorDescription)
         {
             Intent errorIntent = new Intent();
-            errorIntent.PutExtra(OAuth2ResponseBaseClaim.Error, errorCode)
-                .PutExtra(OAuth2ResponseBaseClaim.ErrorDescription, errorDescription);
+            errorIntent.PutExtra("error", errorCode)
+                .PutExtra("error_description", errorDescription);
             ReturnToCaller(AndroidConstants.AuthCodeError, errorIntent);
         }
 

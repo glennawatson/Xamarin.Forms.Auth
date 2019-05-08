@@ -4,7 +4,7 @@
 
 namespace Xamarin.Forms.Auth
 {
-    internal class LogMessages
+    internal static class LogMessages
     {
         public const string BeginningAcquireByRefreshToken = "Begin acquire token by refresh token...";
         public const string NoScopesProvidedForRefreshTokenRequest = "No scopes provided for acquire token by refresh token request. Using default scope instead.";

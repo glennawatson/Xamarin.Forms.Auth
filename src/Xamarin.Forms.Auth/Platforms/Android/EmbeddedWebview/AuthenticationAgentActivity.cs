@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Android.App;
 using Android.Content;
@@ -13,6 +14,7 @@ using Android.Widget;
 
 namespace Xamarin.Forms.Auth
 {
+    [SuppressMessage("Design", "warning CA1812: AuthenticationAgentActivity is an internal class that is apparently never instantiated.", Justification = "Used by Android reflectively")]
     [Activity(Label = "Sign in")]
     internal class AuthenticationAgentActivity : Activity
     {

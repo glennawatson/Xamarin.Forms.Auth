@@ -24,19 +24,8 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientApplicationBase"/> class.
         ///  </summary>
-        /// <param name="clientId">Client ID (also known as <i>Application ID</i>) of the application as registered in the
-        ///  application registration portal (https://aka.ms/msal-net-register-app).</param>
-        /// <param name="authority">URL of the security token service (STS) from which MSAL.NET will acquire the tokens.
-        ///  Usual authorities endpoints for the Azure public Cloud are:
-        ///  <list type="bullet">
-        ///  <item><description><c>https://login.microsoftonline.com/tenant/</c> where <c>tenant</c> is the tenant ID of the Azure AD tenant
-        ///  or a domain associated with this Azure AD tenant, in order to sign-in users of a specific organization only</description></item>
-        ///  <item><description><c>https://login.microsoftonline.com/common/</c> to sign-in users with any work and school accounts or Microsoft personal account</description></item>
-        ///  <item><description><c>https://login.microsoftonline.com/organizations/</c> to sign-in users with any work and school accounts</description></item>
-        ///  <item><description><c>https://login.microsoftonline.com/consumers/</c> to sign-in users with only personal Microsoft accounts (live)</description></item>
-        ///  </list>
-        ///  Note that this setting needs to be consistent with what is declared in the application registration portal.
-        ///  </param>
+        /// <param name="clientId">Client ID registered in your application portal.</param>
+        /// <param name="authority">URL of the security token service (STS) from which weT will acquire the tokens.</param>p
         /// <param name="redirectUri">also named <i>Reply URI</i>, the redirect URI is the URI where the STS will call back the application with the security token.</param>
         /// <param name="serviceBundle">The service bundle.</param>
         internal ClientApplicationBase(string clientId, Uri authority, Uri redirectUri, IServiceBundle serviceBundle)
@@ -46,8 +35,6 @@ namespace Xamarin.Forms.Auth
             ClientId = clientId;
             Authority = authority;
             RedirectUri = redirectUri;
-
-            RequestContext requestContext = new RequestContext(ClientId, new OAuth2Logger(Guid.Empty, null));
         }
 
         /// <summary>
@@ -73,7 +60,7 @@ namespace Xamarin.Forms.Auth
         public Uri RedirectUri { get; set; }
 
         /// <summary>
-        /// Sets or Gets a custom query parameters that may be sent to the STS for dogfood testing or debugging. This is a string of segments
+        /// Gets or sets a custom query parameters that may be sent to the STS for dogfood testing or debugging. This is a string of segments
         /// of the form <c>key=value</c> separated by an ampersand character.
         /// Unless requested otherwise by Microsoft support, this parameter should not be set by application developers as it may have adverse effect on the application.
         /// This property is also concatenated to the <c>extraQueryParameter</c> parameters of token acquisition operations.
@@ -82,141 +69,84 @@ namespace Xamarin.Forms.Auth
 
         internal IServiceBundle ServiceBundle { get; }
 
-        /// <summary>
-        /// Returns all the available <see cref="IAccount">accounts</see> in the user token cache for the application.
-        /// </summary>
-        /// <returns>A list of valid accounts.</returns>
-        public Task<IEnumerable<IAccount>> GetAccountsAsync()
-        {
-            RequestContext requestContext = new RequestContext(ClientId, new OAuth2Logger(Guid.Empty, null));
-            IEnumerable<IAccount> accounts = Enumerable.Empty<IAccount>();
-            if (UserTokenCache == null)
-            {
-                requestContext.Logger.Info("Token cache is null or empty. Returning empty list of accounts.");
-            }
-            else
-            {
-                accounts = UserTokenCache.GetAccounts(Authority, requestContext);
-            }
-
-            return Task.FromResult(accounts);
-        }
+        internal ITokenCache TokenCache => ServiceBundle?.PlatformProxy?.TokenCache;
 
         /// <summary>
-        /// Get the <see cref="IAccount"/> by its identifier among the accounts available in the token cache.
+        /// Attempts to acquire an access token from the token cache.
         /// </summary>
-        /// <param name="accountId">Account identifier. The identifier is typically
-        /// value of the <see cref="AccountId.Identifier"/> property of <see cref="AccountId"/>.
-        /// You typically get the account id from an <see cref="IAccount"/> by using the <see cref="IAccount.HomeAccountId"/> property>
-        /// </param>
-        public async Task<IAccount> GetAccountAsync(string accountId)
-        {
-            var accounts = await GetAccountsAsync().ConfigureAwait(false);
-            return accounts.FirstOrDefault(account => account.HomeAccountId.Identifier.Equals(accountId, StringComparison.OrdinalIgnoreCase));
-        }
-
-        /// <summary>
-        /// Attempts to acquire an access token for the <paramref name="account"/> from the user token cache.
-        /// </summary>
-        /// <param name="scopes">Scopes requested to access a protected API</param>
-        /// <param name="account">Account for which the token is requested. <see cref="IAccount"/></param>
-        /// <returns>An <see cref="AuthenticationResult"/> containing the requested token</returns>
-        /// <exception cref="MsalUiRequiredException">can be thrown in the case where an interaction is required with the end user of the application,
-        /// for instance so that the user consents, or re-signs-in (for instance if the password expired), or performs two factor authentication</exception>
+        /// <param name="scopes">Scopes requested to access a protected API.</param>
+        /// <returns>An <see cref="OAuth2TokenResponse"/> containing the requested token.</returns>
+        /// <exception cref="AuthUiRequiredException">can be thrown in the case where an interaction is required with the end user of the application,
+        /// for instance so that the user consents, or re-signs-in (for instance if the password expired), or performs two factor authentication.</exception>
         /// <remarks>
         /// The access token is considered a match if it contains <b>at least</b> all the requested scopes.
         /// This means that an access token with more scopes than requested could be returned as well. If the access token is expired or
         /// close to expiration (within a 5 minute window), then the cached refresh token (if available) is used to acquire a new access token by making a silent network call.
-        ///
-        /// See https://aka.ms/msal-net-acquiretokensilent for more details
         /// </remarks>
-        public async Task<AuthenticationResult> AcquireTokenSilentAsync(IEnumerable<string> scopes, IAccount account)
+        public Task<OAuth2TokenResponse> AcquireTokenSilentAsync(IReadOnlyCollection<string> scopes)
         {
-            return
-                await
-                    AcquireTokenSilentCommonAsync(Authority, scopes, account, false)
-                        .ConfigureAwait(false);
+            return AcquireTokenSilentCommonAsync(Authority, scopes, false);
         }
 
         /// <summary>
-        /// Attempts to acquire an access token for the <paramref name="account"/> from the user token cache, with advanced parameters controlling network call.
+        /// Attempts to acquire an access token with advanced parameters controlling network call.
         /// </summary>
-        /// <param name="scopes">Scopes requested to access a protected API</param>
-        /// <param name="account">Account for which the token is requested. <see cref="IAccount"/></param>
-        /// <param name="authority">Specific authority for which the token is requested. Passing a different value than configured in the application constructor
-        /// narrows down the selection to a specific tenant. This does not change the configured value in the application. This is specific
-        /// to applications managing several accounts (like a mail client with several mailboxes)</param>
+        /// <param name="scopes">Scopes requested to access a protected API.</param>
         /// <param name="forceRefresh">If <c>true</c>, ignore any access token in the cache and attempt to acquire new access token
         /// using the refresh token for the account if this one is available. This can be useful in the case when the application developer wants to make
-        /// sure that conditional access policies are applied immediately, rather than after the expiration of the access token</param>
-        /// <returns>An <see cref="AuthenticationResult"/> containing the requested access token</returns>
-        /// <exception cref="MsalUiRequiredException">can be thrown in the case where an interaction is required with the end user of the application,
+        /// sure that conditional access policies are applied immediately, rather than after the expiration of the access token.</param>
+        /// <returns>An <see cref="OAuth2TokenResponse"/> containing the requested access token.</returns>
+        /// <exception cref="AuthUiRequiredException">can be thrown in the case where an interaction is required with the end user of the application,
         /// for instance, if no refresh token was in the cache, or the user needs to consent, or re-sign-in (for instance if the password expired),
-        /// or performs two factor authentication</exception>
+        /// or performs two factor authentication.</exception>
         /// <remarks>
         /// The access token is considered a match if it contains <b>at least</b> all the requested scopes. This means that an access token with more scopes than
         /// requested could be returned as well. If the access token is expired or close to expiration (within a 5 minute window),
         /// then the cached refresh token (if available) is used to acquire a new access token by making a silent network call.
-        ///
-        /// See https://aka.ms/msal-net-acquiretokensilent for more details
         /// </remarks>
-        public async Task<AuthenticationResult> AcquireTokenSilentAsync(IEnumerable<string> scopes, IAccount account, Uri authority, bool forceRefresh)
+        public Task<OAuth2TokenResponse> AcquireTokenSilentAsync(IReadOnlyCollection<string> scopes, bool forceRefresh)
         {
-            return
-                await
-                    AcquireTokenSilentCommonAsync(authority, scopes, account, forceRefresh).ConfigureAwait(false);
+            return AcquireTokenSilentCommonAsync(Authority, scopes, forceRefresh);
         }
 
         /// <summary>
         /// Removes all tokens in the cache for the specified account.
         /// </summary>
-        /// <param name="account">Instance of the account that needs to be removed.</param>
         /// <returns>A task to monitor the progress of the action.</returns>
-        public Task RemoveAsync(IAccount account)
+        public Task RemoveAsync()
         {
-            RequestContext requestContext = CreateRequestContext();
-            if (account != null)
-            {
-                UserTokenCache?.RemoveAccount(account, requestContext);
-            }
+            TokenCache?.RemoveAccount(Authority, ClientId);
 
             return Task.FromResult(0);
         }
 
-        internal async Task<AuthenticationResult> AcquireTokenSilentCommonAsync(
+        internal Task<OAuth2TokenResponse> AcquireTokenSilentCommonAsync(
             Uri authority,
-            IEnumerable<string> scopes,
-            IAccount account,
+            IReadOnlyCollection<string> scopes,
             bool forceRefresh)
         {
-            if (account == null)
-            {
-                throw new AuthUiRequiredException(AuthUiRequiredException.UserNullError, "The account is required to be able to retrieve a token.");
-            }
-
             var handler = new SilentRequest(
                 ServiceBundle,
-                CreateRequestParameters(authority, scopes, account),
+                CreateRequestParameters(authority, scopes),
                 forceRefresh);
 
-            return await handler.RunAsync(CancellationToken.None).ConfigureAwait(false);
+            return handler.RunAsync(CancellationToken.None);
         }
 
-        internal async Task<AuthenticationResult> AcquireByRefreshTokenCommonAsync(IEnumerable<string> scopes, string userProvidedRefreshToken)
+        internal Task<OAuth2TokenResponse> AcquireByRefreshTokenCommonAsync(IReadOnlyCollection<string> scopes, string userProvidedRefreshToken)
         {
             var context = CreateRequestContext();
             SortedSet<string> scopesToPass;
 
-            if (scopes == null || !scopes.Any())
+            if (scopes == null || scopes.Count == 0)
             {
-                scopesToPass = new SortedSet<string>();
-                scopesToPass.Add(ClientId + "/.default");
+                scopesToPass = new SortedSet<string> { ClientId + "/.default" };
                 context.Logger.Info(LogMessages.NoScopesProvidedForRefreshTokenRequest);
             }
             else
             {
                 scopesToPass = ScopeHelper.CreateSortedSetFromEnumerable(scopes);
-                context.Logger.Info(string.Format(CultureInfo.InvariantCulture, LogMessages.UsingXScopesForRefreshTokenRequest, scopes.Count()));
+                context.Logger.Info(string.Format(CultureInfo.InvariantCulture, LogMessages.UsingXScopesForRefreshTokenRequest, scopes.Count));
             }
 
             var reqParams = new AuthenticationRequestParameters
@@ -235,20 +165,18 @@ namespace Xamarin.Forms.Auth
                 reqParams,
                 userProvidedRefreshToken);
 
-            return await handler.RunAsync(CancellationToken.None).ConfigureAwait(false);
+            return handler.RunAsync(CancellationToken.None);
         }
 
         internal virtual AuthenticationRequestParameters CreateRequestParameters(
             Uri authority,
-            IEnumerable<string> scopes,
-            IAccount account)
+            IReadOnlyCollection<string> scopes)
         {
             return new AuthenticationRequestParameters
             {
                 SliceParameters = SliceParameters,
                 Authority = authority,
                 ClientId = ClientId,
-                Account = account,
                 Scope = ScopeHelper.CreateSortedSetFromEnumerable(scopes),
                 RedirectUri = RedirectUri,
                 RequestContext = CreateRequestContext(),

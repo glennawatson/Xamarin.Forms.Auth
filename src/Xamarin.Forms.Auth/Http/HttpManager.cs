@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Xamarin.Forms.Auth
@@ -26,10 +27,11 @@ namespace Xamarin.Forms.Auth
             Uri endpoint,
             IDictionary<string, string> headers,
             IDictionary<string, string> bodyParameters,
-            RequestContext requestContext)
+            RequestContext requestContext,
+            CancellationToken token)
         {
             HttpContent body = bodyParameters == null ? null : new FormUrlEncodedContent(bodyParameters);
-            return await SendPostAsync(endpoint, headers, body, requestContext).ConfigureAwait(false);
+            return await SendPostAsync(endpoint, headers, body, requestContext, token).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -37,22 +39,24 @@ namespace Xamarin.Forms.Auth
             Uri endpoint,
             IDictionary<string, string> headers,
             HttpContent body,
-            RequestContext requestContext)
+            RequestContext requestContext,
+            CancellationToken token)
         {
-            return await ExecuteWithRetryAsync(endpoint, headers, body, HttpMethod.Post, requestContext).ConfigureAwait(false);
+            return await ExecuteWithRetryAsync(endpoint, headers, body, HttpMethod.Post, requestContext, token: token).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task<HttpResponse> SendGetAsync(
             Uri endpoint,
             Dictionary<string, string> headers,
-            RequestContext requestContext)
+            RequestContext requestContext,
+            CancellationToken token)
         {
-            return await ExecuteWithRetryAsync(endpoint, headers, null, HttpMethod.Get, requestContext).ConfigureAwait(false);
+            return await ExecuteWithRetryAsync(endpoint, headers, null, HttpMethod.Get, requestContext, token: token).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Performs the POST request just like <see cref="SendPostAsync(Uri, IDictionary{string, string}, HttpContent, RequestContext)"/>
+        /// Performs the POST request just like <see cref="SendPostAsync(Uri, IDictionary{string, string}, HttpContent, RequestContext, CancellationToken)"/>
         /// but does not throw a ServiceUnavailable service exception. Instead, it returns the <see cref="IHttpWebResponse"/> associated
         /// with the request.
         /// </summary>
@@ -60,14 +64,16 @@ namespace Xamarin.Forms.Auth
         /// <param name="headers">The headers to use.</param>
         /// <param name="body">The body to send..</param>
         /// <param name="requestContext">The context with information about the request.</param>
+        /// <param name="token">A cancellation token for cancellation.</param>
         /// <returns>The response.</returns>
         public async Task<IHttpWebResponse> SendPostForceResponseAsync(
             Uri uri,
             Dictionary<string, string> headers,
             StringContent body,
-            RequestContext requestContext)
+            RequestContext requestContext,
+            CancellationToken token)
         {
-            return await ExecuteWithRetryAsync(uri, headers, body, HttpMethod.Post, requestContext, doNotThrow: true).ConfigureAwait(false);
+            return await ExecuteWithRetryAsync(uri, headers, body, HttpMethod.Post, requestContext, doNotThrow: true, token: token).ConfigureAwait(false);
         }
 
         internal /* internal for test only */ static async Task<HttpResponse> CreateResponseAsync(HttpResponseMessage response)
@@ -86,6 +92,34 @@ namespace Xamarin.Forms.Auth
         protected virtual HttpClient GetHttpClient()
         {
             return _httpClientFactory.HttpClient;
+        }
+
+        private static async Task<HttpContent> CloneHttpContentAsync(HttpContent httpContent)
+        {
+            var temp = new MemoryStream();
+            await httpContent.CopyToAsync(temp).ConfigureAwait(false);
+            temp.Position = 0;
+
+            var clone = new StreamContent(temp);
+            if (httpContent.Headers != null)
+            {
+                foreach (var h in httpContent.Headers)
+                {
+                    clone.Headers.Add(h.Key, h.Value);
+                }
+            }
+
+#if WINDOWS_APP
+            // WORKAROUND 
+            // On UWP there is a bug in the Http stack that causes an exception to be thrown when moving around a stream.
+            // https://stackoverflow.com/questions/31774058/postasync-throwing-irandomaccessstream-error-when-targeting-windows-10-uwp
+            // LoadIntoBufferAsync is necessary to buffer content for multiple reads - see https://stackoverflow.com/questions/26942514/multiple-calls-to-httpcontent-readasasync
+            // Documentation is sparse, but it looks like loading the buffer into memory avoids the bug, without 
+            // replacing the System.Net.HttpClient with Windows.Web.Http.HttpClient, which is not exactly a drop in replacement
+            await clone.LoadIntoBufferAsync().ConfigureAwait(false);
+#endif
+
+            return clone;
         }
 
         private HttpRequestMessage CreateRequestMessage(Uri endpoint, IDictionary<string, string> headers)
@@ -110,7 +144,8 @@ namespace Xamarin.Forms.Auth
             HttpMethod method,
             RequestContext requestContext,
             bool doNotThrow = false,
-            bool retry = true)
+            bool retry = true,
+            CancellationToken token = default)
         {
             Exception timeoutException = null;
             bool isRetryable = false;
@@ -126,7 +161,7 @@ namespace Xamarin.Forms.Auth
                     clonedBody = await CloneHttpContentAsync(body).ConfigureAwait(false);
                 }
 
-                response = await ExecuteAsync(endpoint, headers, clonedBody, method).ConfigureAwait(false);
+                response = await ExecuteAsync(endpoint, headers, clonedBody, method, token).ConfigureAwait(false);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -165,7 +200,8 @@ namespace Xamarin.Forms.Auth
                         method,
                         requestContext,
                         doNotThrow,
-                        retry: false).ConfigureAwait(false);
+                        retry: false,
+                        token: token).ConfigureAwait(false);
                 }
 
                 requestContext.Logger.Info("Request retry failed.");
@@ -196,7 +232,8 @@ namespace Xamarin.Forms.Auth
             Uri endpoint,
             IDictionary<string, string> headers,
             HttpContent body,
-            HttpMethod method)
+            HttpMethod method,
+            CancellationToken token)
         {
             HttpClient client = GetHttpClient();
 
@@ -206,41 +243,13 @@ namespace Xamarin.Forms.Auth
                 requestMessage.Content = body;
 
                 using (HttpResponseMessage responseMessage =
-                    await client.SendAsync(requestMessage).ConfigureAwait(false))
+                    await client.SendAsync(requestMessage, token).ConfigureAwait(false))
                 {
                     HttpResponse returnValue = await CreateResponseAsync(responseMessage).ConfigureAwait(false);
                     returnValue.UserAgent = client.DefaultRequestHeaders.UserAgent.ToString();
                     return returnValue;
                 }
             }
-        }
-
-        private async Task<HttpContent> CloneHttpContentAsync(HttpContent httpContent)
-        {
-            var temp = new MemoryStream();
-            await httpContent.CopyToAsync(temp).ConfigureAwait(false);
-            temp.Position = 0;
-
-            var clone = new StreamContent(temp);
-            if (httpContent.Headers != null)
-            {
-                foreach (var h in httpContent.Headers)
-                {
-                    clone.Headers.Add(h.Key, h.Value);
-                }
-            }
-
-#if WINDOWS_APP
-            // WORKAROUND 
-            // On UWP there is a bug in the Http stack that causes an exception to be thrown when moving around a stream.
-            // https://stackoverflow.com/questions/31774058/postasync-throwing-irandomaccessstream-error-when-targeting-windows-10-uwp
-            // LoadIntoBufferAsync is necessary to buffer content for multiple reads - see https://stackoverflow.com/questions/26942514/multiple-calls-to-httpcontent-readasasync
-            // Documentation is sparse, but it looks like loading the buffer into memory avoids the bug, without 
-            // replacing the System.Net.HttpClient with Windows.Web.Http.HttpClient, which is not exactly a drop in replacement
-            await clone.LoadIntoBufferAsync().ConfigureAwait(false);
-#endif
-
-            return clone;
         }
     }
 }

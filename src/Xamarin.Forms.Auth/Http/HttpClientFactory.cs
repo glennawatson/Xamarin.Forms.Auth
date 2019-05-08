@@ -9,9 +9,6 @@ namespace Xamarin.Forms.Auth
 {
     internal class HttpClientFactory : IHttpClientFactory
     {
-        // The HttpClient is a singleton per ClientApplication so that we don't have a process wide singleton.
-        public const long MaxResponseContentBufferSizeInBytes = 1024*1024;
-
         public HttpClientFactory()
         {
             var httpClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true })
@@ -24,6 +21,8 @@ namespace Xamarin.Forms.Auth
 
             HttpClient = httpClient;
         }
+
+        public long MaxResponseContentBufferSizeInBytes { get; } = 1024 * 1024;
 
         public HttpClient HttpClient { get; }
     }

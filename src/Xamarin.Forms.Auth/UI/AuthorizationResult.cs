@@ -6,12 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
+using Newtonsoft.Json;
+
 namespace Xamarin.Forms.Auth
 {
-    [DataContract]
     internal class AuthorizationResult
     {
-        internal AuthorizationResult(AuthorizationStatus status, string returnedUriInput) : this(status)
+        internal AuthorizationResult(AuthorizationStatus status, string returnedUriInput)
+            : this(status)
         {
             if (Status == AuthorizationStatus.UserCancel)
             {
@@ -34,20 +36,18 @@ namespace Xamarin.Forms.Auth
             Status = status;
         }
 
+        [JsonIgnore]
         public AuthorizationStatus Status { get; private set; }
 
-        [DataMember]
         public string Code { get; private set; }
 
-        [DataMember]
         public string Error { get; set; }
 
-        [DataMember]
         public string ErrorDescription { get; set; }
 
-        [DataMember]
         public string CloudInstanceHost { get; set; }
 
+        [JsonIgnore]
         public string State { get; set; }
 
         public void ParseAuthorizeResponse(string webAuthenticationResult)
@@ -60,8 +60,7 @@ namespace Xamarin.Forms.Auth
             if (!string.IsNullOrWhiteSpace(resultData))
             {
                 // RemoveAccount the leading '?' first
-                Dictionary<string, string> response = CoreHelpers.ParseKeyValueList(resultData.Substring(1), '&',
-                    true, null);
+                var response = CoreHelpers.ParseKeyValueList(resultData.Substring(1), '&', true, null);
 
                 if (response.ContainsKey(OAuth2Parameter.State))
                 {
@@ -76,11 +75,11 @@ namespace Xamarin.Forms.Auth
                 {
                     Code = webAuthenticationResult;
                 }
-                else if (response.ContainsKey(TokenResponseClaim.Error))
+                else if (response.ContainsKey("error"))
                 {
-                    Error = response[TokenResponseClaim.Error];
-                    ErrorDescription = response.ContainsKey(TokenResponseClaim.ErrorDescription)
-                        ? response[TokenResponseClaim.ErrorDescription]
+                    Error = response["error"];
+                    ErrorDescription = response.ContainsKey("error_description")
+                        ? response["error_description"]
                         : null;
                     Status = AuthorizationStatus.ProtocolError;
                 }

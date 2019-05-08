@@ -7,7 +7,7 @@ namespace Xamarin.Forms.Auth
     /// <summary>
     /// Error codes attached to each exception.
     /// </summary>
-    internal class CoreErrorCodes
+    internal static class CoreErrorCodes
     {
         public const string JsonParseError = "json_parse_failed";
         public const string RequestTimeout = "request_timeout";

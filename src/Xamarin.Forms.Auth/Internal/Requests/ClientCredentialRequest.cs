@@ -21,21 +21,21 @@ namespace Xamarin.Forms.Auth
 
         public bool ForceRefresh { get; }
 
-        internal override async Task<AuthenticationResult> ExecuteAsync(CancellationToken cancellationToken)
+        internal override async Task<OAuth2TokenResponse> ExecuteAsync(CancellationToken cancellationToken)
         {
             if (!ForceRefresh && TokenCache != null)
             {
                 var msalAccessTokenItem =
-                    await TokenCache.FindAccessTokenAsync(AuthenticationRequestParameters).ConfigureAwait(false);
+                    await TokenCache.GetAccessToken(AuthenticationRequestParameters.Authority, AuthenticationRequestParameters.ClientId).ConfigureAwait(false);
                 if (msalAccessTokenItem != null)
                 {
-                    return new AuthenticationResult(msalAccessTokenItem, null);
+                    return msalAccessTokenItem;
                 }
             }
 
-            await ResolveAuthorityEndpointsAsync().ConfigureAwait(false);
             var msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(), cancellationToken).ConfigureAwait(false);
-            return CacheTokenResponseAndCreateAuthenticationResult(msalTokenResponse);
+            await CacheTokenResponse(msalTokenResponse).ConfigureAwait(false);
+            return msalTokenResponse;
         }
 
         private Dictionary<string, string> GetBodyParameters()

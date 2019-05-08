@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Xamarin.Forms.Auth
 {
     [global::Android.Runtime.Preserve(AllMembers = true)]
-    internal class DeviceAuthHelper
+    internal static class DeviceAuthHelper
     {
         public static bool CanHandleDeviceAuthChallenge => false;
 

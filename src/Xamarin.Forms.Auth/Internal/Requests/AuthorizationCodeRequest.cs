@@ -18,18 +18,17 @@ namespace Xamarin.Forms.Auth
         {
             if (string.IsNullOrWhiteSpace(authenticationRequestParameters.AuthorizationCode))
             {
-                throw new ArgumentNullException(nameof(authenticationRequestParameters.AuthorizationCode));
+                throw new ArgumentNullException(nameof(authenticationRequestParameters), "There is a problem with " + nameof(authenticationRequestParameters.AuthorizationCode));
             }
 
             RedirectUriHelper.Validate(authenticationRequestParameters.RedirectUri);
         }
 
-
-        internal override async Task<AuthenticationResult> ExecuteAsync(CancellationToken cancellationToken)
+        internal override async Task<OAuth2TokenResponse> ExecuteAsync(CancellationToken cancellationToken)
         {
-            await ResolveAuthorityEndpointsAsync().ConfigureAwait(false);
             var msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(), cancellationToken).ConfigureAwait(false);
-            return CacheTokenResponseAndCreateAuthenticationResult(msalTokenResponse);
+            await CacheTokenResponse(msalTokenResponse).ConfigureAwait(false);
+            return msalTokenResponse;
         }
 
         private Dictionary<string, string> GetBodyParameters()

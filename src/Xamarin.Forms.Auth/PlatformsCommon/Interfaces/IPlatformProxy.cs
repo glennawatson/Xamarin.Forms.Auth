@@ -18,6 +18,11 @@ namespace Xamarin.Forms.Auth
         IPlatformLogger PlatformLogger { get; }
 
         /// <summary>
+        /// Gets the cache for tokens.
+        /// </summary>
+        ITokenCache TokenCache { get; }
+
+        /// <summary>
         /// Gets the device model. On some TFMs this is not returned for security reasons.
         /// </summary>
         /// <returns>The device model or null.</returns>

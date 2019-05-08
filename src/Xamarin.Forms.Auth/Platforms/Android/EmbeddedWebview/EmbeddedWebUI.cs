@@ -25,7 +25,7 @@ namespace Xamarin.Forms.Auth
 
         public override async Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri, RequestContext requestContext)
         {
-            returnedUriReady = new SemaphoreSlim(0);
+            ReturnedUriReady = new SemaphoreSlim(0);
 
             try
             {
@@ -42,13 +42,13 @@ namespace Xamarin.Forms.Auth
                     ex);
             }
 
-            await returnedUriReady.WaitAsync().ConfigureAwait(false);
-            return authorizationResult;
+            await ReturnedUriReady.WaitAsync().ConfigureAwait(false);
+            return AuthorizationResult;
         }
 
         public override void ValidateRedirectUri(Uri redirectUri)
         {
-            RedirectUriHelper.Validate(redirectUri, usesSystemBrowser: false);
+            RedirectUriHelper.Validate(redirectUri);
         }
     }
 }

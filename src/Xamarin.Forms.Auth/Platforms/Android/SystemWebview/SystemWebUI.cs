@@ -24,32 +24,31 @@ namespace Xamarin.Forms.Auth
 
         public async override Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri, RequestContext requestContext)
         {
-            returnedUriReady = new SemaphoreSlim(0);
+            ReturnedUriReady = new SemaphoreSlim(0);
 
             try
             {
                 var agentIntent = new Intent(_parent.Activity, typeof(AuthenticationActivity));
-                agentIntent.PutExtra(AndroidConstants.RequestUrlKey, authorizationUri.AbsoluteUri);
-                agentIntent.PutExtra(AndroidConstants.CustomTabRedirect, redirectUri.OriginalString);
+                agentIntent.PutExtra(AndroidConstants.RequestUrlKey, authorizationUri.AbsoluteUri)
+                    .PutExtra(AndroidConstants.CustomTabRedirect, redirectUri.OriginalString);
                 AuthenticationActivity.RequestContext = RequestContext;
                 _parent.Activity.RunOnUiThread(() => _parent.Activity.StartActivityForResult(agentIntent, 0));
             }
             catch (Exception ex)
             {
-                requestContext.Logger.ErrorPii(ex);
-                throw MsalExceptionFactory.GetClientException(
+                throw ExceptionFactory.GetClientException(
                     CoreErrorCodes.AuthenticationUiFailedError,
                     "AuthenticationActivity failed to start",
                     ex);
             }
 
-            await returnedUriReady.WaitAsync().ConfigureAwait(false);
-            return authorizationResult;
+            await ReturnedUriReady.WaitAsync().ConfigureAwait(false);
+            return AuthorizationResult;
         }
 
         public override void ValidateRedirectUri(Uri redirectUri)
         {
-            RedirectUriHelper.Validate(redirectUri, usesSystemBrowser: true);
+            RedirectUriHelper.Validate(redirectUri);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Xamarin.Forms.Auth
     /// <summary>
     /// Platform / OS specific logic.  No library (ADAL / MSAL) specific code should go in here.
     /// </summary>
-    internal class Netstandard13PlatformProxy : IPlatformProxy
+    internal class PlatformProxy : IPlatformProxy
     {
         private readonly Lazy<IPlatformLogger> _platformLogger =
             new Lazy<IPlatformLogger>(() => new EventSourcePlatformLogger());
@@ -20,6 +20,9 @@ namespace Xamarin.Forms.Auth
         /// <inheritdoc />
         public IPlatformLogger PlatformLogger => _platformLogger.Value;
 
+        /// <inheritdoc />
+        public ITokenCache TokenCache => null;
+
         /// <summary>
         /// Get the user logged in.
         /// </summary>
@@ -28,6 +31,7 @@ namespace Xamarin.Forms.Auth
             return Task.FromResult(string.Empty);
         }
 
+        /// <inheritdoc />
         public Task<bool> IsUserLocalAsync(RequestContext requestContext)
         {
             return Task.FromResult(false);
@@ -45,11 +49,13 @@ namespace Xamarin.Forms.Auth
             return "MSAL.CoreCLR";
         }
 
+        /// <inheritdoc />
         public bool IsDomainJoined()
         {
             return false;
         }
 
+        /// <inheritdoc />
         public string GetEnvironmentVariable(string variable)
         {
             if (string.IsNullOrWhiteSpace(variable))
@@ -75,28 +81,16 @@ namespace Xamarin.Forms.Auth
             return null;
         }
 
-        /// <summary>
-        /// Considered PII, ensure that it is hashed.
-        /// </summary>
-        /// <returns>Name of the calling application</returns>
         public string GetCallingApplicationName()
         {
             return null;
         }
 
-        /// <summary>
-        /// Considered PII, ensure that it is hashed.
-        /// </summary>
-        /// <returns>Version of the calling application</returns>
         public string GetCallingApplicationVersion()
         {
             return null;
         }
 
-        /// <summary>
-        /// Considered PII. Please ensure that it is hashed.
-        /// </summary>
-        /// <returns>Device identifier</returns>
         public string GetDeviceId()
         {
             return null;

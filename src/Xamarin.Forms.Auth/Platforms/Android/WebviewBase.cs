@@ -10,15 +10,16 @@ namespace Xamarin.Forms.Auth
 {
     internal abstract class WebviewBase : IWebUI
     {
-        protected static SemaphoreSlim returnedUriReady;
-        protected static AuthorizationResult authorizationResult;
+        protected static SemaphoreSlim ReturnedUriReady { get; set; }
+
+        protected static AuthorizationResult AuthorizationResult { get; set; }
 
         public static void SetAuthorizationResult(AuthorizationResult authorizationResultInput, RequestContext requestContext)
         {
-            if (returnedUriReady != null)
+            if (ReturnedUriReady != null)
             {
-                authorizationResult = authorizationResultInput;
-                returnedUriReady.Release();
+                AuthorizationResult = authorizationResultInput;
+                ReturnedUriReady.Release();
             }
             else
             {
@@ -28,8 +29,8 @@ namespace Xamarin.Forms.Auth
 
         public static void SetAuthorizationResult(AuthorizationResult authorizationResultInput)
         {
-            authorizationResult = authorizationResultInput;
-            returnedUriReady.Release();
+            AuthorizationResult = authorizationResultInput;
+            ReturnedUriReady.Release();
         }
 
         public abstract Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri, RequestContext requestContext);

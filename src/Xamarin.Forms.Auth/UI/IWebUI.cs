@@ -12,6 +12,13 @@ namespace Xamarin.Forms.Auth
     /// </summary>
     internal interface IWebUI
     {
+        /// <summary>
+        /// Azures a authentication result from the specified URIs.
+        /// </summary>
+        /// <param name="authorizationUri">The URI to the authorization server.</param>
+        /// <param name="redirectUri">The URI where to redirect with the results.</param>
+        /// <param name="requestContext">The context which contains the request details.</param>
+        /// <returns>The results of the authorization attempt.</returns>
         Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri, RequestContext requestContext);
 
         /// <summary>

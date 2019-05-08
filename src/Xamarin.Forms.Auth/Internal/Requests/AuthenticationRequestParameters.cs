@@ -28,10 +28,6 @@ namespace Xamarin.Forms.Auth
 
         public string ExtraQueryParameters { get; set; }
 
-        public IAccount Account { get; set; }
-
-        public UserAssertion UserAssertion { get; set; }
-
         public bool IsClientCredentialRequest { get; set; }
 
         public string SliceParameters { get; set; }
@@ -49,8 +45,7 @@ namespace Xamarin.Forms.Auth
             builder.AppendLine("Client Id - " + ClientId)
                 .AppendLine("Scopes - " + Scope?.AsSingleString())
                 .AppendLine("Redirect Uri - " + RedirectUri?.OriginalString)
-                .AppendLine("LoginHint provided? - " + !string.IsNullOrEmpty(LoginHint))
-                .AppendLine("User provided? - " + (Account != null));
+                .AppendLine("LoginHint provided? - " + !string.IsNullOrEmpty(LoginHint));
             Dictionary<string, string> dict = CoreHelpers.ParseKeyValueList(ExtraQueryParameters, '&', true, RequestContext);
             builder.AppendLine("Extra Query Params Keys (space separated) - " + dict.Keys.AsSingleString());
             dict = CoreHelpers.ParseKeyValueList(SliceParameters, '&', true, RequestContext);
@@ -63,8 +58,7 @@ namespace Xamarin.Forms.Auth
                 Environment.NewLine + "=== Request Data ===" + Environment.NewLine + "Authority Provided? - " +
                 (Authority != null) + Environment.NewLine);
             builder.AppendLine("Scopes - " + Scope?.AsSingleString())
-                .AppendLine("LoginHint provided? - " + !string.IsNullOrEmpty(LoginHint))
-                .AppendLine("User provided? - " + (Account != null));
+                .AppendLine("LoginHint provided? - " + !string.IsNullOrEmpty(LoginHint));
             dict = CoreHelpers.ParseKeyValueList(ExtraQueryParameters, '&', true, RequestContext);
             builder.AppendLine("Extra Query Params Keys (space separated) - " + dict.Keys.AsSingleString());
             dict = CoreHelpers.ParseKeyValueList(SliceParameters, '&', true, RequestContext);

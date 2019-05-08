@@ -9,9 +9,7 @@ namespace Xamarin.Forms.Auth
 {
     /// <summary>
     /// This exception class is to inform developers that UI interaction is required for authentication to
-    /// succeed. It's thrown when calling <see cref="ClientApplicationBase.AcquireTokenSilentAsync(System.Collections.Generic.IEnumerable{string}, IAccount)"/> or one
-    /// of its overrides, and when the token does not exists in the cache, or the user needs to provide more content, or perform multiple factor authentication based
-    /// on Azure AD policies, etc..
+    /// succeed.
     /// </summary>
     [Serializable]
     public class AuthUiRequiredException : AuthServiceException
@@ -19,30 +17,25 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Standard OAuth2 protocol error code. It indicates to the libray that the application needs to expose the UI to the user
         /// so that the user does an interactive action in order to get a new token.
-        /// <para>Mitigation.</para> If your application is a <see cref="T:PublicClientApplication"/> call one of the <c>AcquireTokenAsync</c> overrides to
-        /// perform an interactive authentication. If your application is a <see cref="T:ConfidentialClientApplication"/> chances are that the Claims member
-        /// of the exception is not empty. See <see cref="P:MsalServiceException.Claims"/> for the right mitigation.
         /// </summary>
         public const string InvalidGrantError = "invalid_grant";
 
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
         /// <summary>
         /// <para>Mitigation.</para> If your application is a <see cref="PublicClientApplication"/> call one of the <c>AcquireTokenAsync</c> overrides so
-        /// that the user of your application signs-in and accepts consent. If your application is a <see cref="T:ConfidentialClientApplication"/>. If it's a Web App
-        /// you should have previously called <see cref="ConfidentialClientApplication.AcquireTokenByAuthorizationCodeAsync(string, System.Collections.Generic.IEnumerable{string})"/>
-        /// as described in https://aka.ms/msal-net-authorization-code. This error should not happen in Web APIs.
+        /// that the user of your application signs-in and accepts consent.
         /// </summary>
         public const string NoTokensFoundError = "no_tokens_found";
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 
         /// <summary>
-        /// This error code comes back from <see cref="ClientApplicationBase.AcquireTokenSilentAsync(System.Collections.Generic.IEnumerable{string}, IAccount)"/> calls when a null user is
+        /// This error code comes back from <see cref="ClientApplicationBase.AcquireTokenSilentAsync(System.Collections.Generic.IReadOnlyCollection{string})"/> calls when a null user is
         /// passed as the <c>account</c> parameter.
         /// </summary>
         public const string UserNullError = "user_null";
 
         /// <summary>
-        /// This error code comes back from <see cref="ClientApplicationBase.AcquireTokenSilentAsync(System.Collections.Generic.IEnumerable{string}, IAccount)"/> calls when
+        /// This error code comes back from <see cref="ClientApplicationBase.AcquireTokenSilentAsync(System.Collections.Generic.IReadOnlyCollection{string})"/> calls when
         /// the user cache had not been set in the application constructor.
         /// </summary>
         public const string TokenCacheNullError = "token_cache_null";

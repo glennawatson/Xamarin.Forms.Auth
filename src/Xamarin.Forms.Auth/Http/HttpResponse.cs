@@ -13,7 +13,8 @@ namespace Xamarin.Forms.Auth
     {
         public HttpResponseHeaders Headers { get; set; }
 
-        public IDictionary<string, string> HeadersAsDictionary {
+        public IDictionary<string, string> HeadersAsDictionary
+        {
             get
             {
                 var headers = new Dictionary<string, string>();
@@ -35,6 +36,5 @@ namespace Xamarin.Forms.Auth
         public string UserAgent { get; set; }
 
         public string Body { get; set; }
-
     }
 }

@@ -11,7 +11,7 @@ namespace Xamarin.Forms.Auth
 {
     internal class ByRefreshTokenRequest : RequestBase
     {
-        private string _userProvidedRefreshToken;
+        private readonly string _userProvidedRefreshToken;
 
         public ByRefreshTokenRequest(
             IServiceBundle serviceBundle,
@@ -22,7 +22,7 @@ namespace Xamarin.Forms.Auth
             _userProvidedRefreshToken = userProvidedRefreshToken;
         }
 
-        internal override async Task<AuthenticationResult> ExecuteAsync(CancellationToken cancellationToken)
+        internal override async Task<OAuth2TokenResponse> ExecuteAsync(CancellationToken cancellationToken)
         {
             if (TokenCache == null)
             {
@@ -32,7 +32,6 @@ namespace Xamarin.Forms.Auth
             }
 
             AuthenticationRequestParameters.RequestContext.Logger.Info(LogMessages.BeginningAcquireByRefreshToken);
-            await ResolveAuthorityEndpointsAsync().ConfigureAwait(false);
             var msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(_userProvidedRefreshToken), cancellationToken)
                                         .ConfigureAwait(false);
 
@@ -43,7 +42,8 @@ namespace Xamarin.Forms.Auth
                 throw new AuthServiceException(msalTokenResponse.Error, msalTokenResponse.ErrorDescription, null);
             }
 
-            return CacheTokenResponseAndCreateAuthenticationResult(msalTokenResponse);
+            await CacheTokenResponse(msalTokenResponse).ConfigureAwait(false);
+            return msalTokenResponse;
         }
 
         private Dictionary<string, string> GetBodyParameters(string refreshTokenSecret)

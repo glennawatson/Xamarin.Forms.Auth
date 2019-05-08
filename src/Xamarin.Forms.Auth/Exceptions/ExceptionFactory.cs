@@ -46,7 +46,7 @@ namespace Xamarin.Forms.Auth
         {
             ValidateRequiredArgs(errorCode, errorMessage);
 
-            return new AuthException(errorCode, errorMessage, innerException)
+            return new AuthServiceException(errorCode, errorMessage, innerException)
             {
                 Claims = exceptionDetail?.Claims,
                 ResponseBody = exceptionDetail?.ResponseBody,
@@ -63,7 +63,7 @@ namespace Xamarin.Forms.Auth
         {
             ValidateRequiredArgs(errorCode, errorMessage);
 
-            return new AuthException(errorCode, errorMessage, innerException)
+            return new AuthUiRequiredException(errorCode, errorMessage, innerException)
             {
                 Claims = exceptionDetail?.Claims,
                 ResponseBody = exceptionDetail?.ResponseBody,
