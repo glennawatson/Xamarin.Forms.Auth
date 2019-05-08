@@ -107,7 +107,7 @@ namespace Xamarin.Forms.Auth
         /// <returns>hash code of the PromptValue.</returns>
         public override int GetHashCode()
         {
-            return PromptValue != null ? PromptValue.GetHashCode(StringComparison.InvariantCulture) : 0;
+            return PromptValue != null ? StringComparer.InvariantCulture.GetHashCode(PromptValue) : 0;
         }
 
         /// <inheritdoc />

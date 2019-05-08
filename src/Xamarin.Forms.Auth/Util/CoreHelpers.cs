@@ -4,11 +4,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 
 namespace Xamarin.Forms.Auth
 {
+    [SuppressMessage("Design", "CA1307: The behavior of 'string.Replace(string, string)' could vary based on the current user's locale settings", Justification = "Not on all platforms.")]
     internal static class CoreHelpers
     {
         public static string ByteArrayToString(byte[] input)

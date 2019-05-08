@@ -86,12 +86,6 @@ namespace Xamarin.Forms.Auth
         }
 
         /// <inheritdoc />
-        public string GetDefaultRedirectUri(string clientId)
-        {
-            return string.Format(CultureInfo.InvariantCulture, AndroidDefaultRedirectUriTemplate, clientId);
-        }
-
-        /// <inheritdoc />
         public string GetProductName()
         {
             return "OAuth2.Xamarin.Android";
