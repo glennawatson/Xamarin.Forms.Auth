@@ -14,21 +14,33 @@ namespace Xamarin.Forms.Auth
         /// Optionally check that the redirect uri is not the OAuth2 standard redirect uri urn:ietf:wg:oauth:2.0:oob
         /// when using a system browser, because the browser cannot redirect back to the app.
         /// </summary>
-        /// <param name="redirectUri">The URI to validate.</param>
-        public static void Validate(Uri redirectUri)
+        /// <param name="redirectUri">The uri to validate.</param>
+        /// <param name="usesSystemBrowser">If we are using the system browser.</param>
+        public static void Validate(Uri redirectUri, bool usesSystemBrowser = false)
         {
             if (redirectUri == null)
             {
-                throw ExceptionFactory.GetClientException(
-                    CoreErrorCodes.NoRedirectUri,
-                    CoreErrorMessages.NoRedirectUri);
+                throw new AuthClientException(
+                    AuthError.NoRedirectUri,
+                    AuthErrorMessage.NoRedirectUri);
             }
 
             if (!string.IsNullOrWhiteSpace(redirectUri.Fragment))
             {
                 throw new ArgumentException(
-                    CoreErrorMessages.RedirectUriContainsFragment,
+                    AuthErrorMessage.RedirectUriContainsFragment,
                     nameof(redirectUri));
+            }
+
+            if (usesSystemBrowser &&
+                Constants.DefaultRedirectUri.Equals(redirectUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new AuthClientException(
+                    AuthError.DefaultRedirectUriIsInvalid,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        AuthErrorMessage.DefaultRedirectUriIsInvalid,
+                        Constants.DefaultRedirectUri));
             }
         }
     }

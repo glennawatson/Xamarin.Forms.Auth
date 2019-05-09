@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Glenn Watson. All rights reserved.
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
@@ -36,5 +36,7 @@ namespace Xamarin.Forms.Auth
 
         public const string Prompt = "prompt"; // prompt is not standard oauth2 parameter
         public const string ClientInfo = "client_info"; // restrict_to_hint is not standard oauth2 parameter
+
+        public const string Claims = "claims"; // claims is not a standard oauth2 paramter
     }
 }

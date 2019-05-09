@@ -8,79 +8,78 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Xamarin.Forms.Auth
 {
+    /// <summary>
+    /// We invoke this class from different threads and they all use the same HttpClient.
+    /// To prevent race conditions, make sure you do not get / set anything on HttpClient itself,
+    /// instead rely on HttpRequest objects which are thread specific.
+    ///
+    /// In particular, do not change any properties on HttpClient such as BaseAddress, buffer sizes and Timeout. You should
+    /// also not access DefaultRequestHeaders because the getters are not thread safe (use HttpRequestMessage.Headers instead).
+    /// </summary>
     internal class HttpManager : IHttpManager
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IAuthHttpClientFactory _httpClientFactory;
 
-        public HttpManager(IHttpClientFactory httpClientFactory = null)
+        public HttpManager(IAuthHttpClientFactory httpClientFactory = null)
         {
             _httpClientFactory = httpClientFactory ?? new HttpClientFactory();
         }
 
-        /// <inheritdoc />
         public async Task<HttpResponse> SendPostAsync(
             Uri endpoint,
             IDictionary<string, string> headers,
             IDictionary<string, string> bodyParameters,
-            RequestContext requestContext,
-            CancellationToken token)
+            RequestContext requestContext)
         {
             HttpContent body = bodyParameters == null ? null : new FormUrlEncodedContent(bodyParameters);
-            return await SendPostAsync(endpoint, headers, body, requestContext, token).ConfigureAwait(false);
+            return await SendPostAsync(endpoint, headers, body, requestContext).ConfigureAwait(false);
         }
 
-        /// <inheritdoc />
         public async Task<HttpResponse> SendPostAsync(
             Uri endpoint,
             IDictionary<string, string> headers,
             HttpContent body,
-            RequestContext requestContext,
-            CancellationToken token)
+            RequestContext requestContext)
         {
-            return await ExecuteWithRetryAsync(endpoint, headers, body, HttpMethod.Post, requestContext, token: token).ConfigureAwait(false);
+            return await ExecuteWithRetryAsync(endpoint, headers, body, HttpMethod.Post, requestContext).ConfigureAwait(false);
         }
 
-        /// <inheritdoc />
         public async Task<HttpResponse> SendGetAsync(
             Uri endpoint,
-            Dictionary<string, string> headers,
-            RequestContext requestContext,
-            CancellationToken token)
+            IDictionary<string, string> headers,
+            RequestContext requestContext)
         {
-            return await ExecuteWithRetryAsync(endpoint, headers, null, HttpMethod.Get, requestContext, token: token).ConfigureAwait(false);
+            return await ExecuteWithRetryAsync(endpoint, headers, null, HttpMethod.Get, requestContext).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Performs the POST request just like <see cref="SendPostAsync(Uri, IDictionary{string, string}, HttpContent, RequestContext, CancellationToken)"/>
-        /// but does not throw a ServiceUnavailable service exception. Instead, it returns the <see cref="IHttpWebResponse"/> associated
+        /// Performs the POST request just like <see cref="SendPostAsync(Uri, IDictionary{string, string}, HttpContent, RequestContext)"/>
+        /// but does not throw a ServiceUnavailable service exception. Instead, it returns the <see cref="HttpResponse"/> associated
         /// with the request.
         /// </summary>
-        /// <param name="uri">The end point where to end the message.</param>
-        /// <param name="headers">The headers to use.</param>
-        /// <param name="body">The body to send..</param>
-        /// <param name="requestContext">The context with information about the request.</param>
-        /// <param name="token">A cancellation token for cancellation.</param>
-        /// <returns>The response.</returns>
-        public async Task<IHttpWebResponse> SendPostForceResponseAsync(
+        /// <param name="uri">The uri of the request.</param>
+        /// <param name="headers">The headers of the request.</param>
+        /// <param name="body">The body of the request.</param>
+        /// <param name="requestContext">The context of the request.</param>
+        /// <returns>The response from the request.</returns>
+        public async Task<HttpResponse> SendPostForceResponseAsync(
             Uri uri,
             Dictionary<string, string> headers,
             StringContent body,
-            RequestContext requestContext,
-            CancellationToken token)
+            RequestContext requestContext)
         {
-            return await ExecuteWithRetryAsync(uri, headers, body, HttpMethod.Post, requestContext, doNotThrow: true, token: token).ConfigureAwait(false);
+            return await ExecuteWithRetryAsync(uri, headers, body, HttpMethod.Post, requestContext, doNotThrow: true).ConfigureAwait(false);
         }
 
         internal /* internal for test only */ static async Task<HttpResponse> CreateResponseAsync(HttpResponseMessage response)
         {
             var body = response.Content == null
-                ? null
-                : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                           ? null
+                           : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return new HttpResponse
             {
                 Headers = response.Headers,
@@ -91,7 +90,7 @@ namespace Xamarin.Forms.Auth
 
         protected virtual HttpClient GetHttpClient()
         {
-            return _httpClientFactory.HttpClient;
+            return _httpClientFactory.GetHttpClient();
         }
 
         private static async Task<HttpContent> CloneHttpContentAsync(HttpContent httpContent)
@@ -110,11 +109,11 @@ namespace Xamarin.Forms.Auth
             }
 
 #if WINDOWS_APP
-            // WORKAROUND 
+            // WORKAROUND
             // On UWP there is a bug in the Http stack that causes an exception to be thrown when moving around a stream.
             // https://stackoverflow.com/questions/31774058/postasync-throwing-irandomaccessstream-error-when-targeting-windows-10-uwp
             // LoadIntoBufferAsync is necessary to buffer content for multiple reads - see https://stackoverflow.com/questions/26942514/multiple-calls-to-httpcontent-readasasync
-            // Documentation is sparse, but it looks like loading the buffer into memory avoids the bug, without 
+            // Documentation is sparse, but it looks like loading the buffer into memory avoids the bug, without
             // replacing the System.Net.HttpClient with Windows.Web.Http.HttpClient, which is not exactly a drop in replacement
             await clone.LoadIntoBufferAsync().ConfigureAwait(false);
 #endif
@@ -144,8 +143,7 @@ namespace Xamarin.Forms.Auth
             HttpMethod method,
             RequestContext requestContext,
             bool doNotThrow = false,
-            bool retry = true,
-            CancellationToken token = default)
+            bool retry = true)
         {
             Exception timeoutException = null;
             bool isRetryable = false;
@@ -161,7 +159,7 @@ namespace Xamarin.Forms.Auth
                     clonedBody = await CloneHttpContentAsync(body).ConfigureAwait(false);
                 }
 
-                response = await ExecuteAsync(endpoint, headers, clonedBody, method, token).ConfigureAwait(false);
+                response = await ExecuteAsync(endpoint, headers, clonedBody, method).ConfigureAwait(false);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -169,11 +167,7 @@ namespace Xamarin.Forms.Auth
                 }
 
                 requestContext.Logger.Info(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        CoreErrorMessages.HttpRequestUnsuccessful,
-                        (int)response.StatusCode,
-                        response.StatusCode));
+                    string.Format(CultureInfo.InvariantCulture, AuthErrorMessage.HttpRequestUnsuccessful, (int)response.StatusCode, response.StatusCode));
 
                 if ((int)response.StatusCode >= 500 && (int)response.StatusCode < 600)
                 {
@@ -182,7 +176,7 @@ namespace Xamarin.Forms.Auth
             }
             catch (TaskCanceledException exception)
             {
-                requestContext.Logger.Error(exception.Message);
+                requestContext.Logger.Error("The HTTP request failed or it was canceled. " + exception.Message);
                 isRetryable = true;
                 timeoutException = exception;
             }
@@ -200,18 +194,16 @@ namespace Xamarin.Forms.Auth
                         method,
                         requestContext,
                         doNotThrow,
-                        retry: false,
-                        token: token).ConfigureAwait(false);
+                        retry: false).ConfigureAwait(false);
                 }
 
-                requestContext.Logger.Info("Request retry failed.");
+                requestContext.Logger.Error("Request retry failed.");
                 if (timeoutException != null)
                 {
-                    throw ExceptionFactory.GetServiceException(
-                        CoreErrorCodes.RequestTimeout,
+                    throw new AuthServiceException(
+                        AuthError.RequestTimeout,
                         "Request to the endpoint timed out.",
-                        timeoutException,
-                        (ExceptionDetail)null);
+                        timeoutException);
                 }
 
                 if (doNotThrow)
@@ -219,10 +211,10 @@ namespace Xamarin.Forms.Auth
                     return response;
                 }
 
-                throw ExceptionFactory.GetServiceException(
-                        CoreErrorCodes.ServiceNotAvailable,
-                        "Service is unavailable to process the request",
-                        response);
+                throw new AuthServiceException(AuthError.ServiceNotAvailable, "Service is unavailable to process the request")
+                {
+                    HttpResponse = response
+                };
             }
 
             return response;
@@ -232,8 +224,7 @@ namespace Xamarin.Forms.Auth
             Uri endpoint,
             IDictionary<string, string> headers,
             HttpContent body,
-            HttpMethod method,
-            CancellationToken token)
+            HttpMethod method)
         {
             HttpClient client = GetHttpClient();
 
@@ -243,10 +234,10 @@ namespace Xamarin.Forms.Auth
                 requestMessage.Content = body;
 
                 using (HttpResponseMessage responseMessage =
-                    await client.SendAsync(requestMessage, token).ConfigureAwait(false))
+                    await client.SendAsync(requestMessage).ConfigureAwait(false))
                 {
                     HttpResponse returnValue = await CreateResponseAsync(responseMessage).ConfigureAwait(false);
-                    returnValue.UserAgent = client.DefaultRequestHeaders.UserAgent.ToString();
+                    returnValue.UserAgent = requestMessage.Headers.UserAgent.ToString();
                     return returnValue;
                 }
             }

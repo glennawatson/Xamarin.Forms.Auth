@@ -8,39 +8,28 @@ using Newtonsoft.Json;
 
 namespace Xamarin.Forms.Auth
 {
-    /// <summary>
-    /// A response from the OAuth2 authentication.
-    /// </summary>
-    public class OAuth2ResponseBase
+    internal class OAuth2ResponseBase
     {
-        /// <summary>
-        /// Gets or sets any error string.
-        /// </summary>
-        [JsonProperty(PropertyName = "error")]
+        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.Error)]
         public string Error { get; set; }
 
-        /// <summary>
-        /// Gets or sets any error description.
-        /// </summary>
-        [JsonProperty(PropertyName = "error_description")]
+        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.SubError)]
+        public string SubError { get; set; }
+
+        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.ErrorDescription)]
         public string ErrorDescription { get; set; }
 
         /// <summary>
-        /// Gets or sets any error codes.
+        /// Gets or sets do not expose these in the MsalException because Evo does not guarantee that the error
+        /// codes remain the same.
         /// </summary>
-        [JsonProperty(PropertyName = "error_codes")]
+        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.ErrorCodes)]
         public string[] ErrorCodes { get; set; }
 
-        /// <summary>
-        /// Gets or sets the correlation id.
-        /// </summary>
-        [JsonProperty(PropertyName = "correlation_id")]
+        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.CorrelationId)]
         public string CorrelationId { get; set; }
 
-        /// <summary>
-        /// Gets or sets any claims.
-        /// </summary>
-        [JsonProperty(PropertyName = "claims")]
+        [JsonProperty(PropertyName = OAuth2ResponseBaseClaim.Claims)]
         public string Claims { get; set; }
     }
 }

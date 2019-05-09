@@ -2,8 +2,8 @@
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using Android.App;
@@ -11,12 +11,12 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.CustomTabs;
+
 using Uri = Android.Net.Uri;
 
 namespace Xamarin.Forms.Auth
 {
-    [SuppressMessage("Design", "warning CA1812: AuthenticationActivity is an internal class that is apparently never instantiated.", Justification = "Used by Android reflectively")]
-    [Activity(Name = "Xamarin.Auth.Forms.AuthenticationActivity")]
+    [Activity(Name = "xamarin.forms.auth.AuthenticationActivity")]
     [global::Android.Runtime.Preserve(AllMembers = true)]
     internal class AuthenticationActivity : Activity
     {
@@ -43,7 +43,7 @@ namespace Xamarin.Forms.Auth
             if (Intent == null)
             {
                 SendError(
-                    CoreErrorCodes.UnresolvableIntentError,
+                    AuthError.UnresolvableIntentError,
                     "Received null data intent from caller");
                 return;
             }
@@ -52,7 +52,7 @@ namespace Xamarin.Forms.Auth
             _requestId = Intent.GetIntExtra(AndroidConstants.RequestId, 0);
             if (string.IsNullOrEmpty(_requestUrl))
             {
-                SendError(CoreErrorCodes.InvalidRequest, "Request url is not set on the intent");
+                SendError(AuthError.InvalidRequest, "Request url is not set on the intent");
             }
         }
 
@@ -85,9 +85,9 @@ namespace Xamarin.Forms.Auth
                 Intent browserIntent = new Intent(Intent.ActionView, Uri.Parse(_requestUrl));
                 browserIntent.AddCategory(Intent.CategoryBrowsable);
 
-                OAuth2Logger.Default.Warning(
+                RequestContext.Logger.Warning(
                     "Browser with custom tabs package not available. " +
-                    "Launching with alternate browser.");
+                    "Launching with alternate browser. See https://aka.ms/msal-net-system-browsers for details.");
 
                 try
                 {
@@ -95,15 +95,12 @@ namespace Xamarin.Forms.Auth
                 }
                 catch (ActivityNotFoundException ex)
                 {
-                    throw ExceptionFactory.GetClientException(
-                           CoreErrorCodes.AndroidActivityNotFound,
-                           CoreErrorMessages.AndroidActivityNotFound,
-                           ex);
+                    throw new AuthClientException(AuthError.AndroidActivityNotFound, AuthErrorMessage.AndroidActivityNotFound, ex);
                 }
             }
             else
             {
-                OAuth2Logger.Default.Info(
+                RequestContext.Logger.Info(
                     string.Format(
                     CultureInfo.CurrentCulture,
                     "Browser with custom tabs package available. Using {0}. ",
@@ -126,6 +123,11 @@ namespace Xamarin.Forms.Auth
             ReturnToCaller(AndroidConstants.Cancel, new Intent());
         }
 
+        /**
+         * Return the error back to caller.
+         * @param resultCode The result code to return back.
+         * @param data {@link Intent} contains the detailed result.
+         */
         private void ReturnToCaller(int resultCode, Intent data)
         {
             data.PutExtra(AndroidConstants.RequestId, _requestId);
@@ -133,11 +135,16 @@ namespace Xamarin.Forms.Auth
             Finish();
         }
 
+        /**
+         * Send error back to caller with the error description.
+         * @param errorCode The error code to send back.
+         * @param errorDescription The error description to send back.
+         */
         private void SendError(string errorCode, string errorDescription)
         {
             Intent errorIntent = new Intent();
-            errorIntent.PutExtra("error", errorCode)
-                .PutExtra("error_description", errorDescription);
+            errorIntent.PutExtra(OAuth2ResponseBaseClaim.Error, errorCode)
+                .PutExtra(OAuth2ResponseBaseClaim.ErrorDescription, errorDescription);
             ReturnToCaller(AndroidConstants.AuthCodeError, errorIntent);
         }
 

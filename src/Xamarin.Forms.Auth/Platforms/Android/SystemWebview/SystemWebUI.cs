@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Glenn Watson. All rights reserved.
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
@@ -6,6 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
+
 using Uri = System.Uri;
 
 namespace Xamarin.Forms.Auth
@@ -22,7 +23,11 @@ namespace Xamarin.Forms.Auth
 
         public RequestContext RequestContext { get; set; }
 
-        public async override Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri, RequestContext requestContext)
+        public override async Task<AuthorizationResult> AcquireAuthorizationAsync(
+            Uri authorizationUri,
+            Uri redirectUri,
+            RequestContext requestContext,
+            CancellationToken cancellationToken)
         {
             ReturnedUriReady = new SemaphoreSlim(0);
 
@@ -36,19 +41,20 @@ namespace Xamarin.Forms.Auth
             }
             catch (Exception ex)
             {
-                throw ExceptionFactory.GetClientException(
-                    CoreErrorCodes.AuthenticationUiFailedError,
+                requestContext.Logger.ErrorPii(ex);
+                throw new AuthClientException(
+                    AuthError.AuthenticationUiFailedError,
                     "AuthenticationActivity failed to start",
                     ex);
             }
 
-            await ReturnedUriReady.WaitAsync().ConfigureAwait(false);
+            await ReturnedUriReady.WaitAsync(cancellationToken).ConfigureAwait(false);
             return AuthorizationResult;
         }
 
         public override void ValidateRedirectUri(Uri redirectUri)
         {
-            RedirectUriHelper.Validate(redirectUri);
+            RedirectUriHelper.Validate(redirectUri, usesSystemBrowser: true);
         }
     }
 }

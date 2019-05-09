@@ -5,76 +5,67 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Xamarin.Forms.Auth
 {
     /// <summary>
-    /// A manager responsible for providing HTTP functionality.
+    /// Manages a abstraction of http requests.
     /// </summary>
     internal interface IHttpManager
     {
         /// <summary>
-        /// Sends the message request using POST.
+        /// Sends a post request to the endpoint.
         /// </summary>
-        /// <param name="endpoint">The end point where to end the message.</param>
-        /// <param name="headers">The headers to use.</param>
-        /// <param name="bodyParameters">Parameters for the body.</param>
-        /// <param name="requestContext">The context with information about the request.</param>
-        /// <param name="token">A cancellation token for cancelling a request.</param>
-        /// <returns>The response.</returns>
+        /// <param name="endpoint">The end point where to send the request.</param>
+        /// <param name="headers">The headers for the request.</param>
+        /// <param name="bodyParameters">The body parameters of the request.</param>
+        /// <param name="requestContext">The context of the request.</param>
+        /// <returns>The response from the request.</returns>
         Task<HttpResponse> SendPostAsync(
             Uri endpoint,
             IDictionary<string, string> headers,
             IDictionary<string, string> bodyParameters,
-            RequestContext requestContext,
-            CancellationToken token);
+            RequestContext requestContext);
 
         /// <summary>
-        /// Sends the message request using POST.
+        /// Sends a post request to the endpoint.
         /// </summary>
-        /// <param name="endpoint">The end point where to end the message.</param>
-        /// <param name="headers">The headers to use.</param>
-        /// <param name="body">The body to send..</param>
-        /// <param name="requestContext">The context with information about the request.</param>
-        /// <param name="token">A cancellation token for cancelling a request.</param>
-        /// <returns>The response.</returns>
+        /// <param name="endpoint">The end point where to send the request.</param>
+        /// <param name="headers">The headers for the request.</param>
+        /// <param name="body">The body of the request.</param>
+        /// <param name="requestContext">The context of the request.</param>
+        /// <returns>The response from the request.</returns>
         Task<HttpResponse> SendPostAsync(
             Uri endpoint,
             IDictionary<string, string> headers,
             HttpContent body,
-            RequestContext requestContext,
-            CancellationToken token);
+            RequestContext requestContext);
 
         /// <summary>
-        /// Sends the message request using GET.
+        /// Sends a get request to the endpoint.
         /// </summary>
-        /// <param name="endpoint">The end point where to end the message.</param>
-        /// <param name="headers">The headers to use.</param>
-        /// <param name="requestContext">The context with information about the request.</param>
-        /// <param name="token">A cancellation token for cancelling a request.</param>
-        /// <returns>The response.</returns>
+        /// <param name="endpoint">The end point where to send the request.</param>
+        /// <param name="headers">The headers for the request.</param>
+        /// <param name="requestContext">The context of the request.</param>
+        /// <returns>The response from the request.</returns>
         Task<HttpResponse> SendGetAsync(
             Uri endpoint,
-            Dictionary<string, string> headers,
-            RequestContext requestContext,
-            CancellationToken token);
+            IDictionary<string, string> headers,
+            RequestContext requestContext);
 
         /// <summary>
-        /// Sends the message request using POST which requires a response.
+        /// Sends a post request to the endpoint forcing a response.
         /// </summary>
-        /// <param name="uri">The end point where to end the message.</param>
-        /// <param name="headers">The headers to use.</param>
-        /// <param name="body">The body to send..</param>
-        /// <param name="requestContext">The context with information about the request.</param>
-        /// <param name="token">A cancellation token for cancelling a request.</param>
-        /// <returns>The response.</returns>
-        Task<IHttpWebResponse> SendPostForceResponseAsync(
+        /// <param name="uri">The end point where to send the request.</param>
+        /// <param name="headers">The headers for the request.</param>
+        /// <param name="body">The body of the request.</param>
+        /// <param name="requestContext">The context of the request.</param>
+        /// <returns>The response from the request.</returns>
+        Task<HttpResponse> SendPostForceResponseAsync(
             Uri uri,
             Dictionary<string, string> headers,
             StringContent body,
-            RequestContext requestContext,
-            CancellationToken token);
+            RequestContext requestContext);
     }
 }

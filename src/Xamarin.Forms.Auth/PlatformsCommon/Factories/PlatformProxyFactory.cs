@@ -9,22 +9,18 @@ namespace Xamarin.Forms.Auth
     /// <summary>
     ///     Returns the platform / os specific implementation of a PlatformProxy.
     /// </summary>
-    internal class PlatformProxyFactory
+    internal static class PlatformProxyFactory
     {
-        // thread safety ensured by implicit LazyThreadSafetyMode.ExecutionAndPublication
-        private static readonly Lazy<IPlatformProxy> PlatformProxyLazy = new Lazy<IPlatformProxy>(
-            () => new PlatformProxy());
-
-        private PlatformProxyFactory()
-        {
-        }
-
         /// <summary>
         ///     Gets the platform proxy, which can be used to perform platform specific operations.
         /// </summary>
-        public static IPlatformProxy GetPlatformProxy()
+        /// <param name="logger">The logger to use on the platform.</param>
+        /// <returns>The platform proxy.</returns>
+        public static IPlatformProxy CreatePlatformProxy(ICoreLogger logger)
         {
-            return PlatformProxyLazy.Value;
+            var finalLogger = logger ?? AuthLogger.NullLogger;
+
+            return new PlatformProxy(finalLogger);
         }
     }
 }

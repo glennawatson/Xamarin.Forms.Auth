@@ -10,53 +10,16 @@ namespace Xamarin.Forms.Auth
     /// <summary>
     /// Platform / OS specific logic.  No library (ADAL / MSAL) specific code should go in here.
     /// </summary>
-    internal class PlatformProxy : IPlatformProxy
+    internal class PlatformProxy : AbstractPlatformProxy
     {
-        private readonly Lazy<IPlatformLogger> _platformLogger =
-            new Lazy<IPlatformLogger>(() => new EventSourcePlatformLogger());
-
-        private IWebUIFactory _overloadWebUiFactory;
-
-        /// <inheritdoc />
-        public IPlatformLogger PlatformLogger => _platformLogger.Value;
-
-        /// <inheritdoc />
-        public ITokenCache TokenCache => null;
-
-        /// <summary>
-        /// Get the user logged in.
-        /// </summary>
-        public Task<string> GetUserPrincipalNameAsync()
+        public PlatformProxy(ICoreLogger logger)
+            : base(logger)
         {
-            return Task.FromResult(string.Empty);
         }
 
-        /// <inheritdoc />
-        public Task<bool> IsUserLocalAsync(RequestContext requestContext)
-        {
-            return Task.FromResult(false);
-        }
+        public override bool IsSystemWebViewAvailable => false;
 
-        /// <inheritdoc />
-        public string GetBrokerOrRedirectUri(Uri redirectUri)
-        {
-            return redirectUri.OriginalString;
-        }
-
-        /// <inheritdoc />
-        public string GetProductName()
-        {
-            return "MSAL.CoreCLR";
-        }
-
-        /// <inheritdoc />
-        public bool IsDomainJoined()
-        {
-            return false;
-        }
-
-        /// <inheritdoc />
-        public string GetEnvironmentVariable(string variable)
+        public override string GetEnvironmentVariable(string variable)
         {
             if (string.IsNullOrWhiteSpace(variable))
             {
@@ -66,46 +29,66 @@ namespace Xamarin.Forms.Auth
             return Environment.GetEnvironmentVariable(variable);
         }
 
-        public string GetProcessorArchitecture()
+        /// <inheritdoc />
+        protected override string InternalGetProductName()
+        {
+            return "MSAL.CoreCLR";
+        }
+
+        protected override string InternalGetProcessorArchitecture()
         {
             return null;
         }
 
-        public string GetOperatingSystem()
+        protected override string InternalGetOperatingSystem()
         {
             return null;
         }
 
-        public string GetDeviceModel()
+        protected override string InternalGetDeviceModel()
         {
             return null;
         }
 
-        public string GetCallingApplicationName()
+        /// <summary>
+        /// Considered PII, ensure that it is hashed.
+        /// </summary>
+        /// <returns>Name of the calling application.</returns>
+        protected override string InternalGetCallingApplicationName()
         {
             return null;
         }
 
-        public string GetCallingApplicationVersion()
+        /// <summary>
+        /// Considered PII, ensure that it is hashed.
+        /// </summary>
+        /// <returns>Version of the calling application.</returns>
+        protected override string InternalGetCallingApplicationVersion()
         {
             return null;
         }
 
-        public string GetDeviceId()
+        /// <summary>
+        /// Considered PII. Please ensure that it is hashed.
+        /// </summary>
+        /// <returns>Device identifier.</returns>
+        protected override string InternalGetDeviceId()
         {
             return null;
         }
+
+        protected override IWebUIFactory CreateWebUiFactory() => new WebUIFactory();
+
+        protected override ICryptographyManager InternalGetCryptographyManager() => new NetStandard13CryptographyManager();
+
+        protected override IPlatformLogger InternalGetPlatformLogger() => new EventSourcePlatformLogger();
 
         /// <inheritdoc />
-        public IWebUIFactory GetWebUiFactory()
+        protected override ITokenCache InternalGetTokenCache()
         {
-            return _overloadWebUiFactory ?? new WebUIFactory();
+            return null;
         }
 
-        /// <inheritdoc />
-        public void SetWebUiFactory(IWebUIFactory webUiFactory)
-        {
-            _overloadWebUiFactory = webUiFactory;
-        }
+        protected override IFeatureFlags CreateFeatureFlags() => new NetStandardFeatureFlags();
     }
 }

@@ -8,25 +8,21 @@ namespace Xamarin.Forms.Auth
 {
     internal class AndroidPlatformLogger : IPlatformLogger
     {
-        /// <inheritdoc />
         public void Error(string errorMessage)
         {
             Log.Error(null, errorMessage);
         }
 
-        /// <inheritdoc />
         public void Warning(string message)
         {
             Log.Warn(null, message);
         }
 
-        /// <inheritdoc />
         public void Verbose(string message)
         {
             Log.Verbose(null, message);
         }
 
-        /// <inheritdoc />
         public void Information(string message)
         {
             Log.Info(null, message);

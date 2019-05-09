@@ -1,10 +1,9 @@
-// Copyright (c) 2019 Glenn Watson. All rights reserved.
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Android.App;
 using Android.Content;
@@ -14,7 +13,6 @@ using Android.Widget;
 
 namespace Xamarin.Forms.Auth
 {
-    [SuppressMessage("Design", "warning CA1812: AuthenticationAgentActivity is an internal class that is apparently never instantiated.", Justification = "Used by Android reflectively")]
     [Activity(Label = "Sign in")]
     internal class AuthenticationAgentActivity : Activity
     {
@@ -39,9 +37,10 @@ namespace Xamarin.Forms.Auth
         {
             base.OnCreate(bundle);
 
+            // Create your application here
             WebView webView = new WebView(ApplicationContext);
             var relativeLayout = new RelativeLayout(ApplicationContext);
-            webView.LayoutParameters = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MatchParent, RelativeLayout.LayoutParams.MatchParent);
+            webView.LayoutParameters = new RelativeLayout.LayoutParams(global::Android.Views.ViewGroup.LayoutParams.MatchParent, global::Android.Views.ViewGroup.LayoutParams.MatchParent);
 
             relativeLayout.AddView(webView);
             SetContentView(relativeLayout);
@@ -50,7 +49,6 @@ namespace Xamarin.Forms.Auth
             WebSettings webSettings = webView.Settings;
             string userAgent = webSettings.UserAgentString;
             webSettings.UserAgentString = userAgent + BrokerConstants.ClientTlsNotSupported;
-            OAuth2Logger.Default.Verbose("UserAgent:" + webSettings.UserAgentString);
 
             webSettings.JavaScriptEnabled = true;
 
@@ -89,13 +87,13 @@ namespace Xamarin.Forms.Auth
                 }
             }
 
-            [Obsolete]
+            [Obsolete] // because parent is obsolete
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {
                 Uri uri = new Uri(url);
                 if (url.StartsWith(BrokerConstants.BrowserExtPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    OAuth2Logger.Default.Verbose("It is browser launch request");
+                    // TODO(migration): Figure out how to get logger into this class.  MsalLogger.Default.Verbose("It is browser launch request");
                     OpenLinkInBrowser(url, Activity);
                     view.StopLoading();
                     Activity.Finish();
@@ -104,7 +102,7 @@ namespace Xamarin.Forms.Auth
 
                 if (url.StartsWith(BrokerConstants.BrowserExtInstallPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    OAuth2Logger.Default.Verbose("It is an azure authenticator install request");
+                    // TODO(migration): Figure out how to get logger into this class.  MsalLogger.Default.Verbose("It is an azure authenticator install request");
                     view.StopLoading();
                     Finish(Activity, url);
                     return true;
@@ -141,8 +139,8 @@ namespace Xamarin.Forms.Auth
                         Query = string.Format(
                             CultureInfo.InvariantCulture,
                             "error={0}&error_description={1}",
-                            CoreErrorCodes.NonHttpsRedirectNotSupported,
-                            CoreErrorMessages.NonHttpsRedirectNotSupported)
+                            AuthError.NonHttpsRedirectNotSupported,
+                            AuthErrorMessage.NonHttpsRedirectNotSupported)
                     };
                     Finish(Activity, errorUri.ToString());
                     return true;

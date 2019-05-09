@@ -12,25 +12,25 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Logs a error.
         /// </summary>
-        /// <param name="message">The message to log.</param>
+        /// <param name="message">The message.</param>
         void Error(string message);
 
         /// <summary>
         /// Logs a warning.
         /// </summary>
-        /// <param name="message">The message to log.</param>
+        /// <param name="message">The message.</param>
         void Warning(string message);
 
         /// <summary>
         /// Logs a verbose message.
         /// </summary>
-        /// <param name="message">The message to log.</param>
+        /// <param name="message">The message.</param>
         void Verbose(string message);
 
         /// <summary>
         /// Logs a informational message.
         /// </summary>
-        /// <param name="message">The message to log.</param>
+        /// <param name="message">The message.</param>
         void Information(string message);
     }
 }

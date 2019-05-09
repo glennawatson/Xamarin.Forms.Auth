@@ -3,9 +3,11 @@
 // See the LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
+
 using SafariServices;
 using UIKit;
 
@@ -15,8 +17,11 @@ namespace Xamarin.Forms.Auth
     {
         public RequestContext RequestContext { get; set; }
 
-        public override async Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri,
-            RequestContext requestContext)
+        public override async Task<AuthorizationResult> AcquireAuthorizationAsync(
+            Uri authorizationUri,
+            Uri redirectUri,
+            RequestContext requestContext,
+            CancellationToken cancellationToken)
         {
             ViewController = null;
             InvokeOnMainThread(() =>
@@ -27,9 +32,9 @@ namespace Xamarin.Forms.Auth
 
             ReturnedUriReady = new SemaphoreSlim(0);
             Authenticate(authorizationUri, redirectUri, requestContext);
-            await ReturnedUriReady.WaitAsync().ConfigureAwait(false);
+            await ReturnedUriReady.WaitAsync(cancellationToken).ConfigureAwait(false);
 
-            //dismiss safariviewcontroller
+            // dismiss safariviewcontroller
             ViewController.InvokeOnMainThread(() =>
             {
                 SafariViewController?.DismissViewController(false, null);
@@ -44,11 +49,13 @@ namespace Xamarin.Forms.Auth
             {
                 /* For app center builds, this will need to build on a hosted mac agent. The mac agent does not have the latest SDK's required to build 'ASWebAuthenticationSession'
                 * Until the agents are updated, appcenter build will need to ignore the use of 'ASWebAuthenticationSession' for iOS 12.*/
-#if BUILDENV != APPCENTER
+#if !IS_APPCENTER_BUILD
                 if (UIDevice.CurrentDevice.CheckSystemVersion(12, 0))
                 {
-                    asWebAuthenticationSession = new AuthenticationServices.ASWebAuthenticationSession(new NSUrl(authorizationUri.AbsoluteUri),
-                        redirectUri.Scheme, (callbackUrl, error) =>
+                    AsWebAuthenticationSession = new AuthenticationServices.ASWebAuthenticationSession(
+                        new NSUrl(authorizationUri.AbsoluteUri),
+                        redirectUri.Scheme,
+                        (callbackUrl, error) =>
                         {
                             if (error != null)
                             {
@@ -60,10 +67,29 @@ namespace Xamarin.Forms.Auth
                             }
                         });
 
-                    asWebAuthenticationSession.Start();
+                    AsWebAuthenticationSession.Start();
                 }
-
                 else if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
+                {
+                    SfAuthenticationSession = new SFAuthenticationSession(
+                        new NSUrl(authorizationUri.AbsoluteUri),
+                        redirectUri.Scheme,
+                        (callbackUrl, error) =>
+                        {
+                            if (error != null)
+                            {
+                                ProcessCompletionHandlerError(error);
+                            }
+                            else
+                            {
+                                ContinueAuthentication(callbackUrl.ToString());
+                            }
+                        });
+
+                    SfAuthenticationSession.Start();
+                }
+#else
+                if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
                 {
                     sfAuthenticationSession = new SFAuthenticationSession(new NSUrl(authorizationUri.AbsoluteUri),
                         redirectUri.Scheme, (callbackUrl, error) =>
@@ -79,24 +105,6 @@ namespace Xamarin.Forms.Auth
                         });
 
                     sfAuthenticationSession.Start();
-                }
-#else
-                if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
-                {
-                    SfAuthenticationSession = new SFAuthenticationSession(new NSUrl(authorizationUri.AbsoluteUri),
-                        redirectUri.Scheme, (callbackUrl, error) =>
-                        {
-                            if (error != null)
-                            {
-                                ProcessCompletionHandlerError(error);
-                            }
-                            else
-                            {
-                                ContinueAuthentication(callbackUrl.ToString());
-                            }
-                        });
-
-                    SfAuthenticationSession.Start();
                 }
 #endif
                 else
@@ -114,13 +122,14 @@ namespace Xamarin.Forms.Auth
             catch (Exception ex)
             {
                 requestContext.Logger.ErrorPii(ex);
-                throw MsalExceptionFactory.GetClientException(
-                    CoreErrorCodes.AuthenticationUiFailedError,
+                throw new AuthClientException(
+                    AuthError.AuthenticationUiFailedError,
                     "Failed to invoke SFSafariViewController",
                     ex);
             }
         }
 
+        [SuppressMessage("Design", "CA1822: Unused parameter", Justification = "Needs to be available.")]
         public void ProcessCompletionHandlerError(NSError error)
         {
             if (ReturnedUriReady != null)

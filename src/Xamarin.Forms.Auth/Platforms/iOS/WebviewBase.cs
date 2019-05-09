@@ -5,7 +5,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+#if !IS_APPCENTER_BUILD
+using AuthenticationServices;
+#endif
 using Foundation;
+
 using SafariServices;
 using UIKit;
 
@@ -13,8 +17,6 @@ namespace Xamarin.Forms.Auth
 {
     internal abstract class WebviewBase : NSObject, IWebUI, ISFSafariViewControllerDelegate
     {
-        private nint _taskId = UIApplication.BackgroundTaskInvalid;
-
         public WebviewBase()
         {
             DidEnterBackgroundNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIApplication.DidEnterBackgroundNotification, OnMoveToBackground);
@@ -31,7 +33,13 @@ namespace Xamarin.Forms.Auth
 
         protected SFAuthenticationSession SfAuthenticationSession { get; set; }
 
-        protected nint TaskId { get => _taskId; set => _taskId = value; }
+#if !IS_APPCENTER_BUILD
+        /* For app center builds, this will need to build on a hosted mac agent. The mac agent does not have the latest SDK's required to build 'ASWebAuthenticationSession'
+        * Until the agents are updated, appcenter build will need to ignore the use of 'ASWebAuthenticationSession' for iOS 12.*/
+        protected ASWebAuthenticationSession AsWebAuthenticationSession { get; set; }
+#endif
+
+        protected nint TaskId { get; set; } = UIApplication.BackgroundTaskInvalid;
 
         protected NSObject DidEnterBackgroundNotification { get; set; }
 
@@ -53,9 +61,13 @@ namespace Xamarin.Forms.Auth
             return true;
         }
 
-        public abstract Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri, RequestContext requestContext);
-
         public abstract void ValidateRedirectUri(Uri redirectUri);
+
+        public abstract Task<AuthorizationResult> AcquireAuthorizationAsync(
+        Uri authorizationUri,
+        Uri redirectUri,
+        RequestContext requestContext,
+        CancellationToken cancellationToken);
 
         protected void OnMoveToBackground(NSNotification notification)
         {
@@ -90,6 +102,7 @@ namespace Xamarin.Forms.Auth
                     DidEnterBackgroundNotification.Dispose();
                     DidEnterBackgroundNotification = null;
                 }
+
                 if (WillEnterForegroundNotification != null)
                 {
                     WillEnterForegroundNotification.Dispose();

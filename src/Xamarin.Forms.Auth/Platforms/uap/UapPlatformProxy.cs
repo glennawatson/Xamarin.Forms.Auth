@@ -1,6 +1,5 @@
-﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
-// Glenn Watson licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for full license information.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
@@ -13,16 +12,26 @@ using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.Storage;
 using Windows.System;
 
+
+
+
+
+
+
+
 namespace Xamarin.Forms.Auth
 {
     /// <summary>
     /// Platform / OS specific logic. No library (ADAL / MSAL) specific code should go in here.
     /// </summary>
-    internal class UapPlatformProxy : IPlatformProxy
+    internal class UapPlatformProxy : AbstractPlatformProxy
     {
-        private readonly Lazy<IPlatformLogger> _platformLogger =
-            new Lazy<IPlatformLogger>(() => new EventSourcePlatformLogger());
-        private IWebUIFactory _overloadWebUiFactory;
+        public UapPlatformProxy(ICoreLogger logger)
+            : base(logger)
+        {
+        }
+
+        public override bool IsSystemWebViewAvailable => false;
 
         /// <summary>
         /// Get the user logged in to Windows or throws
@@ -32,14 +41,14 @@ namespace Xamarin.Forms.Auth
         /// select the first principal name that can be used
         /// </remarks>
         /// <returns>The username or throws</returns>
-        public async Task<string> GetUserPrincipalNameAsync()
+        public override async Task<string> GetUserPrincipalNameAsync()
         {
             IReadOnlyList<User> users = await User.FindAllAsync();
             if (users == null || !users.Any())
             {
-                throw MsalExceptionFactory.GetClientException(
-                    CoreErrorCodes.CannotAccessUserInformationOrUserNotDomainJoined,
-                    CoreErrorMessages.UapCannotFindDomainUser);
+                throw new MsalClientException(
+                    MsalError.CannotAccessUserInformationOrUserNotDomainJoined,
+                    MsalErrorMessage.UapCannotFindDomainUser);
             }
 
             var getUserDetailTasks = users.Select(async u =>
@@ -77,67 +86,66 @@ namespace Xamarin.Forms.Auth
             // user has domain name, but no upn -> missing Enterprise Auth capability
             if (userDetails.Any(d => !string.IsNullOrWhiteSpace(d.Domain)))
             {
-                throw MsalExceptionFactory.GetClientException(
-                   CoreErrorCodes.CannotAccessUserInformationOrUserNotDomainJoined,
-                   CoreErrorMessages.UapCannotFindUpn);
+                throw new MsalClientException(
+                   MsalError.CannotAccessUserInformationOrUserNotDomainJoined,
+                   MsalErrorMessage.UapCannotFindUpn);
             }
 
             // no domain, no upn -> missing User Info capability
-            throw MsalExceptionFactory.GetClientException(
-                CoreErrorCodes.CannotAccessUserInformationOrUserNotDomainJoined,
-                CoreErrorMessages.UapCannotFindDomainUser);
+            throw new MsalClientException(
+                MsalError.CannotAccessUserInformationOrUserNotDomainJoined,
+                MsalErrorMessage.UapCannotFindDomainUser);
 
         }
 
-        public async Task<bool> IsUserLocalAsync(RequestContext requestContext)
+        public override async Task<bool> IsUserLocalAsync(RequestContext requestContext)
         {
             IReadOnlyList<User> users = await User.FindAllAsync();
             return users.Any(u => u.Type == UserType.LocalUser || u.Type == UserType.LocalGuest);
         }
 
-        public bool IsDomainJoined()
+        public override bool IsDomainJoined()
         {
             return NetworkInformation.GetHostNames().Any(entry => entry.Type == HostNameType.DomainName);
         }
 
-
-        public string GetEnvironmentVariable(string variable)
+        public override string GetEnvironmentVariable(string variable)
         {
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             return localSettings.Values.ContainsKey(variable) ? localSettings.Values[variable].ToString() : null;
         }
 
-        public string GetProcessorArchitecture()
+        protected override string InternalGetProcessorArchitecture()
         {
             return WindowsNativeMethods.GetProcessorArchitecture();
         }
 
-        public string GetOperatingSystem()
+        protected override string InternalGetOperatingSystem()
         {
             // In WinRT, there is no way to reliably get OS version. All can be done reliably is to check
             // for existence of specific features which does not help in this case, so we do not emit OS in WinRT.
             return null;
         }
 
-        public string GetDeviceModel()
+        protected override string InternalGetDeviceModel()
         {
             var deviceInformation = new Windows.Security.ExchangeActiveSyncProvisioning.EasClientDeviceInformation();
             return deviceInformation.SystemProductName;
         }
 
         /// <inheritdoc />
-        public string GetBrokerOrRedirectUri(Uri redirectUri)
+        public override string GetBrokerOrRedirectUri(Uri redirectUri)
         {
             return redirectUri.OriginalString;
         }
 
         /// <inheritdoc />
-        public string GetDefaultRedirectUri(string correlationId)
+        public override string GetDefaultRedirectUri(string correlationId)
         {
             return Constants.DefaultRedirectUri;
         }
 
-        public string GetProductName()
+        protected override string InternalGetProductName()
         {
             return "MSAL.UAP";
         }
@@ -146,7 +154,7 @@ namespace Xamarin.Forms.Auth
         /// Considered PII, ensure that it is hashed.
         /// </summary>
         /// <returns>Name of the calling application</returns>
-        public string GetCallingApplicationName()
+        protected override string InternalGetCallingApplicationName()
         {
             return Package.Current?.DisplayName?.ToString();
         }
@@ -155,7 +163,7 @@ namespace Xamarin.Forms.Auth
         /// Considered PII, ensure that it is hashed.
         /// </summary>
         /// <returns>Version of the calling application</returns>
-        public string GetCallingApplicationVersion()
+        protected override string InternalGetCallingApplicationVersion()
         {
             return Package.Current?.Id?.Version.ToString();
         }
@@ -164,37 +172,42 @@ namespace Xamarin.Forms.Auth
         /// Considered PII. Please ensure that it is hashed.
         /// </summary>
         /// <returns>Device identifier</returns>
-        public string GetDeviceId()
+        protected override string InternalGetDeviceId()
         {
             return new EasClientDeviceInformation()?.Id.ToString();
         }
 
-        public ILegacyCachePersistence CreateLegacyCachePersistence()
+        public override ILegacyCachePersistence CreateLegacyCachePersistence() => new UapLegacyCachePersistence(Logger, CryptographyManager);
+
+        public override ITokenCacheAccessor CreateTokenCacheAccessor() => new InMemoryTokenCacheAccessor();
+
+        public override ITokenCacheBlobStorage CreateTokenCacheBlobStorage() => new UapTokenCacheBlobStorage(CryptographyManager, Logger);
+
+        protected override IWebUIFactory CreateWebUiFactory() => new WebUIFactory();
+        protected override ICryptographyManager InternalGetCryptographyManager() => new UapCryptographyManager();
+        protected override IPlatformLogger InternalGetPlatformLogger() => new EventSourcePlatformLogger();
+
+        public override string GetDeviceNetworkState()
         {
-            return new UapLegacyCachePersistence(CryptographyManager);
+            // TODO(mats):
+            return string.Empty;
         }
 
-        public ITokenCacheAccessor CreateTokenCacheAccessor()
+        public override string GetDevicePlatformTelemetryId()
         {
-            return new UapTokenCacheAccessor(CryptographyManager);
+            // TODO(mats):
+            return string.Empty;
         }
 
-        /// <inheritdoc />
-        public ICryptographyManager CryptographyManager { get; } = new UapCryptographyManager();
-
-        /// <inheritdoc />
-        public IPlatformLogger PlatformLogger => _platformLogger.Value;
-
-        /// <inheritdoc />
-        public IWebUIFactory GetWebUiFactory()
+        public override string GetMatsOsPlatform()
         {
-            return _overloadWebUiFactory ?? new WebUIFactory();
+            return MatsConverter.AsString(OsPlatform.Win32);
         }
 
-        /// <inheritdoc />
-        public void SetWebUiFactory(IWebUIFactory webUiFactory)
+        public override int GetMatsOsPlatformCode()
         {
-            _overloadWebUiFactory = webUiFactory;
+            return MatsConverter.AsInt(OsPlatform.Win32);
         }
+        protected override IFeatureFlags CreateFeatureFlags() => new UapFeatureFlags();
     }
 }

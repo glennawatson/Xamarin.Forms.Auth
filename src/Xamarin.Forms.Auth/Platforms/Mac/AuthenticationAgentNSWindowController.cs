@@ -1,13 +1,17 @@
-// Copyright (c) 2019 Glenn Watson. All rights reserved.
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using CoreGraphics;
-using Foundation;
+
 using AppKit;
+
+using CoreGraphics;
+
+using Foundation;
+
 using WebKit;
 
 namespace Xamarin.Forms.Auth
@@ -16,27 +20,27 @@ namespace Xamarin.Forms.Auth
     internal class AuthenticationAgentNSWindowController
         : NSWindowController, IWebPolicyDelegate, IWebFrameLoadDelegate, INSWindowDelegate
     {
-        private const int DEFAULT_WINDOW_WIDTH = 420;
-        private const int DEFAULT_WINDOW_HEIGHT = 650;
-
-        private WebView _webView;
-        private NSProgressIndicator _progressIndicator;
-        private NSWindow _callerWindow;
+        private const int DefaultWindowWidth = 420;
+        private const int DefaultWindowHeight = 650;
 
         private readonly string _url;
         private readonly string _callback;
         private readonly ReturnCodeCallback _callbackMethod;
 
-        public delegate void ReturnCodeCallback(AuthorizationResult result);
+        private WebView _webView;
+        private NSProgressIndicator _progressIndicator;
+        private NSWindow _callerWindow;
 
         public AuthenticationAgentNSWindowController(string url, string callback, ReturnCodeCallback callbackMethod)
-            : base ("PlaceholderNibNameToForceWindowLoad")
+            : base("PlaceholderNibNameToForceWindowLoad")
         {
             _url = url;
             _callback = callback;
             _callbackMethod = callbackMethod;
             NSUrlProtocol.RegisterClass(new ObjCRuntime.Class(typeof(CoreCustomUrlProtocol)));
         }
+
+        public delegate void ReturnCodeCallback(AuthorizationResult result);
 
         [Export("windowWillClose:")]
         public void WillClose(NSNotification notification)
@@ -53,44 +57,9 @@ namespace Xamarin.Forms.Auth
             RunModal();
         }
 
-        //webview only works on main runloop, not nested, so set up manual modal runloop
-        void RunModal()
-        {
-            var window = Window;
-            IntPtr session = NSApplication.SharedApplication.BeginModalSession(window);
-            NSRunResponse result = NSRunResponse.Continues;
-
-            while (result == NSRunResponse.Continues)
-            {
-                using (var pool = new NSAutoreleasePool())
-                {
-                    var nextEvent = NSApplication.SharedApplication.NextEvent(
-                        NSEventMask.AnyEvent,
-                        NSDate.DistantFuture,
-                        NSRunLoopMode.Default,
-                        true);
-
-                    //discard events that are for other windows, else they remain somewhat interactive
-                    if (nextEvent.Window != null && nextEvent.Window != window)
-                    {
-                        continue;
-                    }
-
-                    NSApplication.SharedApplication.SendEvent(nextEvent);
-
-                    // Run the window modally until there are no events to process
-                    result = (NSRunResponse)(long)NSApplication.SharedApplication.RunModalSession(session);
-
-                    // Give the main loop some time
-                    NSRunLoop.Current.LimitDateForMode(NSRunLoopMode.Default);
-                }
-            }
-
-            NSApplication.SharedApplication.EndModalSession(session);
-        }
-
-        //largely ported from azure-activedirectory-library-for-objc
-        //ADAuthenticationViewController.m
+        /// <summary>
+        /// Loads the window.
+        /// </summary>
         public override void LoadWindow()
         {
             var parentWindow = _callerWindow ?? NSApplication.SharedApplication.MainWindow;
@@ -107,7 +76,7 @@ namespace Xamarin.Forms.Auth
             }
 
             // Calculate the center of the current main window so we can position our window in the center of it
-            CGRect centerRect = CenterRect(windowRect, new CGRect(0, 0, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
+            CGRect centerRect = CenterRect(windowRect, new CGRect(0, 0, DefaultWindowWidth, DefaultWindowHeight));
 
             var window = new NSWindow(centerRect, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, true)
             {
@@ -133,12 +102,13 @@ namespace Xamarin.Forms.Auth
             // at least make it looks like something is happening.
             _progressIndicator = new NSProgressIndicator(
                 new CGRect(
-                    (DEFAULT_WINDOW_WIDTH / 2) - 16,
-                    (DEFAULT_WINDOW_HEIGHT / 2) - 16,
+                    (DefaultWindowWidth / 2) - 16,
+                    (DefaultWindowHeight / 2) - 16,
                     32,
                     32))
             {
                 Style = NSProgressIndicatorStyle.Spinning,
+
                 // Keep the item centered in the window even if it's resized.
                 AutoresizingMask = NSViewResizingMask.MinXMargin | NSViewResizingMask.MaxXMargin | NSViewResizingMask.MinYMargin | NSViewResizingMask.MaxYMargin
             };
@@ -153,22 +123,8 @@ namespace Xamarin.Forms.Auth
             _webView.MainFrameUrl = _url;
         }
 
-        static CGRect CenterRect(CGRect rect1, CGRect rect2)
-        {
-            nfloat x = rect1.X + ((rect1.Width - rect2.Width) / 2);
-            nfloat y = rect1.Y + ((rect1.Height - rect2.Height) / 2);
-
-            x = x < 0 ? 0 : x;
-            y = y < 0 ? 0 : y;
-
-            rect2.X = x;
-            rect2.X = y;
-
-            return rect2;
-        }
-
         [Export("webView:decidePolicyForNavigationAction:request:frame:decisionListener:")]
-        void DecidePolicyForNavigation(WebView webView, NSDictionary actionInformation, NSUrlRequest request, WebFrame frame, NSObject decisionToken)
+        public void DecidePolicyForNavigation(WebView webView, NSDictionary actionInformation, NSUrlRequest request, WebFrame frame, NSObject decisionToken)
         {
             if (request == null)
             {
@@ -224,8 +180,8 @@ namespace Xamarin.Forms.Auth
                 !request.Url.Scheme.Equals("https", StringComparison.CurrentCultureIgnoreCase))
             {
                 var result = new AuthorizationResult(AuthorizationStatus.ErrorHttp);
-                result.Error = CoreErrorCodes.NonHttpsRedirectNotSupported;
-                result.ErrorDescription = CoreErrorMessages.NonHttpsRedirectNotSupported;
+                result.Error = AuthError.NonHttpsRedirectNotSupported;
+                result.ErrorDescription = AuthErrorMessage.NonHttpsRedirectNotSupported;
                 _callbackMethod(result);
                 WebView.DecideIgnore(decisionToken);
                 Close();
@@ -243,16 +199,66 @@ namespace Xamarin.Forms.Auth
             _progressIndicator.StopAnimation(null);
         }
 
-        void CancelAuthentication()
-        {
-            _callbackMethod(new AuthorizationResult(AuthorizationStatus.UserCancel, null));
-        }
-
         [Export("windowShouldClose:")]
         public bool WindowShouldClose(NSObject sender)
         {
             CancelAuthentication();
             return true;
+        }
+
+        private static CGRect CenterRect(CGRect rect1, CGRect rect2)
+        {
+            nfloat x = rect1.X + ((rect1.Width - rect2.Width) / 2);
+            nfloat y = rect1.Y + ((rect1.Height - rect2.Height) / 2);
+
+            x = x < 0 ? 0 : x;
+            y = y < 0 ? 0 : y;
+
+            rect2.X = x;
+            rect2.X = y;
+
+            return rect2;
+        }
+
+        private void RunModal()
+        {
+            // webview only works on main runloop, not nested, so set up manual modal runloop
+            var window = Window;
+            IntPtr session = NSApplication.SharedApplication.BeginModalSession(window);
+            NSRunResponse result = NSRunResponse.Continues;
+
+            while (result == NSRunResponse.Continues)
+            {
+                using (var pool = new NSAutoreleasePool())
+                {
+                    var nextEvent = NSApplication.SharedApplication.NextEvent(
+                        NSEventMask.AnyEvent,
+                        NSDate.DistantFuture,
+                        NSRunLoopMode.Default,
+                        true);
+
+                    // discard events that are for other windows, else they remain somewhat interactive
+                    if (nextEvent.Window != null && nextEvent.Window != window)
+                    {
+                        continue;
+                    }
+
+                    NSApplication.SharedApplication.SendEvent(nextEvent);
+
+                    // Run the window modally until there are no events to process
+                    result = (NSRunResponse)(long)NSApplication.SharedApplication.RunModalSession(session);
+
+                    // Give the main loop some time
+                    NSRunLoop.Current.LimitDateForMode(NSRunLoopMode.Default);
+                }
+            }
+
+            NSApplication.SharedApplication.EndModalSession(session);
+        }
+
+        private void CancelAuthentication()
+        {
+            _callbackMethod(new AuthorizationResult(AuthorizationStatus.UserCancel, null));
         }
     }
 }

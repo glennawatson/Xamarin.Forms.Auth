@@ -3,60 +3,38 @@
 // See the LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 using Newtonsoft.Json;
 
 namespace Xamarin.Forms.Auth
 {
-    /// <summary>
-    /// An OAuth response that contains tokens.
-    /// </summary>
-    public class OAuth2TokenResponse : OAuth2ResponseBase
+    internal class OAuth2TokenResponse : OAuth2ResponseBase
     {
         private long _expiresIn;
         private long _extendedExpiresIn;
 
-        /// <summary>
-        /// Gets or sets the token type.
-        /// </summary>
-        [JsonProperty(PropertyName = "token_type")]
+        [JsonProperty(PropertyName = TokenResponseClaim.TokenType)]
         public string TokenType { get; set; }
 
-        /// <summary>
-        /// Gets or sets the access token.
-        /// </summary>
-        [JsonProperty(PropertyName = "access_token")]
+        [JsonProperty(PropertyName = TokenResponseClaim.AccessToken)]
         public string AccessToken { get; set; }
 
-        /// <summary>
-        /// Gets or sets the refresh token.
-        /// </summary>
-        [JsonProperty(PropertyName = "refresh_token")]
+        [JsonProperty(PropertyName = TokenResponseClaim.RefreshToken)]
         public string RefreshToken { get; set; }
 
-        /// <summary>
-        /// Gets or sets the scopes.
-        /// </summary>
-        [JsonProperty(PropertyName = "scope")]
+        [JsonProperty(PropertyName = TokenResponseClaim.Scope)]
         public string Scope { get; set; }
 
-        /// <summary>
-        /// Gets or sets the client information.
-        /// </summary>
-        [JsonProperty(PropertyName = "client_info")]
+        [JsonProperty(PropertyName = TokenResponseClaim.ClientInfo)]
         public string ClientInfo { get; set; }
 
-        /// <summary>
-        /// Gets or sets the id token.
-        /// </summary>
-        [JsonProperty(PropertyName = "id_token")]
+        [JsonProperty(PropertyName = TokenResponseClaim.IdToken)]
         public string IdToken { get; set; }
 
-        /// <summary>
-        /// Gets or sets the expiration time.
-        /// </summary>
-        [JsonProperty(PropertyName = "expires_in")]
+        [JsonProperty(PropertyName = TokenResponseClaim.ExpiresIn)]
         public long ExpiresIn
         {
             get => _expiresIn;
@@ -67,10 +45,7 @@ namespace Xamarin.Forms.Auth
             }
         }
 
-        /// <summary>
-        /// Gets or sets the extended expiration time.
-        /// </summary>
-        [JsonProperty(PropertyName = "ext_expires_in")]
+        [JsonProperty(PropertyName = TokenResponseClaim.ExtendedExpiresIn)]
         public long ExtendedExpiresIn
         {
             get => _extendedExpiresIn;
@@ -81,22 +56,16 @@ namespace Xamarin.Forms.Auth
             }
         }
 
-        /// <summary>
-        /// Gets the access token expiration date time.
-        /// </summary>
+        [JsonProperty(PropertyName = TokenResponseClaim.FamilyId)]
+        public string FamilyId { get; set; }
+
         [JsonIgnore]
         public DateTimeOffset AccessTokenExpiresOn { get; private set; }
 
-        /// <summary>
-        /// Gets the access token extended date time.
-        /// </summary>
         [JsonIgnore]
         public DateTimeOffset AccessTokenExtendedExpiresOn { get; private set; }
 
-        /// <summary>
-        /// Gets the ID token as a parsed object.
-        /// </summary>
-        /// <returns>The ID token.</returns>
-        public IdToken GetIdToken() => Auth.IdToken.Parse(IdToken);
+        [JsonIgnore]
+        public Uri Authority { get; private set; }
     }
 }

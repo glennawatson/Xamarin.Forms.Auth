@@ -11,54 +11,62 @@ namespace Xamarin.Forms.Auth
 {
     internal class SilentRequest : RequestBase
     {
+        private readonly AcquireTokenSilentParameters _silentParameters;
+
         public SilentRequest(
             IServiceBundle serviceBundle,
             AuthenticationRequestParameters authenticationRequestParameters,
-            bool forceRefresh)
-            : base(serviceBundle, authenticationRequestParameters)
+            AcquireTokenSilentParameters silentParameters)
+            : base(serviceBundle, authenticationRequestParameters, silentParameters)
         {
-            ForceRefresh = forceRefresh;
+            _silentParameters = silentParameters;
         }
 
-        public bool ForceRefresh { get; }
+        internal override Task PreRunAsync()
+        {
+            AuthenticationRequestParameters.Authority = AuthenticationRequestParameters.AuthorityOverride == null
+                                                            ? ServiceBundle.Config.AuthorityInfo
+                                                            : AuthenticationRequestParameters.AuthorityOverride;
 
-        internal override async Task<OAuth2TokenResponse> ExecuteAsync(CancellationToken cancellationToken)
+            return Task.CompletedTask;
+        }
+
+        internal override async Task<AuthenticationResult> ExecuteAsync(CancellationToken cancellationToken)
         {
             if (TokenCache == null)
             {
                 throw new AuthUiRequiredException(
-                    AuthUiRequiredException.TokenCacheNullError,
-                    "Token cache is set to null. Silent requests cannot be executed.");
+                    AuthError.TokenCacheNullError,
+                    AuthErrorMessage.NullTokenCacheForSilentError);
             }
 
-            OAuth2TokenResponse tokenResponse = null;
+            var tokenResponse = await TokenCache.GetAccessToken(AuthenticationRequestParameters.Authority, AuthenticationRequestParameters.ClientId).ConfigureAwait(false);
 
             // Look for access token
-            if (!ForceRefresh)
+            if (!_silentParameters.ForceRefresh && tokenResponse != null)
             {
-                tokenResponse =
-                    await TokenCache.GetAccessToken(AuthenticationRequestParameters.Authority, AuthenticationRequestParameters.ClientId).ConfigureAwait(false);
+                return new AuthenticationResult(tokenResponse, ServiceBundle.Config.IsExtendedTokenLifetimeEnabled);
             }
 
-            if (tokenResponse != null && tokenResponse.AccessTokenExpiresOn < DateTimeOffset.UtcNow)
-            {
-                return tokenResponse;
-            }
-
-            var refreshToken = tokenResponse?.RefreshToken;
-
-            if (refreshToken == null)
+            if (tokenResponse?.RefreshToken == null)
             {
                 AuthenticationRequestParameters.RequestContext.Logger.Verbose("No Refresh Token was found in the cache");
 
                 throw new AuthUiRequiredException(
-                    AuthUiRequiredException.NoTokensFoundError,
-                    "No Refresh Token found in the cache");
+                    AuthError.NoTokensFoundError,
+                    AuthErrorMessage.NoTokensFoundError);
             }
 
+            tokenResponse = await RefreshAccessTokenAsync(tokenResponse.RefreshToken, cancellationToken).ConfigureAwait(false);
+            return CacheTokenResponseAndCreateAuthenticationResult(tokenResponse);
+        }
+
+        private async Task<OAuth2TokenResponse> RefreshAccessTokenAsync(string refreshToken, CancellationToken cancellationToken)
+        {
             AuthenticationRequestParameters.RequestContext.Logger.Verbose("Refreshing access token...");
+
             var msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(refreshToken), cancellationToken)
-                                        .ConfigureAwait(false);
+                                    .ConfigureAwait(false);
 
             if (msalTokenResponse.RefreshToken == null)
             {
@@ -66,8 +74,6 @@ namespace Xamarin.Forms.Auth
                 AuthenticationRequestParameters.RequestContext.Logger.Info(
                     "Refresh token was missing from the token refresh response, so the refresh token in the request is returned instead");
             }
-
-            await CacheTokenResponse(msalTokenResponse).ConfigureAwait(false);
 
             return msalTokenResponse;
         }

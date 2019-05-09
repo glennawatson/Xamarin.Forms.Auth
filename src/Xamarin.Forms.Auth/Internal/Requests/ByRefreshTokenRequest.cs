@@ -2,7 +2,6 @@
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,39 +10,38 @@ namespace Xamarin.Forms.Auth
 {
     internal class ByRefreshTokenRequest : RequestBase
     {
-        private readonly string _userProvidedRefreshToken;
+        private readonly AcquireTokenByRefreshTokenParameters _refreshTokenParameters;
 
         public ByRefreshTokenRequest(
             IServiceBundle serviceBundle,
             AuthenticationRequestParameters authenticationRequestParameters,
-            string userProvidedRefreshToken)
-        : base(serviceBundle, authenticationRequestParameters)
+            AcquireTokenByRefreshTokenParameters refreshTokenParameters)
+            : base(serviceBundle, authenticationRequestParameters, refreshTokenParameters)
         {
-            _userProvidedRefreshToken = userProvidedRefreshToken;
+            _refreshTokenParameters = refreshTokenParameters;
         }
 
-        internal override async Task<OAuth2TokenResponse> ExecuteAsync(CancellationToken cancellationToken)
+        internal override async Task<AuthenticationResult> ExecuteAsync(CancellationToken cancellationToken)
         {
             if (TokenCache == null)
             {
                 throw new AuthUiRequiredException(
-                    AuthUiRequiredException.TokenCacheNullError,
-                    CoreErrorMessages.NullTokenCacheError);
+                    AuthError.TokenCacheNullError,
+                    AuthErrorMessage.NullTokenCacheError);
             }
 
-            AuthenticationRequestParameters.RequestContext.Logger.Info(LogMessages.BeginningAcquireByRefreshToken);
-            var msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(_userProvidedRefreshToken), cancellationToken)
-                                        .ConfigureAwait(false);
+            AuthenticationRequestParameters.RequestContext.Logger.Verbose(LogMessages.BeginningAcquireByRefreshToken);
+            var msalTokenResponse = await SendTokenRequestAsync(
+                                        GetBodyParameters(_refreshTokenParameters.RefreshToken),
+                                        cancellationToken).ConfigureAwait(false);
 
             if (msalTokenResponse.RefreshToken == null)
             {
-                AuthenticationRequestParameters.RequestContext.Logger.Info(
-                    CoreErrorMessages.NoRefreshTokenInResponse);
+                AuthenticationRequestParameters.RequestContext.Logger.Info(AuthErrorMessage.NoRefreshTokenInResponse);
                 throw new AuthServiceException(msalTokenResponse.Error, msalTokenResponse.ErrorDescription, null);
             }
 
-            await CacheTokenResponse(msalTokenResponse).ConfigureAwait(false);
-            return msalTokenResponse;
+            return CacheTokenResponseAndCreateAuthenticationResult(msalTokenResponse);
         }
 
         private Dictionary<string, string> GetBodyParameters(string refreshTokenSecret)

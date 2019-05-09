@@ -4,39 +4,65 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Xamarin.Forms.Auth
 {
     internal class AuthenticationRequestParameters
     {
-        public RequestContext RequestContext { get; set; }
+        private readonly AcquireTokenCommonParameters _commonParameters;
+
+        public AuthenticationRequestParameters(
+            IServiceBundle serviceBundle,
+            AcquireTokenCommonParameters commonParameters,
+            RequestContext requestContext)
+        {
+            _commonParameters = commonParameters;
+
+            Authority = commonParameters.AuthorityOverride == null
+                ? serviceBundle.Config.AuthorityInfo
+                : commonParameters.AuthorityOverride;
+
+            ClientId = serviceBundle.Config.ClientId;
+            Scope = ScopeHelper.CreateSortedSetFromEnumerable(commonParameters.Scopes);
+            RedirectUri = serviceBundle.Config.RedirectUri;
+            RequestContext = requestContext;
+
+            // Set application wide query parameters.
+            ExtraQueryParameters = serviceBundle.Config.ExtraQueryParameters ?? new Dictionary<string, string>();
+
+            // Copy in call-specific query parameters.
+            if (commonParameters.ExtraQueryParameters != null)
+            {
+                foreach (var kvp in commonParameters.ExtraQueryParameters)
+                {
+                    ExtraQueryParameters[kvp.Key] = kvp.Value;
+                }
+            }
+        }
+
+        public RequestContext RequestContext { get; }
 
         public Uri Authority { get; set; }
 
-        public string TenantUpdatedCanonicalAuthority { get; set; }
+        public SortedSet<string> Scope { get; }
 
-        public SortedSet<string> Scope { get; set; }
-
-        public string ClientId { get; set; }
-
-        public string AuthorizationCode { get; set; }
+        public string ClientId { get; }
 
         public Uri RedirectUri { get; set; }
 
+        public IDictionary<string, string> ExtraQueryParameters { get; }
+
+        public string Claims => _commonParameters.Claims;
+
+        public Uri AuthorityOverride => _commonParameters.AuthorityOverride;
+
         public string LoginHint { get; set; }
-
-        public string ExtraQueryParameters { get; set; }
-
-        public bool IsClientCredentialRequest { get; set; }
-
-        public string SliceParameters { get; set; }
-
-        public bool SendCertificate { get; set; }
 
         public bool IsRefreshTokenRequest { get; set; }
 
-        public void LogState()
+        public void LogParameters(ICoreLogger logger)
         {
             // Create Pii enabled string builder
             var builder = new StringBuilder(
@@ -45,11 +71,7 @@ namespace Xamarin.Forms.Auth
             builder.AppendLine("Client Id - " + ClientId)
                 .AppendLine("Scopes - " + Scope?.AsSingleString())
                 .AppendLine("Redirect Uri - " + RedirectUri?.OriginalString)
-                .AppendLine("LoginHint provided? - " + !string.IsNullOrEmpty(LoginHint));
-            Dictionary<string, string> dict = CoreHelpers.ParseKeyValueList(ExtraQueryParameters, '&', true, RequestContext);
-            builder.AppendLine("Extra Query Params Keys (space separated) - " + dict.Keys.AsSingleString());
-            dict = CoreHelpers.ParseKeyValueList(SliceParameters, '&', true, RequestContext);
-            builder.AppendLine("Slice Parameters Keys(space separated) - " + dict.Keys.AsSingleString());
+                .AppendLine("Extra Query Params Keys (space separated) - " + ExtraQueryParameters.Keys.AsSingleString());
 
             string messageWithPii = builder.ToString();
 
@@ -58,12 +80,8 @@ namespace Xamarin.Forms.Auth
                 Environment.NewLine + "=== Request Data ===" + Environment.NewLine + "Authority Provided? - " +
                 (Authority != null) + Environment.NewLine);
             builder.AppendLine("Scopes - " + Scope?.AsSingleString())
-                .AppendLine("LoginHint provided? - " + !string.IsNullOrEmpty(LoginHint));
-            dict = CoreHelpers.ParseKeyValueList(ExtraQueryParameters, '&', true, RequestContext);
-            builder.AppendLine("Extra Query Params Keys (space separated) - " + dict.Keys.AsSingleString());
-            dict = CoreHelpers.ParseKeyValueList(SliceParameters, '&', true, RequestContext);
-            builder.AppendLine("Slice Parameters Keys(space separated) - " + dict.Keys.AsSingleString());
-            RequestContext.Logger.Info(builder.ToString());
+                .AppendLine("Extra Query Params Keys (space separated) - " + ExtraQueryParameters.Keys.AsSingleString());
+            logger.InfoPii(messageWithPii, builder.ToString());
         }
     }
 }

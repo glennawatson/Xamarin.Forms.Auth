@@ -5,17 +5,27 @@
 namespace Xamarin.Forms.Auth
 {
     /// <summary>
-    /// A set of services available on the platforms.
+    /// A service bundle which contains information that can be different per platform.
     /// </summary>
     internal interface IServiceBundle
     {
         /// <summary>
-        /// Gets the selected http manager.
+        /// Gets the application configuration.
+        /// </summary>
+        IApplicationConfiguration Config { get; }
+
+        /// <summary>
+        /// Gets the default logger.
+        /// </summary>
+        ICoreLogger DefaultLogger { get; }
+
+        /// <summary>
+        /// Gets the HTTP manager which will handle HTTP clients.
         /// </summary>
         IHttpManager HttpManager { get; }
 
         /// <summary>
-        /// Gets the proxy manager for a platform.
+        /// Gets the platform proxy, which will contain platform specific implementations.
         /// </summary>
         IPlatformProxy PlatformProxy { get; }
     }

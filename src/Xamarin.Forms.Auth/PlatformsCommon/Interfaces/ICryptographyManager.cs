@@ -7,67 +7,67 @@ using System.Security.Cryptography.X509Certificates;
 namespace Xamarin.Forms.Auth
 {
     /// <summary>
-    /// Handles encrypting different values.
+    /// Handles common cryptography actions.
     /// </summary>
     internal interface ICryptographyManager
     {
         /// <summary>
-        /// Creates a base 64 url encoded value with a SHA 256 hash.
+        /// Creates a Base 64 URL encoded value with a SHA 256 hash.
         /// </summary>
-        /// <param name="input">The value to encrypt.</param>
+        /// <param name="input">The input string.</param>
         /// <returns>The encrypted value.</returns>
         string CreateBase64UrlEncodedSha256Hash(string input);
 
         /// <summary>
-        /// Creates a code verifier value.
+        /// Gets a code verifier for use in OAuth style authentication.
         /// </summary>
-        /// <returns>The code verifier value.</returns>
+        /// <returns>The code verifier.</returns>
         string GenerateCodeVerifier();
 
         /// <summary>
-        /// Create a encrypted string with SHA 256.
+        /// Creates a SHA256 hash value from the input.
         /// </summary>
-        /// <param name="input">The value to encrypt.</param>
-        /// <returns>The encrypted value.</returns>
+        /// <param name="input">The value to encode.</param>
+        /// <returns>The hash.</returns>
         string CreateSha256Hash(string input);
 
         /// <summary>
-        /// Create a encrypted byte array with SHA 256.
+        /// Creates a SHA256 hash value from the input.
         /// </summary>
-        /// <param name="input">The value to encrypt.</param>
-        /// <returns>The encrypted value.</returns>
+        /// <param name="input">The value to encode.</param>
+        /// <returns>The hash.</returns>
         byte[] CreateSha256HashBytes(string input);
 
         /// <summary>
-        /// Encrypt a value.
+        /// Encrypts the string value.
         /// </summary>
-        /// <param name="message">The value to encrypt.</param>
-        /// <returns>The encrypted value.</returns>
+        /// <param name="message">The message to encrypt.</param>
+        /// <returns>The encrypted message.</returns>
         string Encrypt(string message);
 
         /// <summary>
-        /// Decrypt a value.
+        /// Decrypts the encrypted string.
         /// </summary>
-        /// <param name="encryptedMessage">The value to decrypt.</param>
-        /// <returns>The decrypted value.</returns>
+        /// <param name="encryptedMessage">The encrypted message.</param>
+        /// <returns>The decrypted message.</returns>
         string Decrypt(string encryptedMessage);
 
         /// <summary>
-        /// Encrypt a value.
+        /// Encrypts the string value.
         /// </summary>
-        /// <param name="message">The value to encrypt.</param>
-        /// <returns>The encrypted value.</returns>
+        /// <param name="message">The message to encrypt.</param>
+        /// <returns>The encrypted message.</returns>
         byte[] Encrypt(byte[] message);
 
         /// <summary>
-        /// Decrypt a value.
+        /// Decrypts the encrypted string.
         /// </summary>
-        /// <param name="encryptedMessage">The value to decrypt.</param>
-        /// <returns>The decrypted value.</returns>
+        /// <param name="encryptedMessage">The encrypted message.</param>
+        /// <returns>The decrypted message.</returns>
         byte[] Decrypt(byte[] encryptedMessage);
 
         /// <summary>
-        /// Signs a value with a certificate.
+        /// Sign a string value with the included certificate.
         /// </summary>
         /// <param name="message">The message to sign.</param>
         /// <param name="certificate">The certificate to sign with.</param>

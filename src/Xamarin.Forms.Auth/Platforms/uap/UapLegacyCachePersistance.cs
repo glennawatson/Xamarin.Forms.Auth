@@ -1,10 +1,13 @@
-﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
-// Glenn Watson licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for full license information.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+
+
+
+
 
 namespace Xamarin.Forms.Auth
 {
@@ -18,9 +21,11 @@ namespace Xamarin.Forms.Auth
         private const int MaxCompositeValueLength = 1024;
 
         private readonly ICryptographyManager _cryptographyManager;
+        private readonly ICoreLogger _logger;
 
-        public UapLegacyCachePersistence(ICryptographyManager cryptographyManager)
+        public UapLegacyCachePersistence(ICoreLogger logger, ICryptographyManager cryptographyManager)
         {
+            _logger = logger;
             _cryptographyManager = cryptographyManager;
         }
 
@@ -35,7 +40,7 @@ namespace Xamarin.Forms.Auth
             }
             catch (Exception ex)
             {
-                MsalLogger.Default.WarningPiiWithPrefix(ex, "Failed to load adal cache: ");
+                _logger.WarningPiiWithPrefix(ex, "Failed to load adal cache: ");
                 // Ignore as the cache seems to be corrupt
             }
 
@@ -53,7 +58,7 @@ namespace Xamarin.Forms.Auth
             }
             catch (Exception ex)
             {
-                MsalLogger.Default.WarningPiiWithPrefix(ex, "Failed to save adal cache: ");
+                _logger.WarningPiiWithPrefix(ex, "Failed to save adal cache: ");
             }
         }
 

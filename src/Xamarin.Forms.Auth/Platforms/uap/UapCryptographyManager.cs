@@ -1,6 +1,5 @@
-﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
-// Glenn Watson licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for full license information.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -10,6 +9,9 @@ using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Security.Cryptography.DataProtection;
 using Windows.Storage.Streams;
+
+
+
 
 namespace Xamarin.Forms.Auth
 {
@@ -77,7 +79,7 @@ namespace Xamarin.Forms.Auth
 
             DataProtectionProvider dataProtectionProvider = new DataProtectionProvider(ProtectionDescriptor);
             IBuffer messageBuffer = CryptographicBuffer.ConvertStringToBinary(message, BinaryStringEncoding.Utf8);
-            IBuffer protectedBuffer = RunAsyncTaskAndWait(dataProtectionProvider.ProtectAsync(messageBuffer).AsTask());
+            IBuffer protectedBuffer = dataProtectionProvider.ProtectAsync(messageBuffer).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
             return Convert.ToBase64String(protectedBuffer.ToArray(0, (int)protectedBuffer.Length));
         }
 
@@ -90,7 +92,7 @@ namespace Xamarin.Forms.Auth
 
             DataProtectionProvider dataProtectionProvider = new DataProtectionProvider(ProtectionDescriptor);
             IBuffer messageBuffer = Convert.FromBase64String(encryptedMessage).AsBuffer();
-            IBuffer unprotectedBuffer = RunAsyncTaskAndWait(dataProtectionProvider.UnprotectAsync(messageBuffer).AsTask());
+            IBuffer unprotectedBuffer = dataProtectionProvider.UnprotectAsync(messageBuffer).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
             return CryptographicBuffer.ConvertBinaryToString(BinaryStringEncoding.Utf8, unprotectedBuffer);
         }
 
@@ -102,7 +104,7 @@ namespace Xamarin.Forms.Auth
             }
 
             DataProtectionProvider dataProtectionProvider = new DataProtectionProvider(ProtectionDescriptor);
-            IBuffer protectedBuffer = RunAsyncTaskAndWait(dataProtectionProvider.ProtectAsync(message.AsBuffer()).AsTask());
+            IBuffer protectedBuffer = dataProtectionProvider.ProtectAsync(message.AsBuffer()).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
             return protectedBuffer.ToArray(0, (int)protectedBuffer.Length);
         }
 
@@ -114,7 +116,7 @@ namespace Xamarin.Forms.Auth
             }
 
             DataProtectionProvider dataProtectionProvider = new DataProtectionProvider(ProtectionDescriptor);
-            IBuffer buffer = RunAsyncTaskAndWait(dataProtectionProvider.UnprotectAsync(encryptedMessage.AsBuffer()).AsTask());
+            IBuffer buffer = dataProtectionProvider.UnprotectAsync(encryptedMessage.AsBuffer()).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
             return buffer.ToArray(0, (int)buffer.Length);
         }
 
@@ -125,19 +127,5 @@ namespace Xamarin.Forms.Auth
             throw new NotImplementedException();
         }
 
-        private static T RunAsyncTaskAndWait<T>(Task<T> task)
-        {
-            try
-            {
-                Task.Run(async () => await task.ConfigureAwait(false)).Wait();
-                return task.Result;
-            }
-            catch (AggregateException ae)
-            {
-                // Any exception thrown as a result of running task will cause AggregateException to be thrown with
-                // actual exception as inner.
-                throw ae.InnerExceptions[0];
-            }
-        }
     }
 }

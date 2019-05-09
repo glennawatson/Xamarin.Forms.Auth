@@ -5,16 +5,16 @@
 namespace Xamarin.Forms.Auth
 {
     /// <summary>
-    /// A factory which creates web based authentication dialogs.
+    /// A factory which will generate the web ui.
     /// </summary>
     internal interface IWebUIFactory
     {
         /// <summary>
-        /// Creates the web authentication dialog.
+        /// Generates a web UI.
         /// </summary>
-        /// <param name="coreUIParent">The parent of the form.</param>
-        /// <param name="requestContext">The request.</param>
-        /// <returns>The web authentication dialog handle.</returns>
+        /// <param name="coreUIParent">The parent of the UI.</param>
+        /// <param name="requestContext">The request being made.</param>
+        /// <returns>The web UI.</returns>
         IWebUI CreateAuthenticationDialog(CoreUIParent coreUIParent, RequestContext requestContext);
     }
 }

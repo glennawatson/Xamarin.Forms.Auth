@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Glenn Watson. All rights reserved.
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
@@ -20,9 +20,12 @@ namespace Xamarin.Forms.Auth
         /// <param name="requestCode">Request response code.</param>
         /// <param name="resultCode">Result code from authentication.</param>
         /// <param name="data">Response data from authentication.</param>
+        [CLSCompliant(false)]
         public static void SetAuthenticationContinuationEventArgs(int requestCode, Result resultCode, Intent data)
         {
-            RequestContext requestContext = new RequestContext(null, new OAuth2Logger(Guid.Empty, null));
+            // TODO(migration): how can a public static method get access to the proper ClientRequestBase to wire into the logger and appropriate requestcontext?
+            // Can we move this call to be somewhere on the ClientApplicationBase or something else that's wired into that?
+            RequestContext requestContext = new RequestContext(null, AuthLogger.Create(null));
 
             requestContext.Logger.Info(string.Format(CultureInfo.InvariantCulture, "Received Activity Result({0})", (int)resultCode));
             AuthorizationResult authorizationResult = null;
@@ -61,7 +64,7 @@ namespace Xamarin.Forms.Auth
             switch ((int)resultCode)
             {
                 case AndroidConstants.AuthCodeReceived:
-                    return CreateResultForOkResponse(data.GetStringExtra("com.Xamarin.Auth.Forms.finalUrl"));
+                    return CreateResultForOkResponse(data.GetStringExtra("com.microsoft.identity.client.finalUrl"));
 
                 case AndroidConstants.Cancel:
                     return new AuthorizationResult(AuthorizationStatus.UserCancel, null);

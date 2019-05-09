@@ -13,39 +13,24 @@ namespace Xamarin.Forms.Auth
     /// <summary>
     /// Platform / OS specific logic.
     /// </summary>
-    internal class PlatformProxy : IPlatformProxy
+    internal class PlatformProxy : AbstractPlatformProxy
     {
-        private readonly Lazy<IPlatformLogger> _platformLogger = new Lazy<IPlatformLogger>(() => new ConsolePlatformLogger());
-        private IWebUIFactory _overloadWebUiFactory;
+        internal const string IosDefaultRedirectUriTemplate = "msal{0}://auth";
 
-        /// <inheritdoc />
-        public ICryptographyManager CryptographyManager { get; } = new MacCryptographyManager();
+        private static readonly Lazy<string> DeviceIdLazy = new Lazy<string>(
+           () => NetworkInterface.GetAllNetworkInterfaces().Where(nic => nic.OperationalStatus == OperationalStatus.Up)
+                                 .Select(nic => nic.GetPhysicalAddress()?.ToString()).FirstOrDefault());
 
-        /// <inheritdoc />
-        public IPlatformLogger PlatformLogger => _platformLogger.Value;
-
-        /// <inheritdoc />
-        public Task<string> GetUserPrincipalNameAsync()
+        public PlatformProxy(ICoreLogger logger)
+            : base(logger)
         {
-            return Task.FromResult(string.Empty);
         }
 
-        /// <inheritdoc />
-        public Task<bool> IsUserLocalAsync(RequestContext requestContext)
-        {
-            return Task.FromResult(false);
-        }
+        public override bool IsSystemWebViewAvailable => false;
 
-        /// <inheritdoc />
-        public bool IsDomainJoined()
+        public override string GetEnvironmentVariable(string variable)
         {
-            return false;
-        }
-
-        /// <inheritdoc />
-        public string GetEnvironmentVariable(string variable)
-        {
-            if (String.IsNullOrWhiteSpace(variable))
+            if (string.IsNullOrWhiteSpace(variable))
             {
                 throw new ArgumentNullException(nameof(variable));
             }
@@ -53,37 +38,22 @@ namespace Xamarin.Forms.Auth
             return Environment.GetEnvironmentVariable(variable);
         }
 
-        /// <inheritdoc />
-        public string GetProcessorArchitecture()
+        protected override string InternalGetProcessorArchitecture()
         {
             return null;
         }
 
-        /// <inheritdoc />
-        public string GetOperatingSystem()
+        protected override string InternalGetOperatingSystem()
         {
             return Environment.OSVersion.ToString();
         }
 
-        /// <inheritdoc />
-        public string GetDeviceModel()
+        protected override string InternalGetDeviceModel()
         {
             return null;
         }
 
-        /// <inheritdoc />
-        public string GetBrokerOrRedirectUri(Uri redirectUri)
-        {
-            return redirectUri.OriginalString;
-        }
-
-        /// <inheritdoc />
-        public string GetDefaultRedirectUri(string clientId)
-        {
-            return Constants.DefaultRedirectUri;
-        }
-
-        public string GetProductName()
+        protected override string InternalGetProductName()
         {
             return "MSAL.Xamarin.Mac";
         }
@@ -91,8 +61,8 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Considered PII, ensure that it is hashed.
         /// </summary>
-        /// <returns>Name of the calling application</returns>
-        public string GetCallingApplicationName()
+        /// <returns>Name of the calling application.</returns>
+        protected override string InternalGetCallingApplicationName()
         {
             return Assembly.GetEntryAssembly()?.GetName()?.Name;
         }
@@ -101,34 +71,29 @@ namespace Xamarin.Forms.Auth
         /// Considered PII, ensure that it is hashed.
         /// </summary>
         /// <returns>Version of the calling application.</returns>
-        public string GetCallingApplicationVersion()
+        protected override string InternalGetCallingApplicationVersion()
         {
             return Assembly.GetEntryAssembly()?.GetName()?.Version?.ToString();
         }
 
-        private static readonly Lazy<string> DeviceIdLazy = new Lazy<string>(
-           () => NetworkInterface.GetAllNetworkInterfaces().Where(nic => nic.OperationalStatus == OperationalStatus.Up)
-                                 .Select(nic => nic.GetPhysicalAddress()?.ToString()).FirstOrDefault());
-
         /// <summary>
         /// Considered PII. Please ensure that it is hashed.
         /// </summary>
-        /// <returns>Device identifier</returns>
-        public string GetDeviceId()
+        /// <returns>Device identifier.</returns>
+        protected override string InternalGetDeviceId()
         {
             return DeviceIdLazy.Value;
         }
 
-        /// <inheritdoc />
-        public IWebUIFactory GetWebUiFactory()
-        {
-            return _overloadWebUiFactory ?? new MacUIFactory();
-        }
+        protected override IWebUIFactory CreateWebUiFactory() => new MacUIFactory();
+
+        protected override ICryptographyManager InternalGetCryptographyManager() => new MacCryptographyManager();
+
+        protected override IPlatformLogger InternalGetPlatformLogger() => new ConsolePlatformLogger();
 
         /// <inheritdoc />
-        public void SetWebUiFactory(IWebUIFactory webUiFactory)
-        {
-            _overloadWebUiFactory = webUiFactory;
-        }
+        protected override ITokenCache InternalGetTokenCache() => new EssentialsTokenCache();
+
+        protected override IFeatureFlags CreateFeatureFlags() => new MacFeatureFlags();
     }
 }

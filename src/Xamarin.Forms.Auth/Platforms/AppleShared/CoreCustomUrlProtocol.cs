@@ -9,7 +9,7 @@ namespace Xamarin.Forms.Auth
 {
     internal class CoreCustomUrlProtocol : NSUrlProtocol
     {
-        private NSUrlConnection connection;
+        private NSUrlConnection _connection;
 
         [Export("initWithRequest:cachedResponse:client:")]
         public CoreCustomUrlProtocol(
@@ -21,7 +21,7 @@ namespace Xamarin.Forms.Auth
         }
 
         [Export("canInitWithRequest:")]
-        public static bool CanInitWithRequest(NSUrlRequest request)
+        public static new bool CanInitWithRequest(NSUrlRequest request)
         {
             if (request.Url.Scheme.Equals("https", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -44,14 +44,14 @@ namespace Xamarin.Forms.Auth
                 return;
             }
 
-            NSMutableUrlRequest mutableRequest = (NSMutableUrlRequest) Request.MutableCopy();
+            NSMutableUrlRequest mutableRequest = (NSMutableUrlRequest)Request.MutableCopy();
             SetProperty(new NSString("YES"), "ADURLProtocol", mutableRequest);
-            connection = new NSUrlConnection(mutableRequest, new CoreCustomConnectionDelegate(this), true);
+            _connection = new NSUrlConnection(mutableRequest, new CoreCustomConnectionDelegate(this), true);
         }
 
         public override void StopLoading()
         {
-            connection.Cancel();
+            _connection.Cancel();
         }
 
         private class CoreCustomConnectionDelegate : NSUrlConnectionDataDelegate
@@ -81,9 +81,12 @@ namespace Xamarin.Forms.Auth
                 _client.ReceivedResponse(_handler, response, NSUrlCacheStoragePolicy.NotAllowed);
             }
 
-            public override NSUrlRequest WillSendRequest(NSUrlConnection connection, NSUrlRequest request, NSUrlResponse response)
+            public override NSUrlRequest WillSendRequest(
+                NSUrlConnection connection,
+                NSUrlRequest request,
+                NSUrlResponse response)
             {
-                NSMutableUrlRequest mutableRequest = (NSMutableUrlRequest) request.MutableCopy();
+                NSMutableUrlRequest mutableRequest = (NSMutableUrlRequest)request.MutableCopy();
                 if (response != null)
                 {
                     RemoveProperty("ADURLProtocol", mutableRequest);

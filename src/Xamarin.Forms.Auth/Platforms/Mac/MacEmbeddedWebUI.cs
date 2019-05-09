@@ -1,32 +1,46 @@
-// Copyright (c) 2019 Glenn Watson. All rights reserved.
+﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using AppKit;
 using Foundation;
 
 namespace Xamarin.Forms.Auth
 {
-    internal class MacEmbeddedWebUI : IWebUI
+    internal sealed class MacEmbeddedWebUI : IWebUI, IDisposable
     {
         private SemaphoreSlim _returnedUriReady;
         private AuthorizationResult _authorizationResult;
 
         public CoreUIParent CoreUIParent { get; set; }
+
         public RequestContext RequestContext { get; set; }
 
         public async Task<AuthorizationResult> AcquireAuthorizationAsync(
             Uri authorizationUri,
             Uri redirectUri,
-            RequestContext requestContext)
+            RequestContext requestContext,
+            CancellationToken cancellationToken)
         {
             _returnedUriReady = new SemaphoreSlim(0);
             Authenticate(authorizationUri, redirectUri, requestContext);
-            await _returnedUriReady.WaitAsync().ConfigureAwait(false);
+            await _returnedUriReady.WaitAsync(cancellationToken).ConfigureAwait(false);
 
             return _authorizationResult;
+        }
+
+        public void ValidateRedirectUri(Uri redirectUri)
+        {
+            RedirectUriHelper.Validate(redirectUri, usesSystemBrowser: false);
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _returnedUriReady?.Dispose();
         }
 
         private void SetAuthorizationResult(AuthorizationResult authorizationResultInput)
@@ -55,16 +69,11 @@ namespace Xamarin.Forms.Auth
             }
             catch (Exception ex)
             {
-                throw new MsalClientException(
-                    CoreErrorCodes.AuthenticationUiFailed,
+                throw new AuthClientException(
+                    AuthError.AuthenticationUiFailed,
                     "See inner exception for details",
                     ex);
             }
-        }
-
-        public void ValidateRedirectUri(Uri redirectUri)
-        {
-            RedirectUriHelper.Validate(redirectUri, usesSystemBrowser: false);
         }
     }
 }

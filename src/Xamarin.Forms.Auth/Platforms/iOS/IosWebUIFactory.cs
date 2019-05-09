@@ -17,7 +17,7 @@ namespace Xamarin.Forms.Auth
                 };
             }
 
-            //there is no need to pass UIParent.
+            // there is no need to pass UIParent.
             return new SystemWebUI()
             {
                 RequestContext = requestContext

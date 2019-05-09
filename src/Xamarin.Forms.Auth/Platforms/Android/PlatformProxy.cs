@@ -5,7 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using Android.App;
+using Android.Content;
+using Android.Content.PM;
 
 namespace Xamarin.Forms.Auth
 {
@@ -13,45 +17,34 @@ namespace Xamarin.Forms.Auth
     /// Platform / OS specific logic.  No library (ADAL / MSAL) specific code should go in here.
     /// </summary>
     [global::Android.Runtime.Preserve(AllMembers = true)]
-    internal class PlatformProxy : IPlatformProxy
+    internal class PlatformProxy : AbstractPlatformProxy
     {
-        internal const string AndroidDefaultRedirectUriTemplate = "msal{0}://auth";
+        private const string ChromePackage = "com.android.chrome";
+        private const string CustomTabService = "android.support.customtabs.action.CustomTabsService";
 
-        private readonly Lazy<IPlatformLogger> _platformLogger = new Lazy<IPlatformLogger>(() => new AndroidPlatformLogger());
-        private IWebUIFactory _overloadWebUiFactory;
-
-        /// <inheritdoc />
-        public IPlatformLogger PlatformLogger => _platformLogger.Value;
-
-        /// <inheritdoc />
-        public ITokenCache TokenCache { get; } = new EssentialsTokenCache();
-
-        /// <inheritdoc />
-        public Task<string> GetUserPrincipalNameAsync()
+        public PlatformProxy(ICoreLogger logger)
+            : base(logger)
         {
-            return Task.FromResult(string.Empty);
         }
 
         /// <inheritdoc />
-        public Task<bool> IsUserLocalAsync(RequestContext requestContext)
+        public override bool IsSystemWebViewAvailable
         {
-            return Task.FromResult(false);
+            get
+            {
+                bool isBrowserWithCustomTabSupportAvailable = IsBrowserWithCustomTabSupportAvailable();
+                return (isBrowserWithCustomTabSupportAvailable || IsChromeEnabled()) && isBrowserWithCustomTabSupportAvailable;
+            }
         }
 
         /// <inheritdoc />
-        public bool IsDomainJoined()
-        {
-            return false;
-        }
-
-        /// <inheritdoc />
-        public string GetEnvironmentVariable(string variable)
+        public override string GetEnvironmentVariable(string variable)
         {
             return null;
         }
 
         /// <inheritdoc />
-        public string GetProcessorArchitecture()
+        protected override string InternalGetProcessorArchitecture()
         {
             if (global::Android.OS.Build.VERSION.SdkInt < global::Android.OS.BuildVersionCodes.Lollipop)
             {
@@ -68,68 +61,94 @@ namespace Xamarin.Forms.Auth
         }
 
         /// <inheritdoc />
-        public string GetOperatingSystem()
+        protected override string InternalGetOperatingSystem()
         {
             return global::Android.OS.Build.VERSION.Sdk;
         }
 
         /// <inheritdoc />
-        public string GetDeviceModel()
+        protected override string InternalGetDeviceModel()
         {
             return global::Android.OS.Build.Model;
         }
 
         /// <inheritdoc />
-        public string GetBrokerOrRedirectUri(Uri redirectUri)
+        protected override string InternalGetProductName()
         {
-            return redirectUri.OriginalString;
-        }
-
-        /// <inheritdoc />
-        public string GetProductName()
-        {
-            return "OAuth2.Xamarin.Android";
+            return "MSAL.Xamarin.Android";
         }
 
         /// <summary>
         /// Considered PII, ensure that it is hashed.
         /// </summary>
         /// <returns>Name of the calling application.</returns>
-        public string GetCallingApplicationName()
+        protected override string InternalGetCallingApplicationName()
         {
-            return global::Android.App.Application.Context.ApplicationInfo?.LoadLabel(global::Android.App.Application.Context.PackageManager);
+            return Application.Context.ApplicationInfo?.LoadLabel(Application.Context.PackageManager);
         }
 
         /// <summary>
         /// Considered PII, ensure that it is hashed.
         /// </summary>
         /// <returns>Version of the calling application.</returns>
-        public string GetCallingApplicationVersion()
+        protected override string InternalGetCallingApplicationVersion()
         {
-            return global::Android.App.Application.Context.PackageManager.GetPackageInfo(global::Android.App.Application.Context.PackageName, 0)?.VersionName;
+            return Application.Context.PackageManager.GetPackageInfo(Application.Context.PackageName, 0)?.VersionName;
         }
 
         /// <summary>
         /// Considered PII. Please ensure that it is hashed.
         /// </summary>
         /// <returns>Device identifier.</returns>
-        public string GetDeviceId()
+        protected override string InternalGetDeviceId()
         {
             return global::Android.Provider.Settings.Secure.GetString(
-                global::Android.App.Application.Context.ContentResolver,
+                Application.Context.ContentResolver,
                 global::Android.Provider.Settings.Secure.AndroidId);
         }
 
         /// <inheritdoc />
-        public IWebUIFactory GetWebUiFactory()
+        protected override IWebUIFactory CreateWebUiFactory()
         {
-            return _overloadWebUiFactory ?? new AndroidWebUIFactory();
+            return new AndroidWebUIFactory();
         }
 
         /// <inheritdoc />
-        public void SetWebUiFactory(IWebUIFactory webUiFactory)
+        protected override ICryptographyManager InternalGetCryptographyManager() => new AndroidCryptographyManager();
+
+        /// <inheritdoc />
+        protected override IPlatformLogger InternalGetPlatformLogger() => new AndroidPlatformLogger();
+
+        /// <inheritdoc />
+        protected override ITokenCache InternalGetTokenCache() => new EssentialsTokenCache();
+
+        /// <inheritdoc />
+        protected override IFeatureFlags CreateFeatureFlags() => new AndroidFeatureFlags();
+
+        private static bool IsBrowserWithCustomTabSupportAvailable()
         {
-            _overloadWebUiFactory = webUiFactory;
+            Intent customTabServiceIntent = new Intent(CustomTabService);
+
+            IEnumerable<ResolveInfo> resolveInfoListWithCustomTabs =
+                Application.Context.PackageManager.QueryIntentServices(
+                    customTabServiceIntent, PackageInfoFlags.MatchAll);
+
+            // queryIntentServices could return null or an empty list if no matching service existed.
+            if (resolveInfoListWithCustomTabs == null || !resolveInfoListWithCustomTabs.Any())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsChromeEnabled()
+        {
+            ApplicationInfo applicationInfo = Application.Context.PackageManager.GetApplicationInfo(ChromePackage, 0);
+
+            // Chrome is difficult to uninstall on an Android device. Most users will disable it, but the package will still
+            // show up, therefore need to check application.Enabled is false
+            return string.IsNullOrEmpty(ChromePackage) || applicationInfo.Enabled;
         }
     }
 }

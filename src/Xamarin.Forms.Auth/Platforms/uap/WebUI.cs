@@ -1,6 +1,5 @@
-﻿// Copyright (c) 2019 Glenn Watson. All rights reserved.
-// Glenn Watson licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for full license information.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Globalization;
@@ -8,6 +7,10 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Networking.Connectivity;
 using Windows.Security.Authentication.Web;
+
+
+
+using System.Threading;
 
 namespace Xamarin.Forms.Auth
 {
@@ -24,8 +27,11 @@ namespace Xamarin.Forms.Auth
             silentMode = parent.UseHiddenBrowser;
         }
 
-        public async Task<AuthorizationResult> AcquireAuthorizationAsync(Uri authorizationUri, Uri redirectUri,
-            RequestContext requestContext)
+        public async Task<AuthorizationResult> AcquireAuthorizationAsync(
+            Uri authorizationUri,
+            Uri redirectUri,
+            RequestContext requestContext,
+            CancellationToken cancellationToken)
         {
             bool ssoMode = string.Equals(redirectUri.OriginalString, Constants.UapWEBRedirectUri, StringComparison.OrdinalIgnoreCase);
 
@@ -67,7 +73,7 @@ namespace Xamarin.Forms.Auth
             catch (Exception ex)
             {
                 requestContext.Logger.ErrorPii(ex);
-                throw new MsalException(MsalClientException.AuthenticationUiFailedError, "WAB authentication failed",
+                throw new MsalException(MsalError.AuthenticationUiFailedError, "WAB authentication failed",
                     ex);
             }
 
@@ -84,7 +90,7 @@ namespace Xamarin.Forms.Auth
                                NetworkConnectivityLevel.InternetAccess);
             if (!isConnected)
             {
-                throw new MsalClientException(MsalClientException.NetworkNotAvailableError, MsalErrorMessage.NetworkNotAvailable);
+                throw new MsalClientException(MsalError.NetworkNotAvailableError, MsalErrorMessage.NetworkNotAvailable);
             }
         }
 

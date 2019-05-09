@@ -9,7 +9,7 @@ using System.Net.Http.Headers;
 
 namespace Xamarin.Forms.Auth
 {
-    internal class HttpResponse : IHttpWebResponse
+    internal class HttpResponse
     {
         public HttpResponseHeaders Headers { get; set; }
 

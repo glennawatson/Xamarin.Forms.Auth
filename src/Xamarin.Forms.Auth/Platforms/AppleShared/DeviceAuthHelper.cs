@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Xamarin.Forms.Auth
 {
-    internal class DeviceAuthHelper
+    internal static class DeviceAuthHelper
     {
-        public static bool CanHandleDeviceAuthChallenge { get { return false; } }
+        public static bool CanHandleDeviceAuthChallenge => false;
 
         public static Task<string> CreateDeviceAuthChallengeResponseAsync(IDictionary<string, string> challengeData)
         {

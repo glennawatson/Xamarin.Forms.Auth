@@ -2,17 +2,28 @@
 // Glenn Watson licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
+using System;
+
 namespace Xamarin.Forms.Auth
 {
     internal class ServiceBundle : IServiceBundle
     {
         internal ServiceBundle(
-            IHttpClientFactory httpClientFactory = null,
-            IHttpManager httpManager = null)
+            ApplicationConfiguration config)
         {
-            HttpManager = httpManager ?? new HttpManager(httpClientFactory);
-            PlatformProxy = PlatformProxyFactory.GetPlatformProxy();
+            Config = config;
+
+            DefaultLogger = new AuthLogger(
+                config.LogLevel,
+                config.EnablePiiLogging,
+                config.IsDefaultPlatformLoggingEnabled,
+                config.LoggingCallback);
+
+            PlatformProxy = PlatformProxyFactory.CreatePlatformProxy(DefaultLogger);
+            HttpManager = config.HttpManager ?? new HttpManager(config.HttpClientFactory);
         }
+
+        public ICoreLogger DefaultLogger { get; }
 
         /// <inheritdoc />
         public IHttpManager HttpManager { get; }
@@ -20,14 +31,12 @@ namespace Xamarin.Forms.Auth
         /// <inheritdoc />
         public IPlatformProxy PlatformProxy { get; }
 
-        public static ServiceBundle CreateDefault()
-        {
-            return new ServiceBundle();
-        }
+        /// <inheritdoc />
+        public IApplicationConfiguration Config { get; }
 
-        public static ServiceBundle CreateWithCustomHttpManager(IHttpManager httpManager)
+        public static ServiceBundle Create(ApplicationConfiguration config)
         {
-            return new ServiceBundle(httpManager: httpManager);
+            return new ServiceBundle(config);
         }
     }
 }

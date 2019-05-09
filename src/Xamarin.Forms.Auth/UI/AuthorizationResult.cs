@@ -17,13 +17,17 @@ namespace Xamarin.Forms.Auth
         {
             if (Status == AuthorizationStatus.UserCancel)
             {
-                Error = CoreErrorCodes.AuthenticationCanceledError;
-                ErrorDescription = CoreErrorMessages.AuthenticationCanceled;
+                Error = AuthError.AuthenticationCanceledError;
+                #if ANDROID
+                ErrorDescription = AuthErrorMessage.AuthenticationCanceledAndroid;
+                #else
+                ErrorDescription = AuthErrorMessage.AuthenticationCanceled;
+                #endif
             }
             else if (Status == AuthorizationStatus.UnknownError)
             {
-                Error = CoreErrorCodes.UnknownError;
-                ErrorDescription = CoreErrorMessages.Unknown;
+                Error = AuthError.UnknownError;
+                ErrorDescription = AuthErrorMessage.Unknown;
             }
             else
             {
@@ -47,7 +51,14 @@ namespace Xamarin.Forms.Auth
 
         public string CloudInstanceHost { get; set; }
 
-        [JsonIgnore]
+        /// <summary>
+        /// Gets or sets a string that is added to each authorization Request and is expected to be sent back along with the
+        /// authorization code. MSAL is responsible for validating that the state sent is identical to the state received.
+        /// </summary>
+        /// <remarks>
+        /// This is in addition to PKCE, which is validated by the server to ensure that the system redeeming the auth code
+        /// is the same as the system who asked for it. It protects against XSRF https://openid.net/specs/openid-connect-core-1_0.html.
+        /// </remarks>
         public string State { get; set; }
 
         public void ParseAuthorizeResponse(string webAuthenticationResult)
@@ -60,7 +71,11 @@ namespace Xamarin.Forms.Auth
             if (!string.IsNullOrWhiteSpace(resultData))
             {
                 // RemoveAccount the leading '?' first
-                var response = CoreHelpers.ParseKeyValueList(resultData.Substring(1), '&', true, null);
+                Dictionary<string, string> response = CoreHelpers.ParseKeyValueList(
+                    resultData.Substring(1),
+                    '&',
+                    true,
+                    null);
 
                 if (response.ContainsKey(OAuth2Parameter.State))
                 {
@@ -75,18 +90,18 @@ namespace Xamarin.Forms.Auth
                 {
                     Code = webAuthenticationResult;
                 }
-                else if (response.ContainsKey("error"))
+                else if (response.ContainsKey(OAuth2ResponseBaseClaim.Error))
                 {
-                    Error = response["error"];
-                    ErrorDescription = response.ContainsKey("error_description")
-                        ? response["error_description"]
+                    Error = response[OAuth2ResponseBaseClaim.Error];
+                    ErrorDescription = response.ContainsKey(OAuth2ResponseBaseClaim.ErrorDescription)
+                        ? response[OAuth2ResponseBaseClaim.ErrorDescription]
                         : null;
                     Status = AuthorizationStatus.ProtocolError;
                 }
                 else
                 {
-                    Error = CoreErrorCodes.AuthenticationFailed;
-                    ErrorDescription = CoreErrorMessages.AuthorizationServerInvalidResponse;
+                    Error = AuthError.AuthenticationFailed;
+                    ErrorDescription = AuthErrorMessage.AuthorizationServerInvalidResponse;
                     Status = AuthorizationStatus.UnknownError;
                 }
 
@@ -97,8 +112,8 @@ namespace Xamarin.Forms.Auth
             }
             else
             {
-                Error = CoreErrorCodes.AuthenticationFailed;
-                ErrorDescription = CoreErrorMessages.AuthorizationServerInvalidResponse;
+                Error = AuthError.AuthenticationFailed;
+                ErrorDescription = AuthErrorMessage.AuthorizationServerInvalidResponse;
                 Status = AuthorizationStatus.UnknownError;
             }
         }

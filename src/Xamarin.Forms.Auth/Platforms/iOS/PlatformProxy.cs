@@ -6,6 +6,7 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Foundation;
+
 using UIKit;
 
 namespace Xamarin.Forms.Auth
@@ -13,72 +14,38 @@ namespace Xamarin.Forms.Auth
     /// <summary>
     ///     Platform / OS specific logic.  No library (ADAL / MSAL) specific code should go in here.
     /// </summary>
-    internal class PlatformProxy : IPlatformProxy
+    internal class PlatformProxy : AbstractPlatformProxy
     {
         internal const string IosDefaultRedirectUriTemplate = "msal{0}://auth";
-        private readonly Lazy<IPlatformLogger> _platformLogger =
-            new Lazy<IPlatformLogger>(() => new ConsolePlatformLogger());
 
-        private IWebUIFactory _overloadWebUiFactory;
-
-        /// <inheritdoc />
-        public IPlatformLogger PlatformLogger => _platformLogger.Value;
-
-        /// <inheritdoc />
-        public Task<string> GetUserPrincipalNameAsync()
+        public PlatformProxy(ICoreLogger logger)
+            : base(logger)
         {
-            return Task.FromResult(string.Empty);
         }
 
-        /// <inheritdoc />
-        public Task<bool> IsUserLocalAsync(RequestContext requestContext)
-        {
-            return Task.FromResult(false);
-        }
+        public override bool IsSystemWebViewAvailable => true;
 
-        /// <inheritdoc />
-        public bool IsDomainJoined()
-        {
-            return false;
-        }
-
-        /// <inheritdoc />
-        public string GetEnvironmentVariable(string variable)
+        public override string GetEnvironmentVariable(string variable)
         {
             return null;
         }
 
-        /// <inheritdoc />
-        public string GetProcessorArchitecture()
+        protected override string InternalGetProcessorArchitecture()
         {
             return null;
         }
 
-        /// <inheritdoc />
-        public string GetOperatingSystem()
+        protected override string InternalGetOperatingSystem()
         {
             return UIDevice.CurrentDevice.SystemVersion;
         }
 
-        /// <inheritdoc />
-        public string GetDeviceModel()
+        protected override string InternalGetDeviceModel()
         {
             return UIDevice.CurrentDevice.Model;
         }
 
-        /// <inheritdoc />
-        public string GetBrokerOrRedirectUri(Uri redirectUri)
-        {
-            return redirectUri.OriginalString;
-        }
-
-        /// <inheritdoc />
-        public string GetDefaultRedirectUri(string clientId)
-        {
-            return string.Format(CultureInfo.InvariantCulture, IosDefaultRedirectUriTemplate, clientId);
-        }
-
-        public string GetProductName()
+        protected override string InternalGetProductName()
         {
             return "MSAL.Xamarin.iOS";
         }
@@ -87,7 +54,7 @@ namespace Xamarin.Forms.Auth
         /// Considered PII, ensure that it is hashed.
         /// </summary>
         /// <returns>Name of the calling application.</returns>
-        public string GetCallingApplicationName()
+        protected override string InternalGetCallingApplicationName()
         {
             return (NSString)NSBundle.MainBundle?.InfoDictionary?["CFBundleName"];
         }
@@ -96,7 +63,7 @@ namespace Xamarin.Forms.Auth
         /// Considered PII, ensure that it is hashed.
         /// </summary>
         /// <returns>Version of the calling application.</returns>
-        public string GetCallingApplicationVersion()
+        protected override string InternalGetCallingApplicationVersion()
         {
             return (NSString)NSBundle.MainBundle?.InfoDictionary?["CFBundleVersion"];
         }
@@ -105,21 +72,27 @@ namespace Xamarin.Forms.Auth
         /// Considered PII. Please ensure that it is hashed.
         /// </summary>
         /// <returns>Device identifier.</returns>
-        public string GetDeviceId()
+        protected override string InternalGetDeviceId()
         {
             return UIDevice.CurrentDevice?.IdentifierForVendor?.AsString();
         }
 
         /// <inheritdoc />
-        public IWebUIFactory GetWebUiFactory()
+        protected override IWebUIFactory CreateWebUiFactory()
         {
-            return _overloadWebUiFactory ?? new IosWebUIFactory();
+            return new IosWebUIFactory();
         }
 
+        protected override ICryptographyManager InternalGetCryptographyManager() => new iOSCryptographyManager();
+
+        protected override IPlatformLogger InternalGetPlatformLogger() => new ConsolePlatformLogger();
+
         /// <inheritdoc />
-        public void SetWebUiFactory(IWebUIFactory webUiFactory)
+        protected override ITokenCache InternalGetTokenCache()
         {
-            _overloadWebUiFactory = webUiFactory;
+            return new EssentialsTokenCache();
         }
+
+        protected override IFeatureFlags CreateFeatureFlags() => new iOSFeatureFlags();
     }
 }

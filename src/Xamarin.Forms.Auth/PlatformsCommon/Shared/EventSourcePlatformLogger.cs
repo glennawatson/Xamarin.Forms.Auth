@@ -8,29 +8,29 @@ namespace Xamarin.Forms.Auth
     {
         static EventSourcePlatformLogger()
         {
-            EventSource = new OAuth2EventSource();
+            MsalEventSource = new AuthEventSource();
         }
 
-        internal static OAuth2EventSource EventSource { get; }
+        internal static AuthEventSource MsalEventSource { get; }
 
         public void Error(string message)
         {
-            EventSource.Error(message);
+            MsalEventSource.Error(message);
         }
 
         public void Warning(string message)
         {
-            EventSource.Error(message);
+            MsalEventSource.Error(message);
         }
 
         public void Verbose(string message)
         {
-            EventSource.Error(message);
+            MsalEventSource.Error(message);
         }
 
         public void Information(string message)
         {
-            EventSource.Error(message);
+            MsalEventSource.Error(message);
         }
     }
 }

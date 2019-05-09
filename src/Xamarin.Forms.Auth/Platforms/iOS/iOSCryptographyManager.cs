@@ -3,12 +3,14 @@
 // See the LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Xamarin.Forms.Auth
 {
+    [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Reviewed. Suppression is OK here.")]
     internal class iOSCryptographyManager : ICryptographyManager
     {
         public string CreateBase64UrlEncodedSha256Hash(string input)

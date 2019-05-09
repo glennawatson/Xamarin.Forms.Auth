@@ -5,9 +5,6 @@
 using System;
 using System.Collections.Generic;
 
-using JWT;
-using JWT.Serializers;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -20,88 +17,36 @@ namespace Xamarin.Forms.Auth
     /// https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens#payload-claims
     /// Also contains some additional values available from the Microsoft standard.
     /// </summary>
-    public class IdToken
+     internal class IdToken
     {
-        /// <summary>
-        /// Gets or sets the security token service (STS) that constructs and returns the token,
-        /// and the Azure AD tenant in which the user was authenticated.
-        /// </summary>
-        [JsonProperty(PropertyName = "iss")]
+        [JsonProperty(PropertyName = IdTokenClaim.Issuer)]
         public string Issuer { get; set; }
 
-        /// <summary>
-        /// Gets or sets an immutable identifier for an object in the Microsoft identity system, in this case, a user account.
-        /// This ID uniquely identifies the user across applications.
-        /// </summary>
-        [JsonProperty(PropertyName = "oid")]
+        [JsonProperty(PropertyName = IdTokenClaim.ObjectId)]
         public string ObjectId { get; set; }
 
-        /// <summary>
-        /// Gets or sets a casual name of the user that may or may not be the same as the given_name.
-        /// For instance, a nickname value of 'Mike' might be returned alongside a given_name value of 'Michael'.
-        /// </summary>
-        [JsonProperty("nickname")]
-        public string NickName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Subject-Identifier for the user at the issuer. It's a unique value to identify
-        /// the user.
-        /// </summary>
-        [JsonProperty(PropertyName = "sub")]
+        [JsonProperty(PropertyName = IdTokenClaim.Subject)]
         public string Subject { get; set; }
 
-        /// <summary>
-        /// Gets or sets a GUID that represents the Azure AD tenant that the user is from.
-        /// For work and school accounts, the GUID is the immutable tenant ID of the organization that the user belongs to.
-        /// </summary>
-        [JsonProperty(PropertyName = "tid")]
+        [JsonProperty(PropertyName = IdTokenClaim.TenantId)]
         public string TenantId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the version of the ID token.
-        /// </summary>
-        [JsonProperty(PropertyName = "ver")]
+        [JsonProperty(PropertyName = IdTokenClaim.Version)]
         public string Version { get; set; }
 
-        /// <summary>
-        /// Gets or sets the shorthand name by which the user wishes to be referred to at the RP, such as janedoe or j.doe.
-        /// This value MAY be any valid JSON string including special characters such as @, /, or whitespace.
-        /// The RP MUST NOT rely upon this value being unique.
-        /// </summary>
-        [JsonProperty(PropertyName = "preferred_username")]
+        [JsonProperty(PropertyName = IdTokenClaim.PreferredUsername)]
         public string PreferredUsername { get; set; }
 
-        /// <summary>
-        /// Gets or sets the user's full name in displayable form including all name parts,
-        /// possibly including titles and suffixes, ordered according to the user's locale and preferences.
-        /// </summary>
-        [JsonProperty(PropertyName = "name")]
+        [JsonProperty(PropertyName = IdTokenClaim.Name)]
         public string Name { get; set; }
 
-        /// <summary>
-        /// Gets or sets for guest users, the object ID of the user in the user's home tenant.
-        /// </summary>
-        [JsonProperty(PropertyName = "home_oid")]
+        [JsonProperty(PropertyName = IdTokenClaim.HomeObjectId)]
         public string HomeObjectId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the given name(s) or first name(s) of the user.
-        /// </summary>
-        /// <remarks>
-        /// Note that in some cultures,
-        /// people can have multiple given names; all can be present, with the names being separated by space characters.
-        /// </remarks>
-        [JsonProperty(PropertyName = "given_name")]
+        [JsonProperty(PropertyName = IdTokenClaim.GivenName)]
         public string GivenName { get; set; }
 
-        /// <summary>
-        /// Gets or sets the surname(s) or last name(s) of the user.
-        /// </summary>
-        /// <remarks>
-        /// Note that in some cultures, people can have multiple family names or no family name;
-        /// all can be present, with the names being separated by space characters.
-        /// </remarks>
-        [JsonProperty(PropertyName = "family_name")]
+        [JsonProperty(PropertyName = IdTokenClaim.FamilyName)]
         public string FamilyName { get; set; }
 
         /// <summary>
@@ -121,37 +66,36 @@ namespace Xamarin.Forms.Auth
         [JsonExtensionData]
         public IDictionary<string, JToken> AdditionalData { get; set; }
 
-        /// <summary>
-        /// Parse a token from a string value.
-        /// </summary>
-        /// <param name="token">The string value to parse.</param>
-        /// <returns>The constructed id token.</returns>
-        public static IdToken Parse(string token)
+        public static IdToken Parse(string idToken)
         {
-            if (string.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(idToken))
             {
                 return null;
             }
 
+            string[] idTokenSegments = idToken.Split(new[] { '.' });
+
+            if (idTokenSegments.Length < 2)
+            {
+                throw new AuthClientException(
+                    AuthError.InvalidJwtError,
+                    AuthErrorMessage.IDTokenMustHaveTwoParts);
+            }
+
             try
             {
-                var urlEncoder = new JwtBase64UrlEncoder();
-                var decoder = new JwtDecoder(new JsonNetSerializer(), null, urlEncoder);
-                return decoder.DecodeToObject<IdToken>(token);
+                var idTokenString = Base64UrlHelpers.DecodeToString(idTokenSegments[1]);
+                return JsonConvert.DeserializeObject<IdToken>(idTokenString);
             }
             catch (Exception exc)
             {
-                throw ExceptionFactory.GetClientException(
-                    CoreErrorCodes.JsonParseError,
-                    CoreErrorMessages.FailedToParseIDToken,
+                throw new AuthClientException(
+                    AuthError.JsonParseError,
+                    AuthErrorMessage.FailedToParseIDToken,
                     exc);
             }
         }
 
-        /// <summary>
-        /// Gets the unique id associated with this id token.
-        /// </summary>
-        /// <returns>The unique id.</returns>
         public string GetUniqueId()
         {
             return ObjectId ?? Subject;

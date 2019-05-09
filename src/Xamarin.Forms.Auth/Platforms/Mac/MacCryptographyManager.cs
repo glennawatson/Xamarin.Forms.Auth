@@ -49,7 +49,6 @@ namespace Xamarin.Forms.Auth
             }
         }
 
-        #region Not Implemented
         public string Encrypt(string message)
         {
             throw new NotImplementedException();
@@ -74,7 +73,5 @@ namespace Xamarin.Forms.Auth
         {
             throw new NotImplementedException();
         }
-
-        #endregion
     }
 }
