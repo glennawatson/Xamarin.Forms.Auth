@@ -35,6 +35,7 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('Xamarin.Mac')) ">
     <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
+    <Reference Include="netstandard" />
     <Compile Include="Platforms\AppleShared\**\*.cs" />
     <Compile Include="Platforms\XamarinShared\**\*.cs" />
     <Compile Include="Platforms\Mac\**\*.cs" />

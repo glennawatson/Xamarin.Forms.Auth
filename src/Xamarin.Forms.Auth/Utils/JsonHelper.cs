@@ -3,8 +3,6 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.IO;
-using System.Runtime.Serialization.Json;
-using System.Text;
 
 using Newtonsoft.Json;
 

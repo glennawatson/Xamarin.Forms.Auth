@@ -114,6 +114,12 @@ namespace Xamarin.Forms.Auth
         public IEnumerable<string> Scopes { get; }
 
         /// <summary>
+        /// Parses the ID token text.
+        /// </summary>
+        /// <returns>The parsed ID token.</returns>
+        public IdToken GetParsedIdToken() => Auth.IdToken.Parse(IdToken);
+
+        /// <summary>
         /// Creates the content for an HTTP authorization header from this authentication result, so
         /// that you can call a protected API.
         /// </summary>
