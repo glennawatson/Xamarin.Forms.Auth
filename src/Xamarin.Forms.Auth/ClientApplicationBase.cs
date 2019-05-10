@@ -32,6 +32,14 @@ namespace Xamarin.Forms.Auth
 
         internal ITokenCache TokenCache { get; set; }
 
+        /// <inheritdoc />
+        public AcquireTokenSilentParameterBuilder AcquireTokenSilent(IEnumerable<string> scopes)
+        {
+            return AcquireTokenSilentParameterBuilder.Create(
+                ClientExecutorFactory.CreateClientApplicationBaseExecutor(this),
+                scopes);
+        }
+
         /// <summary>
         /// Removes all tokens in the cache.
         /// </summary>

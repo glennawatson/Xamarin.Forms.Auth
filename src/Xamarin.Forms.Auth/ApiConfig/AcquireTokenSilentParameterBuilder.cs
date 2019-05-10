@@ -50,20 +50,17 @@ namespace Xamarin.Forms.Auth
             return new AcquireTokenSilentParameterBuilder(clientApplicationBaseExecutor).WithScopes(scopes).WithLoginHint(loginHint);
         }
 
+        internal static AcquireTokenSilentParameterBuilder Create(
+            IClientApplicationBaseExecutor clientApplicationBaseExecutor,
+            IEnumerable<string> scopes)
+        {
+            return new AcquireTokenSilentParameterBuilder(clientApplicationBaseExecutor).WithScopes(scopes);
+        }
+
         /// <inheritdoc />
         internal override Task<AuthenticationResult> ExecuteInternalAsync(CancellationToken cancellationToken)
         {
             return ClientApplicationBaseExecutor.ExecuteAsync(CommonParameters, Parameters, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        protected override void Validate()
-        {
-            base.Validate();
-            if (string.IsNullOrWhiteSpace(Parameters.LoginHint))
-            {
-                throw new AuthUiRequiredException(AuthError.UserNullError, AuthErrorMessage.MsalUiRequiredMessage);
-            }
         }
 
         private AcquireTokenSilentParameterBuilder WithLoginHint(string loginHint)
