@@ -25,10 +25,6 @@ namespace Xamarin.Forms.Auth
         {
             ServiceBundle = serviceBundle;
             AuthenticationRequestParameters = authenticationRequestParameters;
-            if (authenticationRequestParameters.Scope == null || authenticationRequestParameters.Scope.Count == 0)
-            {
-                throw new ArgumentNullException(nameof(authenticationRequestParameters), nameof(authenticationRequestParameters.Scope));
-            }
 
             ValidateScopeInput(authenticationRequestParameters.Scope);
 

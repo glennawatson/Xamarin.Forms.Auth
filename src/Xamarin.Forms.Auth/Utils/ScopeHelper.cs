@@ -10,6 +10,8 @@ namespace Xamarin.Forms.Auth
 {
     internal static class ScopeHelper
     {
+        private static readonly SortedSet<string> EmptySet = new SortedSet<string>();
+
         public static bool ScopeContains(SortedSet<string> outerSet, SortedSet<string> possibleContainedSet)
         {
             foreach (string key in possibleContainedSet)
@@ -37,7 +39,7 @@ namespace Xamarin.Forms.Auth
         {
             if (input == null || !input.Any())
             {
-                return new SortedSet<string>();
+                return EmptySet;
             }
 
             return new SortedSet<string>(input);
