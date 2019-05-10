@@ -74,7 +74,7 @@ namespace Xamarin.Forms.Auth
 
         /// <summary>
         /// Sets the Debug logging callback to a default debug method which displays
-        /// the level of the message and the message itself. For details see https://aka.ms/auth-net-logging.
+        /// the level of the message and the message itself. For details .
         /// </summary>
         /// <param name="logLevel">Desired level of logging.  The default is LogLevel.Info.</param>
         /// <param name="enablePiiLogging">Boolean used to enable/disable logging of
@@ -110,7 +110,7 @@ namespace Xamarin.Forms.Auth
         /// Sets the Client ID of the application.
         /// </summary>
         /// <param name="clientId">Client ID (also known as <i>Application ID</i>) of the application as registered in the
-        ///  application registration portal (https://aka.ms/auth-net-register-app).</param>
+        ///  application registration portal.</param>
         /// <returns>The builder to chain the .With methods.</returns>
         public T WithClientId(string clientId)
         {

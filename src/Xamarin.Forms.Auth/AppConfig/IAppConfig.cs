@@ -14,7 +14,7 @@ namespace Xamarin.Forms.Auth
     {
         /// <summary>
         /// Gets client ID (also known as App ID) of the application as registered in the
-        /// application registration portal (https://aka.ms/auth-net-register-app).
+        /// application registration portal.
         /// </summary>
         string ClientId { get; }
 

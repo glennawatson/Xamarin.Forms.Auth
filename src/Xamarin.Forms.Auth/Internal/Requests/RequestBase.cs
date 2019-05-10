@@ -103,7 +103,7 @@ namespace Xamarin.Forms.Auth
             CancellationToken cancellationToken)
         {
 #pragma warning disable CA2234 // Pass system uri objects instead of strings
-            if (!Uri.TryCreate(AuthenticationRequestParameters.Authority, ServiceBundle.Config.TokenEndpointSuffix, out var result))
+            if (!AuthenticationRequestParameters.Authority.TryCombine(ServiceBundle.Config.TokenEndpointSuffix, out var result))
 #pragma warning restore CA2234 // Pass system uri objects instead of strings
             {
                 throw new ArgumentException("Invalid authority URI or token endpoint suffix, Authority cannot be combined with the TokenEndPointSuffix");

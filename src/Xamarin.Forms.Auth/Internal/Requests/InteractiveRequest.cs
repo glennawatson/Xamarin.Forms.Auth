@@ -123,7 +123,7 @@ namespace Xamarin.Forms.Auth
             string qp = requestParameters.ToQueryParameter();
 
 #pragma warning disable CA2234 // Pass system uri objects instead of strings
-            if (!Uri.TryCreate(AuthenticationRequestParameters.Authority, ServiceBundle.Config.AuthorizeEndpointSuffix, out var result))
+            if (!AuthenticationRequestParameters.Authority.TryCombine(ServiceBundle.Config.AuthorizeEndpointSuffix, out var result))
 #pragma warning restore CA2234 // Pass system uri objects instead of strings
             {
                 throw new ArgumentException("Invalid authority URI or authorize endpoint suffix, Authority cannot be combined with the AuthorizeEndPointSuffix");

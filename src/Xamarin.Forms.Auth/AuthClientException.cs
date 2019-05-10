@@ -9,7 +9,7 @@ namespace Xamarin.Forms.Auth
     /// <summary>
     /// This exception class represents errors that are local to the library or the device. Contrary to
     /// <see cref="AuthServiceException"/> which represent errors happening from the Azure AD service or
-    /// the network. For more details, see https://aka.ms/auth-net-exceptions.
+    /// the network. For more details, .
     /// </summary>
     [Serializable]
     public class AuthClientException : AuthException

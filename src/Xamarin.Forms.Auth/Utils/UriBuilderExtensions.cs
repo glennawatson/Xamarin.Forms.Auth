@@ -36,5 +36,12 @@ namespace Xamarin.Forms.Auth
 
             AppendQueryParameters(builder, string.Join("&", list));
         }
+
+        public static bool TryCombine(this Uri uri1, string uri2, out Uri outputUri)
+        {
+            var strippedUri1 = uri1.AbsoluteUri.TrimEnd('/');
+            var strippedUri2 = uri2.TrimStart('/');
+            return Uri.TryCreate($"{strippedUri1}/{strippedUri2}", UriKind.Absolute, out outputUri);
+        }
     }
 }

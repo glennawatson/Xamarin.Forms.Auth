@@ -73,7 +73,7 @@ namespace Xamarin.Forms.Auth
         public const string UnauthorizedResponseExpected = "Unauthorized http response (status code 401) was expected";
         public const string UnexpectedAuthorityValidList = "Unexpected list of valid addresses";
 
-        public const string UnsupportedUserType = "Unsupported User Type '{0}'. Please see https://aka.ms/auth-net-up";
+        public const string UnsupportedUserType = "Unsupported User Type '{0}'. ";
 
         public const string UnsupportedMultiRefreshToken =
             "This authority does not support refresh token for multiple resources. Pass null as a resource";
@@ -115,13 +115,13 @@ namespace Xamarin.Forms.Auth
         public const string BrokerResponseReturnedError = "Broker response returned an error which does not contain an error or error description ";
         public const string BrokerResponseError = "Broker response returned error: ";
         public const string CannotInvokeBroker = "MSAL cannot invoke the broker. The Authenticator App (Broker) may not be installed on the user's device or there was an error invoking the broker. " +
-            "Check logs for more details and see https://aka.ms/auth-brokers. ";
+            "Check logs for more details and . ";
 
         public const string NoAccountForLoginHint = "You are trying to acquire a token silently using a login hint. No account was found in the token cache having this login hint.";
 
         public const string MultipleAccountsForLoginHint = "You are trying to acquire a token silently using a login hint. Multiple accounts were found in the token cache having this login hint. Please choose an account manually an pass it in to AcquireTokenSilently.";
 
-        public const string UnknownUser = "Could not identify the user logged into the OS. See http://aka.ms/auth-net-iwa for details.";
+        public const string UnknownUser = "Could not identify the user logged into the OS.";
 
         public const string HttpRequestUnsuccessful = "Response status code does not indicate success: {0} ({1}).";
 
@@ -140,7 +140,7 @@ namespace Xamarin.Forms.Auth
           "B2C 'authority' Uri should have at least 3 segments in the path (i.e. https://<host>/tfp/<tenant>/<policy>/...)";
 
         public const string UnsupportedAuthorityValidation =
-            "Authority validation is not supported for this type of authority. See http://aka.ms/valid-authorities for details";
+            "Authority validation is not supported for this type of authority.";
 
         public const string AuthenticationCanceled = "User canceled authentication.";
 
@@ -206,12 +206,7 @@ namespace Xamarin.Forms.Auth
         public const string ActivityRequiredForParentObjectAndroid = "On Xamarin.Android, you have to specify the current Activity from which the browser pop-up will be displayed using the WithParentActivityOrWindow method.";
 
         public const string LoggingCallbackAlreadySet = "LoggingCallback has already been set";
-        public const string TelemetryCallbackAlreadySet = "TelemetryCallback has already been set";
         public const string NoClientIdWasSpecified = "No ClientId was specified.";
-        public const string AdfsNotCurrentlySupportedAuthorityType = "ADFS is not currently a supported authority type.";
-        public const string TenantIdAndAadAuthorityInstanceAreMutuallyExclusive = "TenantId and AadAuthorityAudience are both set, but they're mutually exclusive.";
-        public const string InstanceAndAzureCloudInstanceAreMutuallyExclusive = "Instance and AzureCloudInstance are both set but they're mutually exclusive.";
-        public const string NoRefreshTokenProvided = "A refresh token must be provided.";
 
         public const string NullTokenCacheError = "Token cache is set to null. Acquire by refresh token requests cannot be executed.";
         public const string NullTokenCacheForSilentError = "Token cache is set to null. Silent requests cannot be executed.";
@@ -219,43 +214,11 @@ namespace Xamarin.Forms.Auth
         public const string NoTokensFoundError = "No Refresh Token found in the cache";
         public const string NoRefreshTokenInResponse = "Acquire by refresh token request completed, but no refresh token was found";
 
-        public const string ConfidentialClientDoesntImplementIConfidentialClientApplicationExecutor =
-            "ConfidentialClientApplication implementation does not implement IConfidentialClientApplicationExecutor.";
-
-        public const string ClientSecretAndCertificateAreMutuallyExclusive = "ClientSecret and Certificate are mutually exclusive properties.  Only specify one.";
-        public const string ClientIdMustBeAGuid = "Error: ClientId is not a Guid.";
-
-        public const string TelemetryClassIsObsolete =
-            "Telemetry is now specified per ClientApplication.   and https://aka.ms/auth-net-application-configuration";
-
-        public const string LoggingClassIsObsolete =
-            "Logging is now specified per ClientApplication.   and https://aka.ms/auth-net-application-configuration";
-
-        public const string AuthorityDoesNotHaveTwoSegments =
-            "Authority should be in the form <host>/<audience>, for example https://login.microsoftonline.com/common";
-
-        public const string AzureAdMyOrgRequiresSpecifyingATenant = "When specifying AadAuthorityAudience.AzureAdMyOrg, you must also specify a tenant domain or tenant guid.";
-
         public const string CustomWebUiReturnedInvalidUri = "ICustomWebUi returned an invalid uri - it is empty or has no query.";
-
-        public const string InteractiveAuthNotSupported =
-                "On .Net Core, interactive authentication is not supported. " +
-                "Consider using Device Code Flow https://aka.ms/auth-net-device-code-flow or Integrated Windows Auth https://aka.ms/auth-net-iwa " +
-                "- you can also implement your own Web UI - see https://aka.ms/auth-net-custom-web-ui";
 
         public const string CustomWebUiAuthorizationCodeFailed = "CustomWebUi AcquireAuthorizationCode failed";
 
-        public const string TokenCacheJsonSerializerFailedParse = "MSAL V3 Deserialization failed to parse the cache contents. Is this possibly an earlier format needed for DeserializeMsalV2?";
-        public const string TokenCacheDictionarySerializerFailedParse = "MSAL V2 Deserialization failed to parse the cache contents. Is this possibly an earlier format needed for DeserializeMsalV3?  ()";
-        public const string BrokerNotSupportedOnThisPlatform = "Broker is only supported on mobile platforms (Android and iOS).  for details";
-
         public const string MsalExceptionFailedToParse = "Attempted to deserialize an MsalException but the type was unknown.";
-
-        public const string MatsAndTelemetryCallbackCannotBeConfiguredSimultaneously = "MATS cannot be configured at the same time as a TelemetryCallback is provided. These are mututally exclusive.";
-        public const string AkaMsauthnet3BreakingChanges = "";
-
-        public const string B2CAuthorityHostMisMatch = "The B2C authority host that was used when creating the client application is not the same authority host used in the AcquireToken call. " +
-           " for details. ";
 
         public static string InvalidRedirectUriReceived(string invalidRedirectUri)
         {

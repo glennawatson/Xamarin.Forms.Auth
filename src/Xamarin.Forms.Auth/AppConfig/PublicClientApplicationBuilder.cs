@@ -37,7 +37,7 @@ namespace Xamarin.Forms.Auth
         /// Creates a PublicClientApplicationBuilder from a clientID.
         /// </summary>
         /// <param name="clientId">Client ID (also known as App ID) of the application as registered in the
-        /// application registration portal (https://aka.ms/auth-net-register-app)/.</param>
+        /// application registration portal/.</param>
         /// <returns>A <see cref="PublicClientApplicationBuilder"/> from which to set more
         /// parameters, and to create a public client application instance.</returns>
         public static PublicClientApplicationBuilder Create(string clientId)
