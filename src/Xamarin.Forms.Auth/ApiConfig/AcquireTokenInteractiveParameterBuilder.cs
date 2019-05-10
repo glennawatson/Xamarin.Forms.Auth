@@ -141,7 +141,6 @@ namespace Xamarin.Forms.Auth
         }
 #endif
 
-#if NETSTANDARD1_3
         /// <summary>
         ///  Sets a reference to the ViewController (if using Xamarin.iOS), Activity (if using Xamarin.Android)
         ///  IWin32Window or IntPtr (if using .Net Framework). Used for invoking the browser.
@@ -153,7 +152,6 @@ namespace Xamarin.Forms.Auth
         {
             return WithParentObject(parent);
         }
-#endif
 
         internal static AcquireTokenInteractiveParameterBuilder Create(
             IPublicClientApplicationExecutor publicClientApplicationExecutor,
