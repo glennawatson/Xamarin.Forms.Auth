@@ -6,7 +6,7 @@ using System;
 
 namespace Xamarin.Forms.Auth
 {
-    #if !WINDOWS_APP
+#if !WINDOWS_APP
     internal class ConsolePlatformLogger : IPlatformLogger
     {
         public void Error(string message)
@@ -29,5 +29,5 @@ namespace Xamarin.Forms.Auth
             Console.WriteLine(message);
         }
     }
-    #endif
+#endif
 }

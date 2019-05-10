@@ -48,11 +48,11 @@ namespace Xamarin.Forms.Auth
 #endif
 
 #if iOS
-                              /// <summary>
-                              /// Initializes a new instance of the <see cref="CoreUIParent"/> class.
-                              /// Initializes an instance for a provided caller window.
-                              /// </summary>
-                              /// <param name="callerWindow">Caller window. OPTIONAL.</param>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CoreUIParent"/> class.
+        /// Initializes an instance for a provided caller window.
+        /// </summary>
+        /// <param name="callerWindow">Caller window. OPTIONAL.</param>
         public CoreUIParent(UIViewController callerWindow)
         {
             CallerViewController = callerWindow;

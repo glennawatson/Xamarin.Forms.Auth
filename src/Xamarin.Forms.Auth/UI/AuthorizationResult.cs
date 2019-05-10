@@ -17,11 +17,11 @@ namespace Xamarin.Forms.Auth
             if (Status == AuthorizationStatus.UserCancel)
             {
                 Error = AuthError.AuthenticationCanceledError;
-                #if ANDROID
+#if ANDROID
                 ErrorDescription = AuthErrorMessage.AuthenticationCanceledAndroid;
-                #else
+#else
                 ErrorDescription = AuthErrorMessage.AuthenticationCanceled;
-                #endif
+#endif
             }
             else if (Status == AuthorizationStatus.UnknownError)
             {

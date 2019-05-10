@@ -48,11 +48,11 @@ namespace Xamarin.Forms.Auth
 
 #if !ANDROID && !MAC
 #pragma warning disable RCS1163 // Unused parameter.
-                               /// <summary>
-                               /// Generates with the iOS security group chain.
-                               /// </summary>
-                               /// <param name="keychainSecurityGroup">The name of the iOS security group.</param>
-                               /// <returns>The builder.</returns>
+        /// <summary>
+        /// Generates with the iOS security group chain.
+        /// </summary>
+        /// <param name="keychainSecurityGroup">The name of the iOS security group.</param>
+        /// <returns>The builder.</returns>
         public PublicClientApplicationBuilder WithIosKeychainSecurityGroup(string keychainSecurityGroup)
 #pragma warning restore RCS1163 // Unused parameter.
         {

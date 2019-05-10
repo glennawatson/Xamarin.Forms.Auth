@@ -76,5 +76,5 @@ namespace Xamarin.Forms.Auth
         /// </summary>
         /// <returns>A task to monitor the progress.</returns>
         Task RemoveAsync();
-   }
+    }
 }

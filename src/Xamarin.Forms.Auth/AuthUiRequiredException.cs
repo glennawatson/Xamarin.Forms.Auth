@@ -11,7 +11,7 @@ namespace Xamarin.Forms.Auth
     /// succeed. It's thrown when calling <see cref="ClientApplicationBase.AcquireTokenSilent(System.Collections.Generic.IEnumerable{string}, string)"/> or one
     /// of its overrides, and when the token does not exists in the cache, or the user needs to provide more content, or perform multiple factor authentication based
     /// on Azure AD policies, etc..
-    /// For more details, .
+
     /// </summary>
     [Serializable]
     public class AuthUiRequiredException : AuthServiceException
