@@ -19,7 +19,7 @@ namespace Xamarin.Forms.Auth
         private AuthorizationResult _authorizationResult;
         private string _codeVerifier;
         private string _state;
-        private OAuth2TokenResponse _msalTokenResponse;
+        private OAuth2TokenResponse _authTokenResponse;
 
         public InteractiveRequest(
             IServiceBundle serviceBundle,
@@ -50,25 +50,9 @@ namespace Xamarin.Forms.Auth
             await AcquireAuthorizationAsync(cancellationToken).ConfigureAwait(false);
             VerifyAuthorizationResult();
 
-            ////if (AuthenticationRequestParameters.IsBrokerEnabled)
-            ////{
-            ////    var brokerInteractiveRequest = new BrokerInteractiveRequest(
-            ////        AuthenticationRequestParameters,
-            ////        _interactiveParameters,
-            ////        ServiceBundle,
-            ////        _authorizationResult);
+            _authTokenResponse = await SendTokenRequestAsync(GetBodyParameters(), cancellationToken).ConfigureAwait(false);
 
-            ////    if (brokerInteractiveRequest.IsBrokerInvocationRequired())
-            ////    {
-            ////        _msalTokenResponse = await brokerInteractiveRequest.SendTokenRequestToBrokerAsync().ConfigureAwait(false);
-            ////    }
-            ////}
-            ////else
-            ////{
-            _msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(), cancellationToken).ConfigureAwait(false);
-            ////}
-
-            return CacheTokenResponseAndCreateAuthenticationResult(_msalTokenResponse);
+            return CacheTokenResponseAndCreateAuthenticationResult(_authTokenResponse);
         }
 
         internal Task<Uri> CreateAuthorizationUriAsync()
@@ -127,19 +111,25 @@ namespace Xamarin.Forms.Auth
             if (addPkceAndState)
             {
                 _codeVerifier = ServiceBundle.PlatformProxy.CryptographyManager.GenerateCodeVerifier();
-                string codeVerifierHash = ServiceBundle.PlatformProxy.CryptographyManager.CreateBase64UrlEncodedSha256Hash(_codeVerifier);
-
-                requestParameters[OAuth2Parameter.CodeChallenge] = codeVerifierHash;
+                requestParameters[OAuth2Parameter.CodeChallenge] = ServiceBundle.PlatformProxy.CryptographyManager.CreateBase64UrlEncodedSha256Hash(_codeVerifier);
                 requestParameters[OAuth2Parameter.CodeChallengeMethod] = OAuth2Value.CodeChallengeMethodValue;
 
-                _state = Guid.NewGuid().ToString() + Guid.NewGuid().ToString();
+                _state = Guid.NewGuid().ToString() + Guid.NewGuid();
                 requestParameters[OAuth2Parameter.State] = _state;
             }
 
             CheckForDuplicateQueryParameters(AuthenticationRequestParameters.ExtraQueryParameters, requestParameters);
 
             string qp = requestParameters.ToQueryParameter();
-            var builder = new UriBuilder(AuthenticationRequestParameters.Authority);
+
+#pragma warning disable CA2234 // Pass system uri objects instead of strings
+            if (!Uri.TryCreate(AuthenticationRequestParameters.Authority, ServiceBundle.Config.AuthorizeEndpointSuffix, out var result))
+#pragma warning restore CA2234 // Pass system uri objects instead of strings
+            {
+                throw new ArgumentException("Invalid authority URI or authorize endpoint suffix, Authority cannot be combined with the AuthorizeEndPointSuffix");
+            }
+
+            var builder = new UriBuilder(result);
             builder.AppendQueryParameters(qp);
 
             return builder.Uri;

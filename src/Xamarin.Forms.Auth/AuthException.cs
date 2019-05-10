@@ -12,7 +12,7 @@ namespace Xamarin.Forms.Auth
 {
     /// <summary>
     /// Base exception type thrown when an error occurs during token acquisition.
-    /// For more details, see https://aka.ms/msal-net-exceptions.
+    /// For more details, see https://aka.ms/auth-net-exceptions.
     /// </summary>
     /// <remarks>Avoid throwing this exception. Instead throw the more specialized <see cref="AuthClientException"/>
     /// or <see cref="AuthServiceException"/>.

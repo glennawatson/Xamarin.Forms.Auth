@@ -9,38 +9,51 @@ namespace Xamarin.Forms.Auth
 {
     internal sealed class ApplicationConfiguration : IApplicationConfiguration
     {
-        // For telemetry, the ClientName of the application.
-        public string ClientName { get; internal set; }
-
-        // For telemetry, the ClientVersion of the application.
-        public string ClientVersion { get; internal set; }
-
-        public bool UseCorporateNetwork { get; internal set; }
-
-        public string IosKeychainSecurityGroup { get; internal set; }
-
         public IHttpManager HttpManager { get; internal set; }
 
-        public Uri AuthorityInfo { get; internal set; }
+        /// <inheritdoc />
+        public Uri Authority { get; internal set; }
 
+        /// <inheritdoc />
+        public string TokenEndpointSuffix { get; internal set; } = "/token";
+
+        /// <inheritdoc />
+        public string AuthorizeEndpointSuffix { get; internal set; } = "/authorize";
+
+        /// <inheritdoc />
         public string ClientId { get; internal set; }
 
+        /// <inheritdoc />
         public Uri RedirectUri { get; internal set; }
 
+        /// <inheritdoc />
         public bool EnablePiiLogging { get; internal set; }
 
+        /// <inheritdoc />
         public LogLevel LogLevel { get; internal set; } = LogLevel.Info;
 
+        /// <inheritdoc />
         public bool IsDefaultPlatformLoggingEnabled { get; internal set; }
 
+        /// <inheritdoc />
         public IAuthHttpClientFactory HttpClientFactory { get; internal set; }
 
+        /// <inheritdoc />
         public bool IsExtendedTokenLifetimeEnabled { get; set; }
 
+        /// <inheritdoc />
         public LogCallback LoggingCallback { get; internal set; }
 
         public string Component { get; internal set; }
 
+        /// <inheritdoc />
         public IDictionary<string, string> ExtraQueryParameters { get; internal set; } = new Dictionary<string, string>();
+
+#if iOS
+        /// <summary>
+        /// Gets or sets the iOS keychain security group to use.
+        /// </summary>
+        public string IosKeychainSecurityGroup { get; internal set; }
+#endif // iOS
     }
 }

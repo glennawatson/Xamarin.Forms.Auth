@@ -15,7 +15,7 @@ namespace Xamarin.Forms.Auth
     /// </summary>
     internal class PlatformProxy : AbstractPlatformProxy
     {
-        internal const string IosDefaultRedirectUriTemplate = "msal{0}://auth";
+        internal const string IosDefaultRedirectUriTemplate = "auth{0}://auth";
 
         private static readonly Lazy<string> DeviceIdLazy = new Lazy<string>(
            () => NetworkInterface.GetAllNetworkInterfaces().Where(nic => nic.OperationalStatus == OperationalStatus.Up)

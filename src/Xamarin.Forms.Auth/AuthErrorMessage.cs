@@ -73,7 +73,7 @@ namespace Xamarin.Forms.Auth
         public const string UnauthorizedResponseExpected = "Unauthorized http response (status code 401) was expected";
         public const string UnexpectedAuthorityValidList = "Unexpected list of valid addresses";
 
-        public const string UnsupportedUserType = "Unsupported User Type '{0}'. Please see https://aka.ms/msal-net-up";
+        public const string UnsupportedUserType = "Unsupported User Type '{0}'. Please see https://aka.ms/auth-net-up";
 
         public const string UnsupportedMultiRefreshToken =
             "This authority does not support refresh token for multiple resources. Pass null as a resource";
@@ -110,18 +110,18 @@ namespace Xamarin.Forms.Auth
             "No account or login hint was passed to the AcquireTokenSilent call.";
 
         public const string UserMismatchSaveToken = "Returned user identifier does not match the sent user identifier when saving the token to the cache.";
-        public const string IwaNotSupportedForManagedUser = "Integrated Windows Auth is not supported for managed users. See https://aka.ms/msal-net-iwa for details.";
-        public const string ActivityRequired = "On the Android platform, you have to pass the Activity to the UIParent object. See https://aka.ms/msal-interactive-android for details.";
-        public const string BrokerResponseReturnedError = "Broker response returned an error which does not contain an error or error description. See https://aka.ms/msal-brokers for details. ";
+        public const string IwaNotSupportedForManagedUser = "Integrated Windows Auth is not supported for managed users";
+        public const string ActivityRequired = "On the Android platform, you have to pass the Activity to the UIParent object";
+        public const string BrokerResponseReturnedError = "Broker response returned an error which does not contain an error or error description ";
         public const string BrokerResponseError = "Broker response returned error: ";
         public const string CannotInvokeBroker = "MSAL cannot invoke the broker. The Authenticator App (Broker) may not be installed on the user's device or there was an error invoking the broker. " +
-            "Check logs for more details and see https://aka.ms/msal-brokers. ";
+            "Check logs for more details and see https://aka.ms/auth-brokers. ";
 
         public const string NoAccountForLoginHint = "You are trying to acquire a token silently using a login hint. No account was found in the token cache having this login hint.";
 
         public const string MultipleAccountsForLoginHint = "You are trying to acquire a token silently using a login hint. Multiple accounts were found in the token cache having this login hint. Please choose an account manually an pass it in to AcquireTokenSilently.";
 
-        public const string UnknownUser = "Could not identify the user logged into the OS. See http://aka.ms/msal-net-iwa for details.";
+        public const string UnknownUser = "Could not identify the user logged into the OS. See http://aka.ms/auth-net-iwa for details.";
 
         public const string HttpRequestUnsuccessful = "Response status code does not indicate success: {0} ({1}).";
 
@@ -146,7 +146,7 @@ namespace Xamarin.Forms.Auth
 
         public const string AuthenticationCanceledAndroid = "User canceled authentication. On an Android device, this could be " +
             "due to the lack of capabilities, such as custom tabs, for the system browser." +
-            " See https://aka.ms/msal-net-system-browsers for more information.";
+            "  for more information.";
 
         public const string Unknown = "Unknown error";
 
@@ -173,28 +173,28 @@ namespace Xamarin.Forms.Auth
         public const string UnknownUserType = "Unknown User Type";
 
         public const string InternalErrorCacheEmptyUsername =
-            "Internal error - trying to remove an MSAL user with an empty username. Possible cache corruption. See https://aka.ms/adal_token_cache_serialization";
+            "Internal error - trying to remove an MSAL user with an empty username. Possible cache corruption. _token_cache_serialization";
 
         public const string InternalErrorCacheEmptyIdentifier =
-            "Internal error - trying to remove an MSAL user with an empty identifier. Possible cache corruption. See https://aka.ms/adal_token_cache_serialization";
+            "Internal error - trying to remove an MSAL user with an empty identifier. Possible cache corruption. _token_cache_serialization";
 
         public const string NonParsableOAuthError = "An error response was returned by the OAuth2 server, but it could not be parsed. Please inspect the exception properties for details.";
 
         public const string CannotAccessPublisherKeyChain =
            "The application cannot access the iOS keychain for the application publisher (the TeamId is null). " +
            "This is needed to enable Single Sign On between applications of the same publisher. " +
-           "This is an iOS configuration issue. See https://aka.ms/msal-net-enable-keychain-access for more details on enabling keychain access.";
+           "This is an iOS configuration issue.  for more details on enabling keychain access.";
 
         public const string MissingEntitlements =
             "The application does not have keychain access groups enabled in the Entitlements.plist. " +
             "As a result, there was a failure to save to the iOS keychain. " +
             "The keychain access group '{0}' is not enabled in the Entitlements.plist. " +
-            "See https://aka.ms/msal-net-enable-keychain-groups for more details on enabling keychain access groups and entitlements.";
+            " for more details on enabling keychain access groups and entitlements.";
 
         public const string AndroidActivityNotFound = "The Activity cannot be found to launch the given Intent. To ensure authentication, a browser with custom tab support " +
-            "is recommended. See https://aka.ms/msal-net-system-browsers for more details on using system browser on Android.";
+            "is recommended.  for more details on using system browser on Android.";
 
-        public const string DefaultRedirectUriIsInvalid = "The OAuth2 redirect uri {0} should not be used with the system browser, because the operating system cannot go back to the app. Consider using the default redirect uri for this platform. See https://aka.ms/msal-client-apps for more details.";
+        public const string DefaultRedirectUriIsInvalid = "The OAuth2 redirect uri {0} should not be used with the system browser, because the operating system cannot go back to the app. Consider using the default redirect uri for this platform.";
 
         public const string RedirectUriContainsFragment = "'redirectUri' must NOT include a fragment component";
 
@@ -226,10 +226,10 @@ namespace Xamarin.Forms.Auth
         public const string ClientIdMustBeAGuid = "Error: ClientId is not a Guid.";
 
         public const string TelemetryClassIsObsolete =
-            "Telemetry is now specified per ClientApplication.  See https://aka.ms/msal-net-3-breaking-changes and https://aka.ms/msal-net-application-configuration";
+            "Telemetry is now specified per ClientApplication.   and https://aka.ms/auth-net-application-configuration";
 
         public const string LoggingClassIsObsolete =
-            "Logging is now specified per ClientApplication.  See https://aka.ms/msal-net-3-breaking-changes and https://aka.ms/msal-net-application-configuration";
+            "Logging is now specified per ClientApplication.   and https://aka.ms/auth-net-application-configuration";
 
         public const string AuthorityDoesNotHaveTwoSegments =
             "Authority should be in the form <host>/<audience>, for example https://login.microsoftonline.com/common";
@@ -240,22 +240,22 @@ namespace Xamarin.Forms.Auth
 
         public const string InteractiveAuthNotSupported =
                 "On .Net Core, interactive authentication is not supported. " +
-                "Consider using Device Code Flow https://aka.ms/msal-net-device-code-flow or Integrated Windows Auth https://aka.ms/msal-net-iwa " +
-                "- you can also implement your own Web UI - see https://aka.ms/msal-net-custom-web-ui";
+                "Consider using Device Code Flow https://aka.ms/auth-net-device-code-flow or Integrated Windows Auth https://aka.ms/auth-net-iwa " +
+                "- you can also implement your own Web UI - see https://aka.ms/auth-net-custom-web-ui";
 
         public const string CustomWebUiAuthorizationCodeFailed = "CustomWebUi AcquireAuthorizationCode failed";
 
-        public const string TokenCacheJsonSerializerFailedParse = "MSAL V3 Deserialization failed to parse the cache contents. Is this possibly an earlier format needed for DeserializeMsalV2? (See https://aka.ms/msal-net-3x-cache-breaking-change)";
-        public const string TokenCacheDictionarySerializerFailedParse = "MSAL V2 Deserialization failed to parse the cache contents. Is this possibly an earlier format needed for DeserializeMsalV3?  (See https://aka.ms/msal-net-3x-cache-breaking-change)";
-        public const string BrokerNotSupportedOnThisPlatform = "Broker is only supported on mobile platforms (Android and iOS). See https://aka.ms/msal-brokers for details";
+        public const string TokenCacheJsonSerializerFailedParse = "MSAL V3 Deserialization failed to parse the cache contents. Is this possibly an earlier format needed for DeserializeMsalV2?";
+        public const string TokenCacheDictionarySerializerFailedParse = "MSAL V2 Deserialization failed to parse the cache contents. Is this possibly an earlier format needed for DeserializeMsalV3?  ()";
+        public const string BrokerNotSupportedOnThisPlatform = "Broker is only supported on mobile platforms (Android and iOS).  for details";
 
         public const string MsalExceptionFailedToParse = "Attempted to deserialize an MsalException but the type was unknown.";
 
         public const string MatsAndTelemetryCallbackCannotBeConfiguredSimultaneously = "MATS cannot be configured at the same time as a TelemetryCallback is provided. These are mututally exclusive.";
-        public const string AkaMsmsalnet3BreakingChanges = "See https://aka.ms/msal-net-3-breaking-changes";
+        public const string AkaMsauthnet3BreakingChanges = "";
 
         public const string B2CAuthorityHostMisMatch = "The B2C authority host that was used when creating the client application is not the same authority host used in the AcquireToken call. " +
-           "See https://aka.ms/msal-net-b2c for details. ";
+           " for details. ";
 
         public static string InvalidRedirectUriReceived(string invalidRedirectUri)
         {

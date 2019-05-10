@@ -16,7 +16,7 @@ namespace Xamarin.Forms.Auth
         /// the user token cache, where it will be available for further AcquireTokenSilent calls.
         /// This method can be used in migration to MSAL from ADAL v2, and in various integration
         /// scenarios where you have a RefreshToken available.
-        /// See https://aka.ms/msal-net-migration-adal2-msal2.
+        ///
         /// </summary>
         /// <param name="scopes">Scope to request from the token endpoint.
         /// Setting this to null or empty will request an access token, refresh token and ID token with default scopes.</param>

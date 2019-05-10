@@ -134,18 +134,18 @@ namespace Xamarin.Forms.Auth
                 return null;
             }
 
-            var msalTokenResponse = JsonHelper.DeserializeFromJson<OAuth2TokenResponse>(response.Body);
+            var authTokenResponse = JsonHelper.DeserializeFromJson<OAuth2TokenResponse>(response.Body);
 
-            if (msalTokenResponse?.Error == null)
+            if (authTokenResponse?.Error == null)
             {
                 return null;
             }
 
-            if (AuthError.InvalidGrantError.Equals(msalTokenResponse.Error, StringComparison.OrdinalIgnoreCase))
+            if (AuthError.InvalidGrantError.Equals(authTokenResponse.Error, StringComparison.OrdinalIgnoreCase))
             {
                 exceptionToThrow = new AuthUiRequiredException(
                     AuthError.InvalidGrantError,
-                    msalTokenResponse.ErrorDescription)
+                    authTokenResponse.ErrorDescription)
                 {
                     HttpResponse = response
                 };
@@ -153,8 +153,8 @@ namespace Xamarin.Forms.Auth
             else
             {
                 exceptionToThrow = new AuthServiceException(
-                    msalTokenResponse.Error,
-                    msalTokenResponse.ErrorDescription)
+                    authTokenResponse.Error,
+                    authTokenResponse.ErrorDescription)
                 {
                     HttpResponse = response
                 };
@@ -164,7 +164,7 @@ namespace Xamarin.Forms.Auth
             // for the user to auth via browser and this causes a lot of error noise in the logs.
             // So suppress this particular case to an Info so we still see the data but don't
             // log it as an error since it's expected behavior while waiting for the user.
-            if (string.Compare(msalTokenResponse.Error, OAuth2Error.AuthorizationPending, StringComparison.OrdinalIgnoreCase) == 0)
+            if (string.Compare(authTokenResponse.Error, OAuth2Error.AuthorizationPending, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 shouldLogAsError = false;
             }

@@ -14,13 +14,13 @@ namespace Xamarin.Forms.Auth
     {
         /// <summary>
         /// Gets client ID (also known as App ID) of the application as registered in the
-        /// application registration portal (https://aka.ms/msal-net-register-app).
+        /// application registration portal (https://aka.ms/auth-net-register-app).
         /// </summary>
         string ClientId { get; }
 
         /// <summary>
         /// Gets a value indicating whether flag telling if logging of Personally Identifiable Information (PII) is enabled/disabled for
-        /// the application. See https://aka.ms/msal-net-logging.
+        /// the application.
         /// </summary>
         /// <seealso cref="IsDefaultPlatformLoggingEnabled"/>
         bool EnablePiiLogging { get; }
@@ -33,14 +33,13 @@ namespace Xamarin.Forms.Auth
 
         /// <summary>
         /// Gets level of logging requested for the app.
-        /// See https://aka.ms/msal-net-logging.
         /// </summary>
         LogLevel LogLevel { get; }
 
         /// <summary>
         /// Gets a value indicating whether flag telling if logging to platform defaults is enabled/disabled for the app.
         /// In Desktop/UWP, Event Tracing is used. In iOS, NSLog is used.
-        /// In Android, logcat is used. See https://aka.ms/msal-net-logging.
+        /// In Android, logcat is used.
         /// </summary>
         bool IsDefaultPlatformLoggingEnabled { get; }
 
@@ -50,8 +49,7 @@ namespace Xamarin.Forms.Auth
         Uri RedirectUri { get; }
 
         /// <summary>
-        /// Gets callback used for logging. It was set with <see cref="AbstractApplicationBuilder{T}.WithLogging(LogCallback, LogLevel?, bool?, bool?)"/>
-        /// See https://aka.ms/msal-net-logging.
+        /// Gets callback used for logging. It was set with <see cref="AbstractApplicationBuilder{T}.WithLogging(LogCallback, LogLevel?, bool?, bool?)"/>.
         /// </summary>
         LogCallback LoggingCallback { get; }
 

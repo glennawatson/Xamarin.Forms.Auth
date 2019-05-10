@@ -22,7 +22,7 @@ namespace Xamarin.Forms.Auth
 
         /// <summary>
         /// Creates a PublicClientApplicationBuilder from public client application
-        /// configuration options. See https://aka.ms/msal-net-application-configuration.
+        /// configuration options.
         /// </summary>
         /// <param name="options">Public client applications configuration options.</param>
         /// <returns>A <see cref="PublicClientApplicationBuilder"/> from which to set more
@@ -35,10 +35,9 @@ namespace Xamarin.Forms.Auth
 
         /// <summary>
         /// Creates a PublicClientApplicationBuilder from a clientID.
-        /// See https://aka.ms/msal-net-application-configuration.
         /// </summary>
         /// <param name="clientId">Client ID (also known as App ID) of the application as registered in the
-        /// application registration portal (https://aka.ms/msal-net-register-app)/.</param>
+        /// application registration portal (https://aka.ms/auth-net-register-app)/.</param>
         /// <returns>A <see cref="PublicClientApplicationBuilder"/> from which to set more
         /// parameters, and to create a public client application instance.</returns>
         public static PublicClientApplicationBuilder Create(string clientId)

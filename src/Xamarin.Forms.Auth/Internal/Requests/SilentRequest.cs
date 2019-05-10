@@ -24,7 +24,7 @@ namespace Xamarin.Forms.Auth
         internal override Task PreRunAsync()
         {
             AuthenticationRequestParameters.Authority = AuthenticationRequestParameters.AuthorityOverride == null
-                                                            ? ServiceBundle.Config.AuthorityInfo
+                                                            ? ServiceBundle.Config.Authority
                                                             : AuthenticationRequestParameters.AuthorityOverride;
 
             return Task.CompletedTask;
@@ -64,17 +64,17 @@ namespace Xamarin.Forms.Auth
         {
             AuthenticationRequestParameters.RequestContext.Logger.Verbose("Refreshing access token...");
 
-            var msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(refreshToken), cancellationToken)
+            var authTokenResponse = await SendTokenRequestAsync(GetBodyParameters(refreshToken), cancellationToken)
                                     .ConfigureAwait(false);
 
-            if (msalTokenResponse.RefreshToken == null)
+            if (authTokenResponse.RefreshToken == null)
             {
-                msalTokenResponse.RefreshToken = refreshToken;
+                authTokenResponse.RefreshToken = refreshToken;
                 AuthenticationRequestParameters.RequestContext.Logger.Info(
                     "Refresh token was missing from the token refresh response, so the refresh token in the request is returned instead");
             }
 
-            return msalTokenResponse;
+            return authTokenResponse;
         }
 
         private Dictionary<string, string> GetBodyParameters(string refreshTokenSecret)

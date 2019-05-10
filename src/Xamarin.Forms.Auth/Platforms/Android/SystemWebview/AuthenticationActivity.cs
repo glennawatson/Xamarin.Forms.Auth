@@ -88,7 +88,7 @@ namespace Xamarin.Forms.Auth
 
                 RequestContext.Logger.Warning(
                     "Browser with custom tabs package not available. " +
-                    "Launching with alternate browser. See https://aka.ms/msal-net-system-browsers for details.");
+                    "Launching with alternate browser");
 
                 try
                 {

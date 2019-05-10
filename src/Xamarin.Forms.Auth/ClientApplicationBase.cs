@@ -26,7 +26,7 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Gets the URL of the authority.
         /// </summary>
-        public Uri Authority => ServiceBundle.Config.AuthorityInfo;
+        public Uri Authority => ServiceBundle.Config.Authority;
 
         internal IServiceBundle ServiceBundle { get; }
 

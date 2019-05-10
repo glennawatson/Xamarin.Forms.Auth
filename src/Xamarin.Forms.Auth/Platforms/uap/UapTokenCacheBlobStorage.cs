@@ -20,7 +20,7 @@ namespace Xamarin.Forms.Auth
     /// </remarks>
     internal class UapTokenCacheBlobStorage : ITokenCacheBlobStorage
     {
-        private const string CacheFileName = "msalcache.dat";
+        private const string CacheFileName = "authcache.dat";
 
         private readonly ICryptographyManager _cryptographyManager;
 

@@ -128,7 +128,7 @@ namespace Xamarin.Forms.Auth
                 {
                     if (!fileMutex.TryLock())
                     {
-                        throw new InvalidOperationException("msal cannot lock file for write"); // todo: exception
+                        throw new InvalidOperationException("auth cannot lock file for write"); // todo: exception
                     }
 
                     File.WriteAllBytes(GetFullPath(relativePath), data);

@@ -6,7 +6,7 @@ namespace Xamarin.Forms.Auth
 {
     /// <summary>
     ///     Level of the log messages.
-    ///     For details see https://aka.ms/msal-net-logging.
+    ///     For details see https://aka.ms/auth-net-logging.
     /// </summary>
     public enum LogLevel
     {

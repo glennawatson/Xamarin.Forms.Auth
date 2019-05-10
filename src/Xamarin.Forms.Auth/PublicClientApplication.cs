@@ -11,7 +11,7 @@ namespace Xamarin.Forms.Auth
     /// <summary>
     /// Class to be used to acquire tokens in desktop or mobile applications (Desktop / UWP / Xamarin.iOS / Xamarin.Android).
     /// public client applications are not trusted to safely keep application secrets, and therefore they only access Web APIs in the name of the user only.
-    /// For details see https://aka.ms/msal-net-client-applications.
+    /// For details see https://aka.ms/auth-net-client-applications.
     /// </summary>
     public sealed partial class PublicClientApplication : ClientApplicationBase, IPublicClientApplication, IByRefreshToken
     {

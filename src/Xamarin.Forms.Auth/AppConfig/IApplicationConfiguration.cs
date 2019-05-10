@@ -20,6 +20,16 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Gets the authority.
         /// </summary>
-        Uri AuthorityInfo { get; }
+        Uri Authority { get; }
+
+        /// <summary>
+        /// Gets the token end point suffix. This is added to the end of the <see cref="Authority" /> Uri.
+        /// </summary>
+        string TokenEndpointSuffix { get; }
+
+        /// <summary>
+        /// Gets the authorize endpoint suffix. This is added to the end of the <see cref="Authority"/>/ Uri.
+        /// </summary>
+        string AuthorizeEndpointSuffix { get; }
     }
 }

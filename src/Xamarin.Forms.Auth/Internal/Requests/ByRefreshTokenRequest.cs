@@ -31,17 +31,17 @@ namespace Xamarin.Forms.Auth
             }
 
             AuthenticationRequestParameters.RequestContext.Logger.Verbose(LogMessages.BeginningAcquireByRefreshToken);
-            var msalTokenResponse = await SendTokenRequestAsync(
+            var authTokenResponse = await SendTokenRequestAsync(
                                         GetBodyParameters(_refreshTokenParameters.RefreshToken),
                                         cancellationToken).ConfigureAwait(false);
 
-            if (msalTokenResponse.RefreshToken == null)
+            if (authTokenResponse.RefreshToken == null)
             {
                 AuthenticationRequestParameters.RequestContext.Logger.Info(AuthErrorMessage.NoRefreshTokenInResponse);
-                throw new AuthServiceException(msalTokenResponse.Error, msalTokenResponse.ErrorDescription, null);
+                throw new AuthServiceException(authTokenResponse.Error, authTokenResponse.ErrorDescription, null);
             }
 
-            return CacheTokenResponseAndCreateAuthenticationResult(msalTokenResponse);
+            return CacheTokenResponseAndCreateAuthenticationResult(authTokenResponse);
         }
 
         private Dictionary<string, string> GetBodyParameters(string refreshTokenSecret)

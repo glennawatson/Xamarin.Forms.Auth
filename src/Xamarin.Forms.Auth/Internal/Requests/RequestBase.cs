@@ -102,13 +102,21 @@ namespace Xamarin.Forms.Auth
             IDictionary<string, string> additionalBodyParameters,
             CancellationToken cancellationToken)
         {
+#pragma warning disable CA2234 // Pass system uri objects instead of strings
+            if (!Uri.TryCreate(AuthenticationRequestParameters.Authority, ServiceBundle.Config.TokenEndpointSuffix, out var result))
+#pragma warning restore CA2234 // Pass system uri objects instead of strings
+            {
+                throw new ArgumentException("Invalid authority URI or token endpoint suffix, Authority cannot be combined with the TokenEndPointSuffix");
+            }
+
             return SendTokenRequestAsync(
+                result,
                 additionalBodyParameters,
                 cancellationToken);
         }
 
         protected async Task<OAuth2TokenResponse> SendTokenRequestAsync(
-            string tokenEndpoint,
+            Uri tokenEndpoint,
             IDictionary<string, string> additionalBodyParameters,
             CancellationToken cancellationToken)
         {
@@ -154,24 +162,24 @@ namespace Xamarin.Forms.Auth
             authenticationRequestParameters.RequestContext.Logger.InfoPii(messageWithPii, messageWithoutPii);
         }
 
-        private async Task<OAuth2TokenResponse> SendHttpMessageAsync(OAuth2Client client, string tokenEndpoint)
+        private async Task<OAuth2TokenResponse> SendHttpMessageAsync(OAuth2Client client, Uri tokenEndpoint)
         {
             UriBuilder builder = new UriBuilder(tokenEndpoint);
             builder.AppendQueryParameters(AuthenticationRequestParameters.ExtraQueryParameters);
-            OAuth2TokenResponse msalTokenResponse =
+            OAuth2TokenResponse authTokenResponse =
                 await client
                     .GetTokenAsync(
                         builder.Uri,
                         AuthenticationRequestParameters.RequestContext)
                     .ConfigureAwait(false);
 
-            if (string.IsNullOrEmpty(msalTokenResponse.Scope))
+            if (string.IsNullOrEmpty(authTokenResponse.Scope))
             {
-                msalTokenResponse.Scope = AuthenticationRequestParameters.Scope.AsSingleString();
+                authTokenResponse.Scope = AuthenticationRequestParameters.Scope.AsSingleString();
                 AuthenticationRequestParameters.RequestContext.Logger.Info("ScopeSet was missing from the token response, so using developer provided scopes in the result");
             }
 
-            return msalTokenResponse;
+            return authTokenResponse;
         }
 
         private void LogReturnedToken(AuthenticationResult result)

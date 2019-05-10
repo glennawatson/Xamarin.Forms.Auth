@@ -20,7 +20,6 @@ namespace Xamarin.Forms.Auth
         /// <summary>
         /// Method returning an Http client that will be used to
         /// communicate with Azure AD. This enables advanced scenarios.
-        /// See https://aka.ms/msal-net-application-configuration.
         /// </summary>
         /// <returns>An Http client.</returns>
         HttpClient GetHttpClient();

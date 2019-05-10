@@ -20,7 +20,7 @@ namespace Xamarin.Forms.Auth
             _commonParameters = commonParameters;
 
             Authority = commonParameters.AuthorityOverride == null
-                ? serviceBundle.Config.AuthorityInfo
+                ? serviceBundle.Config.Authority
                 : commonParameters.AuthorityOverride;
 
             ClientId = serviceBundle.Config.ClientId;

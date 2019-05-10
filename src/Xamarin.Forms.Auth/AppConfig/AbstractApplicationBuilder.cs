@@ -74,7 +74,7 @@ namespace Xamarin.Forms.Auth
 
         /// <summary>
         /// Sets the Debug logging callback to a default debug method which displays
-        /// the level of the message and the message itself. For details see https://aka.ms/msal-net-logging.
+        /// the level of the message and the message itself. For details see https://aka.ms/auth-net-logging.
         /// </summary>
         /// <param name="logLevel">Desired level of logging.  The default is LogLevel.Info.</param>
         /// <param name="enablePiiLogging">Boolean used to enable/disable logging of
@@ -110,7 +110,7 @@ namespace Xamarin.Forms.Auth
         /// Sets the Client ID of the application.
         /// </summary>
         /// <param name="clientId">Client ID (also known as <i>Application ID</i>) of the application as registered in the
-        ///  application registration portal (https://aka.ms/msal-net-register-app).</param>
+        ///  application registration portal (https://aka.ms/auth-net-register-app).</param>
         /// <returns>The builder to chain the .With methods.</returns>
         public T WithClientId(string clientId)
         {
@@ -119,7 +119,7 @@ namespace Xamarin.Forms.Auth
         }
 
         /// <summary>
-        /// Sets the redirect URI of the application. See https://aka.ms/msal-net-application-configuration.
+        /// Sets the redirect URI of the application.
         /// </summary>
         /// <param name="redirectUri">URL where the STS will call back the application with the security token.
         /// This parameter is not required for desktop or UWP applications (as a default is used).
@@ -133,24 +133,26 @@ namespace Xamarin.Forms.Auth
         }
 
         /// <summary>
-        /// Sets the name of the calling application for telemetry purposes.
+        /// Adds a suffix that will be added to the end of the Authority property.
+        /// This will make up the token endpoint.
         /// </summary>
-        /// <param name="clientName">The name of the application for telemetry purposes.</param>
-        /// <returns>The current item.</returns>
-        public T WithClientName(string clientName)
+        /// <param name="suffix">The suffix to set.</param>
+        /// <returns>The builder to chain the .With methods.</returns>
+        public T WithTokenEndPointSuffix(string suffix)
         {
-            Config.ClientName = GetValueIfNotEmpty(Config.ClientName, clientName);
+            Config.TokenEndpointSuffix = suffix;
             return (T)this;
         }
 
         /// <summary>
-        /// Sets the version of the calling application for telemetry purposes.
+        /// Adds a suffix that will be added to the end of the Authority property.
+        /// This will make up the Authorize endpoint.
         /// </summary>
-        /// <param name="clientVersion">The version of the calling application for telemetry purposes.</param>
-        /// <returns>The current item.</returns>
-        public T WithClientVersion(string clientVersion)
+        /// <param name="suffix">The suffix to set.</param>
+        /// <returns>The builder to chain the .With methods.</returns>
+        public T WithAuthorizeEndPointSuffix(string suffix)
         {
-            Config.ClientVersion = GetValueIfNotEmpty(Config.ClientVersion, clientVersion);
+            Config.AuthorizeEndpointSuffix = suffix;
             return (T)this;
         }
 
@@ -191,7 +193,7 @@ namespace Xamarin.Forms.Auth
         /// <returns>The builder to chain the .With methods.</returns>
         public T WithAuthority(Uri authorityUri)
         {
-            Config.AuthorityInfo = authorityUri;
+            Config.Authority = authorityUri;
             return (T)this;
         }
 
@@ -225,7 +227,6 @@ namespace Xamarin.Forms.Auth
 
         /// <summary>
         /// Sets application options, which can, for instance have been read from configuration files.
-        /// See https://aka.ms/msal-net-application-configuration.
         /// </summary>
         /// <param name="applicationOptions">Application options.</param>
         /// <returns>The builder to chain the .With methods.</returns>

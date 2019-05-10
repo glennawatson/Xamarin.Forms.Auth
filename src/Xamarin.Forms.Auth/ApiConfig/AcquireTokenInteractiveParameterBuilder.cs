@@ -22,7 +22,7 @@ using AppKit;
 namespace Xamarin.Forms.Auth
 {
     /// <summary>
-    /// Builder for an Interactive token request. See https://aka.ms/msal-net-acquire-token-interactively.
+    /// Builder for an Interactive token request.
     /// </summary>
     public sealed class AcquireTokenInteractiveParameterBuilder :
         AbstractPublicClientAcquireTokenParameterBuilder<AcquireTokenInteractiveParameterBuilder>

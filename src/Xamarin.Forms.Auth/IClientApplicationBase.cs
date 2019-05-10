@@ -25,7 +25,7 @@ namespace Xamarin.Forms.Auth
 
         /// <summary>
         /// Attempts to acquire an access token for the <paramref name="loginHint"/> from the user token cache,
-        /// with advanced parameters controlling the network call. See https://aka.ms/msal-net-acquiretokensilent for more details.
+        /// with advanced parameters controlling the network call.  for more details.
         /// </summary>
         /// <param name="scopes">Scopes requested to access a protected API.</param>
         /// <param name="loginHint">Typically the username, in UPN format, e.g. johnd@contoso.com. </param>

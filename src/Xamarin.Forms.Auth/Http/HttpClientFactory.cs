@@ -24,7 +24,6 @@ namespace Xamarin.Forms.Auth
         public HttpClientFactory()
         {
 #if iOS
-            // See https://aka.ms/msal-net-httpclient for details
             if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
             {
                 _httpClient = new HttpClient(new NSUrlSessionHandler())
@@ -33,7 +32,6 @@ namespace Xamarin.Forms.Auth
                 };
             }
 #elif ANDROID
-            // See https://aka.ms/msal-net-httpclient for details
             _httpClient = new HttpClient(new Xamarin.Android.Net.AndroidClientHandler());
 #else
             _httpClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true })

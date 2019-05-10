@@ -126,15 +126,15 @@ namespace Xamarin.Forms.Auth
             {
                 sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "Exception type: {0}", ex.GetType()));
 
-                if (ex is AuthException msalException)
+                if (ex is AuthException authException)
                 {
-                    sb.AppendLine(string.Format(CultureInfo.InvariantCulture, ", ErrorCode: {0}", msalException.ErrorCode));
+                    sb.AppendLine(string.Format(CultureInfo.InvariantCulture, ", ErrorCode: {0}", authException.ErrorCode));
                 }
 
-                if (ex is AuthServiceException msalServiceException)
+                if (ex is AuthServiceException authServiceException)
                 {
-                    sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "HTTP StatusCode {0}", msalServiceException.StatusCode))
-                        .AppendLine(string.Format(CultureInfo.InvariantCulture, "CorrelationId {0}", msalServiceException.CorrelationId));
+                    sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "HTTP StatusCode {0}", authServiceException.StatusCode))
+                        .AppendLine(string.Format(CultureInfo.InvariantCulture, "CorrelationId {0}", authServiceException.CorrelationId));
                 }
 
                 if (ex.InnerException != null)
@@ -153,9 +153,9 @@ namespace Xamarin.Forms.Auth
             return sb.ToString();
         }
 
-        private void Log(LogLevel msalLogLevel, string messageWithPii, string messageScrubbed)
+        private void Log(LogLevel authLogLevel, string messageWithPii, string messageScrubbed)
         {
-            if (_loggingCallback == null || msalLogLevel > _logLevel)
+            if (_loggingCallback == null || authLogLevel >= _logLevel)
             {
                 return;
             }
@@ -170,7 +170,7 @@ namespace Xamarin.Forms.Auth
 
             if (_isDefaultPlatformLoggingEnabled)
             {
-                switch (msalLogLevel)
+                switch (authLogLevel)
                 {
                     case LogLevel.Error:
                         _platformLogger.Error(log);
@@ -187,7 +187,7 @@ namespace Xamarin.Forms.Auth
                 }
             }
 
-            _loggingCallback.Invoke(msalLogLevel, log, isLoggingPii);
+            _loggingCallback.Invoke(authLogLevel, log, isLoggingPii);
         }
     }
 }
