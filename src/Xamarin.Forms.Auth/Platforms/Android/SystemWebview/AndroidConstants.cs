@@ -9,7 +9,7 @@ namespace Xamarin.Forms.Auth
         public const string RequestUrlKey = "com.microsoft.identity.request.url.key";
         public const string RequestId = "com.microsoft.identity.request.id";
         public const string CustomTabRedirect = "com.microsoft.identity.customtab.redirect";
-        public const string AuthorizationFinalUrl = "com.microsoft.identity.client.finalUrl";
+        public const string AuthorizationFinalUrl = "com.xamarin.auth.forms.finalUrl";
         public const int Cancel = 2001;
         public const int AuthCodeError = 2002;
         public const int AuthCodeReceived = 2003;

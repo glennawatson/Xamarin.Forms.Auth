@@ -64,7 +64,7 @@ namespace Xamarin.Forms.Auth
             switch ((int)resultCode)
             {
                 case AndroidConstants.AuthCodeReceived:
-                    return CreateResultForOkResponse(data.GetStringExtra("com.microsoft.identity.client.finalUrl"));
+                    return CreateResultForOkResponse(data.GetStringExtra("com.xamarin.auth.forms.finalUrl"));
 
                 case AndroidConstants.Cancel:
                     return new AuthorizationResult(AuthorizationStatus.UserCancel, null);
