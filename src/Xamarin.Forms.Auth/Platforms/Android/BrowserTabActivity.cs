@@ -15,7 +15,7 @@ namespace Xamarin.Forms.Auth
     /// uri (redirect_uri has to be unique across apps), the os will fire an intent with the redirect,
     /// and the BrowserTabActivity will be launched.
     /// </summary>
-    ////[Activity(Name = "microsoft.identity.client.BrowserTabActivity")]
+    [Activity(Name = "xamarin.forms.auth.BrowserTabActivity")]
     [CLSCompliant(false)]
     public class BrowserTabActivity : Activity
     {
