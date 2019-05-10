@@ -75,9 +75,7 @@ namespace Xamarin.Forms.Auth
 
         protected static SortedSet<string> GetDecoratedScope(SortedSet<string> inputScope)
         {
-            SortedSet<string> set = new SortedSet<string>(inputScope.ToArray());
-            set.UnionWith(ScopeHelper.CreateSortedSetFromEnumerable(OAuth2Value.ReservedScopes));
-            return set;
+            return new SortedSet<string>(inputScope.ToArray());
         }
 
         protected AuthenticationResult CacheTokenResponseAndCreateAuthenticationResult(OAuth2TokenResponse tokenResponse)
@@ -94,15 +92,6 @@ namespace Xamarin.Forms.Auth
 
         protected void ValidateScopeInput(SortedSet<string> scopesToValidate)
         {
-            // Check if scope or additional scope contains client ID.
-            // TODO: instead of failing in the validation, could we simply just remove what the user sets and log that we did so instead?
-            if (scopesToValidate.Intersect(ScopeHelper.CreateSortedSetFromEnumerable(OAuth2Value.ReservedScopes)).Any())
-            {
-                throw new ArgumentException("MSAL always sends the scopes 'openid profile offline_access'. " +
-                                            "They cannot be suppressed as they are required for the " +
-                                            "library to function. Do not include any of these scopes in the scope parameter.");
-            }
-
             if (scopesToValidate.Contains(AuthenticationRequestParameters.ClientId))
             {
                 throw new ArgumentException("API does not accept client id as a user-provided scope");
