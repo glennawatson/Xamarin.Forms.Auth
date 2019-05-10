@@ -11,7 +11,6 @@ namespace Xamarin.Forms.Auth
     /// once with the <c>containsPii</c> parameter equals <c>false</c> and the message without PII,
     /// and a second time with the <c>containsPii</c> parameter equals to <c>true</c> and the message might contain PII.
     /// In some cases (when the message does not contain PII), the message will be the same.
-    /// For details .
     /// </summary>
     /// <param name="level">Log level of the log message to process.</param>
     /// <param name="message">Pre-formatted log message.</param>

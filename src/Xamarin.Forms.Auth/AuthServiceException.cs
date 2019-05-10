@@ -12,7 +12,6 @@ namespace Xamarin.Forms.Auth
 {
     /// <summary>
     /// Exception type thrown when service returns an error response or other networking errors occur.
-
     /// </summary>
     [Serializable]
     public class AuthServiceException : AuthException

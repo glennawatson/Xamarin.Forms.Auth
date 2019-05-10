@@ -10,7 +10,6 @@ namespace Xamarin.Forms.Auth
     /// <summary>
     /// Interface to be used with desktop or mobile applications (Desktop / UWP / Xamarin.iOS / Xamarin.Android).
     /// public client applications are not trusted to safely keep application secrets, and therefore they only access Web APIs in the name of the user only.
-    /// For details .
     /// </summary>
     public partial interface IPublicClientApplication : IClientApplicationBase
     {

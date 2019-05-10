@@ -12,7 +12,6 @@ namespace Xamarin.Forms.Auth
 {
     /// <summary>
     /// Base exception type thrown when an error occurs during token acquisition.
-
     /// </summary>
     /// <remarks>Avoid throwing this exception. Instead throw the more specialized <see cref="AuthClientException"/>
     /// or <see cref="AuthServiceException"/>.
