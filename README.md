@@ -1,49 +1,161 @@
-## Metadata Public API Generator
+## Xamarin.Forms.Auth
 
-MetadataPublicApiGeneratorhas no dependencies and simply creates a string the represents the public API. Any approval library can be used to approve the generated public API.
+Xamarin.Forms.Auth is a OAuth2 library for the Xamarin.Forms platforms. It will allow users to authenticate against OAuth2 servers.
 
-Originally based on [PublicApiGenerator](https://github.com/JakeGinnivan/ApiApprover) but uses System.Metadata.Reflection and Roslyn instead.
+It will cache token response for a particular client inside Xamarin.Essentials libary secure blobs.
 
-## How do I use it
+Originally based on [Microsoft Authentication Library](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet).
 
-> Install-package MetadataPublicApiGenerator
+## Install the NuGet package
 
-``` csharp
-var publicApi = ApiGenerator.GeneratePublicApi(typeof(Library).Assembly);
-```
+> Install-package Xamarin.Forms.Auth
 
-### Manual
+## Inside your Net Standard project
 
 ``` csharp
-[Fact]
-public void my_assembly_has_no_public_api_changes()
-{
-    var publicApi = ApiGenerator.GeneratePublicApi(typeof(Library).Assembly);
-
-    var approvedFilePath = "PublicApi.approved.txt";
-    if (!File.Exists(approvedFilePath))
+    public class OAuth2LoginService : ReactiveObject, ILoginService, IEnableLogger
     {
-        // Create a file to write to.
-        using (var sw = File.CreateText(approvedFilePath)) { }
+        private static readonly IPublicClientApplication AuthenticationClient = PublicClientApplicationBuilder
+                  .Create(AuthenticationConfig.ClientId)
+                  .WithAuthority(AuthenticationConfig.Authority)
+                  .WithRedirectUri(AuthenticationConfig.RedirectUrl)
+                  .WithExtraQueryParameters(AuthenticationConfig.AdditionalQueryHeaders)
+                  .Build();
+
+        public OAuth2LoginService()
+        {
+            _currentUserName = _authenticationResults.Select(x => x.GetParsedIdToken().GetUniqueId()).ToProperty(this, nameof(CurrentUserName));
+        }
+
+        /// <inheritdoc />
+        public async Task<string> GetLoginToken(CancellationToken token = default)
+        {
+            AuthenticationResult authResult;
+
+            // let's see if we have the user details already available.
+            try
+            {
+                authResult = await AuthenticationClient.AcquireTokenSilent(AuthenticationConfig.Scopes).ExecuteAsync(token).ConfigureAwait(false);
+            }
+            catch (AuthUiRequiredException)
+            {
+                try
+                {
+                    authResult = await AuthenticationClient.AcquireTokenInteractive(AuthenticationConfig.Scopes)
+                                                 .WithParentActivityOrWindow(App.ParentWindow)
+                                                 .ExecuteAsync(token)
+                                                 .ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    this.Log().Warn(ex, "Could not log into the authentication system");
+                    return null;
+                }
+            }
+
+            return authResult.AccessToken;
+        }
     }
+```
 
-    var approvedApi = File.ReadAllText(approvedFilePath);
+## Xamarin Android specific
 
-    Assert.Equal(approvedApi, publicApi);
+On Xamarin.Android, you need to set the parent activity so that the token gets back once the interaction has happened. Often we do this by setting the main activity as a static members of the App class.
+
+```cs
+var authResult = AcquireTokenInteractive(scopes)
+ .WithParentActivityOrWindow(App.ParentWindow)
+ .ExecuteAsync();
+ ```
+
+Inside your App.xaml.cs add a property for the Parent Window.
+
+```cs
+class App
+{
+    /// <summary>
+    /// Gets or sets the parent window or activity.
+    /// </summary>
+    public static object ParentWindow { get; set; }
 }
 ```
 
-### Shoudly
+Then in your `MainActivity.cs` set the ParentWindow. Make sure that Xamarin.Essentials is initilized also.
 
-> Install-package Shouldly
-
-``` csharp
-[Fact]
-public void my_assembly_has_no_public_api_changes()
+```cs
+public class MainActivity
 {
-    var publicApi = ApiGenerator.GeneratePublicApi(typeof(Library).Assembly);
-
-    //Shouldly
-    publicApi.ShouldMatchApproved();
+    protected override void OnCreate(Bundle savedInstanceState)
+    {
+        App.ParentWindow = this;
+        // Other initialization stuff.
+        Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+        global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+        LoadApplication(new App());
+    }
 }
+```
+
+You need to override the `OnActivityResult` method of the main Activity and call the `SetAuthenticationContinuationEventArgs` method of the `AuthenticationContinuationHelper` class. That line ensures that the control goes back to Xamarin.Forms.Auth once the interactive portion of the authentication flow ended.
+
+```cs
+protected override void OnActivityResult(int requestCode, 
+                                         Result resultCode, Intent data)
+{
+ base.OnActivityResult(requestCode, resultCode, data);
+ AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(requestCode,
+                                                                         resultCode,
+                                                                         data);
+}
+```
+
+We use a Intent filter to indicate when functionality should return back to the main activity. You need to modify the `AndroidManifest.xml` with the new intent filter inside the `Application` tag. Make sure you add your redirect URL.
+
+```xml
+<!--Intent filter to capture System Browser calling back to our app after Sign In-->
+<activity
+    android:name="xamarin.forms.auth.BrowserTabActivity">
+    <intent-filter>
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data android:scheme="https" android:host="<REDIRECT-URL>" />
+    </intent-filter>
+</activity>
+```
+
+## iOS Specific
+
+First you need to override the `OpenUrl` method of the `FormsApplicationDelegate` derived class and call `AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs`.
+
+```cs
+public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
+{
+    AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url);
+    return true;
+}
+```
+
+To enable keychain access, your application must have a keychain access group. You can set your keychain access group by using the WithIosKeychainSecurityGroup() api when creating your application as shown below:
+
+```cs
+var builder = PublicClientApplicationBuilder
+     .Create(ClientId)
+     .WithIosKeychainSecurityGroup("com.myapp.rules")
+     .Build();
+```
+
+The entitlements.plist should be updated to look like the following:
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>keychain-access-groups</key>
+  <array>
+    <string>$(AppIdentifierPrefix)com.myapp.rules</string>
+  </array>
+</dict>
+</plist>
 ```
