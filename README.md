@@ -13,50 +13,50 @@ Originally based on [Microsoft Authentication Library](https://github.com/AzureA
 ## Inside your Net Standard project
 
 ``` csharp
-    public class OAuth2LoginService
+public class OAuth2LoginService
+{
+    // assumes you have made a class called AuthenticationConfig
+    private static readonly IPublicClientApplication AuthenticationClient = PublicClientApplicationBuilder
+              .Create(AuthenticationConfig.ClientId)
+              .WithAuthority(AuthenticationConfig.Authority)
+              .WithRedirectUri(AuthenticationConfig.RedirectUrl)
+              .WithExtraQueryParameters(AuthenticationConfig.AdditionalQueryHeaders)
+              .Build();
+
+    public OAuth2LoginService()
     {
-        // assumes you have made a class called AuthenticationConfig
-        private static readonly IPublicClientApplication AuthenticationClient = PublicClientApplicationBuilder
-                  .Create(AuthenticationConfig.ClientId)
-                  .WithAuthority(AuthenticationConfig.Authority)
-                  .WithRedirectUri(AuthenticationConfig.RedirectUrl)
-                  .WithExtraQueryParameters(AuthenticationConfig.AdditionalQueryHeaders)
-                  .Build();
+        _currentUserName = _authenticationResults.Select(x => x.GetParsedIdToken().GetUniqueId()).ToProperty(this, nameof(CurrentUserName));
+    }
 
-        public OAuth2LoginService()
+    /// <inheritdoc />
+    public async Task<string> GetLoginToken(CancellationToken token = default)
+    {
+        AuthenticationResult authResult;
+
+        // let's see if we have the user details already available.
+        try
         {
-            _currentUserName = _authenticationResults.Select(x => x.GetParsedIdToken().GetUniqueId()).ToProperty(this, nameof(CurrentUserName));
+            authResult = await AuthenticationClient.AcquireTokenSilent(AuthenticationConfig.Scopes).ExecuteAsync(token).ConfigureAwait(false);
         }
-
-        /// <inheritdoc />
-        public async Task<string> GetLoginToken(CancellationToken token = default)
+        catch (AuthUiRequiredException)
         {
-            AuthenticationResult authResult;
-
-            // let's see if we have the user details already available.
             try
             {
-                authResult = await AuthenticationClient.AcquireTokenSilent(AuthenticationConfig.Scopes).ExecuteAsync(token).ConfigureAwait(false);
+                authResult = await AuthenticationClient.AcquireTokenInteractive(AuthenticationConfig.Scopes)
+                                             .WithParentActivityOrWindow(App.ParentWindow)
+                                             .ExecuteAsync(token)
+                                             .ConfigureAwait(false);
             }
-            catch (AuthUiRequiredException)
+            catch (Exception ex)
             {
-                try
-                {
-                    authResult = await AuthenticationClient.AcquireTokenInteractive(AuthenticationConfig.Scopes)
-                                                 .WithParentActivityOrWindow(App.ParentWindow)
-                                                 .ExecuteAsync(token)
-                                                 .ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    this.Log().Warn(ex, "Could not log into the authentication system");
-                    return null;
-                }
+                this.Log().Warn(ex, "Could not log into the authentication system");
+                return null;
             }
-
-            return authResult.AccessToken;
         }
+
+        return authResult.AccessToken;
     }
+}
 ```
 
 ## Xamarin Android specific
