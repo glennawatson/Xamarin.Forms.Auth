@@ -13,8 +13,9 @@ Originally based on [Microsoft Authentication Library](https://github.com/AzureA
 ## Inside your Net Standard project
 
 ``` csharp
-    public class OAuth2LoginService : ReactiveObject, ILoginService, IEnableLogger
+    public class OAuth2LoginService
     {
+        // assumes you have made a class called AuthenticationConfig
         private static readonly IPublicClientApplication AuthenticationClient = PublicClientApplicationBuilder
                   .Create(AuthenticationConfig.ClientId)
                   .WithAuthority(AuthenticationConfig.Authority)
