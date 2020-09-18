@@ -1,25 +1,52 @@
-name: .NET Core
+name: .NET Core Desktop
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
+
+env:
+  configuration: Release
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.301
-    - name: Install dependencies
+        dotnet-version: 3.1.x
+
+    - name: Install Latest NuGet
+      uses: nuget/setup-nuget@v1
+      with:
+        nuget-api-key: ${{ secrets.NuGetAPIKey }}
+        nuget-version: '5.x'
+
+    - name: NBGV
+      uses: dotnet/nbgv@master
+      with:
+        setAllVars: true
+
+    - name: Restore NuGet Packages
       run: dotnet restore
+      working-directory: src
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.1
+
     - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: msbuild /t:build,pack /maxcpucount /p:NoPackageAnalysis=true /verbosity:minimal /p:Configuration=${{ env.configuration }}
+      working-directory: src
+
+    - name: Run Unit Tests
+      run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput="../../artifacts/coverage/coverage.xml" /p:Include="[${{ env.productNamespacePrefix}}*]*" /p:Exclude="[${{ env.productNamespacePrefix}}*Tests.*]*"
+      working-directory: src
