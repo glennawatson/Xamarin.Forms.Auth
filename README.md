@@ -1,3 +1,4 @@
+![.NET Core Desktop](https://github.com/glennawatson/Xamarin.Forms.Auth/workflows/.NET%20Core%20Desktop/badge.svg)
 ## Xamarin.Forms.Auth
 
 Xamarin.Forms.Auth is a OAuth2 library for the Xamarin.Forms platforms. It will allow users to authenticate against OAuth2 servers.
